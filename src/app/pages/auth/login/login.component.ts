@@ -22,9 +22,9 @@ export class LoginComponent {
   };
 
   constructor(
-    private router: Router, 
+    private router: Router,
     private authService: AuthService
-  ) {}
+  ) { }
 
   public handleLogin(event: Event) {
     event.preventDefault();
@@ -37,7 +37,18 @@ export class LoginComponent {
     if (this.emailModel.valid && this.passwordModel.valid) {
       this.authService.login(this.loginForm).subscribe({
         next: () => this.router.navigateByUrl('/app/dashboard'),
-        error: (err: any) => (this.loginError = err.error.description),
+        error: (err: any) => {
+          if (err.error && err.error.message) {
+            this.loginError = err.error.message;
+          } else if (err.error && err.error.description) {
+            this.loginError = err.error.description;
+          } else if (err.status === 401) {
+            this.loginError = 'Email o contraseña incorrectos';
+          } else {
+            this.loginError = 'Error al iniciar sesión. Intenta de nuevo.';
+          }
+          console.error('Login error:', err);
+        },
       });
     }
   }
