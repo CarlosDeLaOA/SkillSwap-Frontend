@@ -1,0 +1,116 @@
+<div class="register-container">
+  <div class="register-card">
+    <!-- Header -->
+    <div class="register-header">
+      <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
+  <i class='bx bx-transfer-alt' style="font-size: 48px; color: #aae16b;"></i>
+  <span style="color: #aae16b; font-weight: 700; font-size: 28px; font-family: 'Epilogue', sans-serif;">SkillSwap</span>
+</div>
+    </div>
+
+    <!-- Role Selection -->
+    <div class="role-selection">
+      <p class="role-label">Selecciona tu rol:</p>
+      <div class="role-buttons">
+        <button 
+          type="button" 
+          class="role-btn" 
+          [class.active]="selectedRole === 'LEARNER'"
+          (click)="selectRole('LEARNER')">
+          SkillSeeker
+        </button>
+        <button 
+          type="button" 
+          class="role-btn role-btn-instructor" 
+          [class.active]="selectedRole === 'INSTRUCTOR'"
+          (click)="selectRole('INSTRUCTOR')">
+          SkillSwapper
+        </button>
+      </div>
+    </div>
+
+    <!-- Registration Form -->
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+      <!-- Name Fields -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName">Nombre</label>
+          <input
+            type="text"
+            id="firstName"
+            formControlName="firstName"
+            placeholder="Ingresa tu nombre"
+            [class.invalid]="isFieldInvalid('firstName')">
+          <span class="error-message" *ngIf="isFieldInvalid('firstName')">
+            {{ getErrorMessage('firstName') }}
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Apellidos</label>
+          <input
+            type="text"
+            id="lastName"
+            formControlName="lastName"
+            placeholder="Ingresa tus apellidos"
+            [class.invalid]="isFieldInvalid('lastName')">
+          <span class="error-message" *ngIf="isFieldInvalid('lastName')">
+            {{ getErrorMessage('lastName') }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Email and Password Fields -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="email">Correo electrónico</label>
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            placeholder="correo@ejemplo.com"
+            (blur)="checkEmailAvailability()"
+            [class.invalid]="isFieldInvalid('email')">
+          <span class="error-message" *ngIf="isFieldInvalid('email')">
+            {{ getErrorMessage('email') }}
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <div class="password-input-wrapper">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              id="password"
+              formControlName="password"
+              placeholder="••••••••"
+              [class.invalid]="isFieldInvalid('password')">
+            <button 
+              type="button" 
+              class="toggle-password"
+              (click)="togglePasswordVisibility()">
+              <i [class]="showPassword ? 'bx bx-hide' : 'bx bx-show'"></i>
+            </button>
+          </div>
+          <span class="error-message" *ngIf="isFieldInvalid('password')">
+            {{ getErrorMessage('password') }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Feedback Message -->
+      <div class="feedback-message" *ngIf="feedbackMessage.message" [class]="feedbackMessage.type">
+        {{ feedbackMessage.message }}
+      </div>
+
+      <!-- Submit Button -->
+      <button 
+        type="submit" 
+        class="submit-btn"
+        [disabled]="isLoading">
+        <span *ngIf="!isLoading">Ir al viaje de aprendizaje</span>
+        <span *ngIf="isLoading">Procesando...</span>
+      </button>
+    </form>
+  </div>
+</div>
