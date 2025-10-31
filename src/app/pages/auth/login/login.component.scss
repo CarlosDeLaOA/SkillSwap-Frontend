@@ -1,47 +1,369 @@
+//#region Imports y Variables
+@import url('https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;700&display=swap');
+
+// Paleta de colores SkillSwap
+$primary: #504ab7;
+$secondary: #aae16b;
+$neutral: #3e3e43;
+$dark: #141414;
+$white: #ffffff;
+$error: #ff4444;
+
+// Tipografía
+$font-family: 'Epilogue', sans-serif;
+$font-regular: 400;
+$font-medium: 500;
+$font-bold: 700;
+//#endregion
+
+//#region Container Principal
 .login-container {
-  height: 100vh;
-  // background-image: url("../../../../assets/img/login/login-bg.jpg");
-  background-position: left;
-  background-size: cover;
-  background-repeat: no-repeat;
-  padding: 20px 20%;
+  display: flex;
+  min-height: 100vh;
+  font-family: $font-family;
+  overflow: hidden;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+}
+//#endregion
+
+//#region Hero Section (Lado Izquierdo)
+.login-hero {
+  flex: 1;
+  background-color: $dark;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
   position: relative;
+
   &::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    top: -10%;
+    right: -15%;
+    width: 60%;
+    height: 120%;
+    background: radial-gradient(circle, rgba(80, 74, 183, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .hero-content {
+    position: relative;
     z-index: 1;
   }
-  .login-card {
-    position: relative;
-    z-index: 2;
-    width: 50%;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 0 37px rgba(8, 21, 66, 0.05);
-    margin: 0 auto;
-    background-color: #fff;
+
+  .hero-title {
+    font-size: 64px;
+    font-weight: $font-bold;
+    color: $white;
+    line-height: 1.2;
+    margin: 0;
+    text-align: left;
+
+    .highlight {
+      color: $secondary;
+    }
+
+    @media (max-width: 1200px) {
+      font-size: 48px;
+    }
+
+    @media (max-width: 768px) {
+      font-size: 36px;
+      text-align: center;
+    }
   }
-  @media screen and (min-width: 801px) and (max-width: 1500px) {
-    padding: 20px 5%;
-    .login-card {
-      width: 60%;
-      .login-main {
-        padding: 0px;
+
+  @media (max-width: 768px) {
+    min-height: 30vh;
+    padding: 20px;
+  }
+}
+//#endregion
+
+//#region Form Section (Lado Derecho)
+.login-form-section {
+  flex: 1;
+  background-color: $neutral;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+
+  .form-wrapper {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 40px 20px;
+  }
+}
+//#endregion
+
+//#region Logo
+.logo-container {
+  text-align: center;
+  margin-bottom: 32px;
+
+  .logo {
+    font-size: 40px;
+    font-weight: $font-bold;
+    margin: 0;
+    letter-spacing: -1px;
+
+    .logo-skill {
+      color: $primary;
+    }
+
+    .logo-swap {
+      color: $secondary;
+    }
+  }
+}
+//#endregion
+
+//#region Form Title
+.form-title {
+  font-size: 24px;
+  font-weight: $font-bold;
+  color: $white;
+  text-align: center;
+  margin: 0 0 32px 0;
+}
+//#endregion
+
+//#region Formulario
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .form-control {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 16px;
+      font-weight: $font-regular;
+      font-family: $font-family;
+      color: $white;
+      background-color: transparent;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      outline: none;
+      transition: all 0.3s ease;
+
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      &:focus {
+        border-color: $primary;
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+
+      &.is-invalid {
+        border-color: $error;
+      }
+
+      &.is-valid {
+        border-color: $secondary;
+      }
+    }
+
+    .error-message {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      color: $error;
+
+      span {
+        line-height: 1;
       }
     }
   }
-  @media screen and (max-width: 800px) {
-    padding: 20px 5%;
-    .login-card {
-      width: 100%;
-      .login-main {
-        padding: 0px;
+
+  .alert-error {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background-color: rgba(255, 68, 68, 0.1);
+    border: 1px solid $error;
+    border-radius: 8px;
+    color: $error;
+    font-size: 14px;
+    font-weight: $font-medium;
+  }
+}
+//#endregion
+
+//#region Botones
+.btn-primary,
+.btn-google {
+  width: 100%;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: $font-bold;
+  font-family: $font-family;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btn-ingresar {
+  background-color: $primary;
+  color: $white;
+
+  &:hover:not(:disabled) {
+    background-color: darken($primary, 8%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(80, 74, 183, 0.3);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+.btn-google {
+  background-color: transparent;
+  color: $white;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+}
+//#endregion
+
+//#region Enlaces
+.form-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+
+  .link-forgot {
+    font-size: 14px;
+    font-weight: $font-medium;
+    color: $secondary;
+    text-decoration: none;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: lighten($secondary, 10%);
+      text-decoration: underline;
+    }
+  }
+
+  .signup-text {
+    font-size: 14px;
+    font-weight: $font-regular;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+
+    .link-signup {
+      color: $secondary;
+      font-weight: $font-medium;
+      text-decoration: none;
+      margin-left: 4px;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: lighten($secondary, 10%);
+        text-decoration: underline;
       }
     }
   }
 }
+//#endregion
+
+//#region Password Requirements
+.password-requirements {
+  margin-top: 12px;
+  padding: 12px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  small {
+    display: block;
+    font-size: 13px;
+    font-weight: $font-medium;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 8px;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.6);
+      transition: color 0.3s ease;
+
+      &.valid {
+        color: $secondary;
+      }
+
+      box-icon {
+        flex-shrink: 0;
+      }
+    }
+  }
+}
+//#endregion
+
+//#region Responsive Design
+@media (max-width: 768px) {
+  .login-hero {
+    .hero-title {
+      font-size: 32px;
+    }
+  }
+
+  .login-form-section {
+    .form-wrapper {
+      max-width: 100%;
+    }
+  }
+
+  .logo-container .logo {
+    font-size: 32px;
+  }
+
+  .form-title {
+    font-size: 20px;
+  }
+}
+//#endregion
