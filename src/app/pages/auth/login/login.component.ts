@@ -5,11 +5,9 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 
 /**
- * Componente de Login para SkillSwap
- * Maneja la autenticación de usuarios (instructores y learners)
+ * Componente de Login 
+ * Maneja la autenticación de usuarios
  * 
- * @author SkillSwap Team
- * @version 1.0.0
  */
 @Component({
   selector: 'app-login',
@@ -38,9 +36,7 @@ export class LoginComponent {
     email: '',
     password: '',
   };
-  //#endregion
 
-  //#region Constructor
   /**
    * Constructor del componente
    * @param router - Servicio de enrutamiento de Angular
@@ -129,9 +125,7 @@ export class LoginComponent {
       this.validatePassword(this.loginForm.password);
     }
   }
-  //#endregion
 
-  //#region Methods
   /**
    * Maneja el evento de submit del formulario de login
    * 
@@ -140,24 +134,19 @@ export class LoginComponent {
   public handleLogin(event: Event): void {
     event.preventDefault();
 
-    // Limpiar errores previos
     this.loginError = '';
     this.passwordValidationError = '';
 
-    // Validar campo de email
     if (!this.emailModel.valid) {
       this.emailModel.control.markAsTouched();
     }
 
-    // Validar campo de password
     if (!this.passwordModel.valid) {
       this.passwordModel.control.markAsTouched();
     }
 
-    // Validar requisitos de contraseña
     const isPasswordValid = this.validatePassword(this.loginForm.password);
 
-    // Si todos los campos son válidos, proceder con el login
     if (this.emailModel.valid && this.passwordModel.valid && isPasswordValid) {
       this.authService.login(this.loginForm).subscribe({
         next: () => this.router.navigateByUrl('/app/dashboard'),
@@ -176,5 +165,4 @@ export class LoginComponent {
       });
     }
   }
-  //#endregion
 }
