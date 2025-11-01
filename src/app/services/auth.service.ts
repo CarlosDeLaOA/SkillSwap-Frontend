@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
-import { IAuthority, ILoginResponse, IResponse, IRoleType, IUser } from '../interfaces';
-import { Observable, firstValueFrom, of, tap } from 'rxjs';
+import { ILoginResponseSkillSwap, IPerson } from '../interfaces';
+import { Observable, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
@@ -8,8 +8,8 @@ import { HttpClient } from '@angular/common/http';
 })
 export class AuthService {
   private accessToken!: string;
-  private expiresIn! : number;
-  private user: IUser = {email: '', authorities: []};
+  private expiresIn!: number;
+  private user: IPerson = { email: '' };
   private http: HttpClient = inject(HttpClient);
 
   constructor() {
@@ -23,19 +23,19 @@ export class AuthService {
       localStorage.setItem('access_token', JSON.stringify(this.accessToken));
 
     if (this.expiresIn)
-      localStorage.setItem('expiresIn',JSON.stringify(this.expiresIn));
+      localStorage.setItem('expiresIn', JSON.stringify(this.expiresIn));
   }
 
   private load(): void {
     let token = localStorage.getItem('access_token');
-    if (token) this.accessToken = token;
+    if (token) this.accessToken = JSON.parse(token);
     let exp = localStorage.getItem('expiresIn');
     if (exp) this.expiresIn = JSON.parse(exp);
     const user = localStorage.getItem('auth_user');
     if (user) this.user = JSON.parse(user);
   }
 
-  public getUser(): IUser | undefined {
+  public getUser(): IPerson | undefined {
     return this.user;
   }
 
@@ -44,7 +44,7 @@ export class AuthService {
   }
 
   public check(): boolean {
-    if (!this.accessToken){
+    if (!this.accessToken) {
       return false;
     } else {
       return true;
@@ -54,44 +54,19 @@ export class AuthService {
   public login(credentials: {
     email: string;
     password: string;
-  }): Observable<ILoginResponse> {
-    return this.http.post<ILoginResponse>('auth/login', credentials).pipe(
-      tap((response: any) => {
+  }): Observable<ILoginResponseSkillSwap> {
+    return this.http.post<ILoginResponseSkillSwap>('auth/login', credentials).pipe(
+      tap((response: ILoginResponseSkillSwap) => {
         this.accessToken = response.token;
-        this.user.email = credentials.email;
         this.expiresIn = response.expiresIn;
-        this.user = response.authUser;
+        this.user = response.authPerson; // ⚠️ CAMBIO CLAVE
         this.save();
       })
     );
   }
 
-  public hasRole(role: string): boolean {
-    return this.user.authorities ?  this.user?.authorities.some(authority => authority.authority == role) : false;
-  }
-
-  public isSuperAdmin(): boolean {
-    return this.user.authorities ?  this.user?.authorities.some(authority => authority.authority == IRoleType.superAdmin) : false;
-  }
-
-  public hasAnyRole(roles: any[]): boolean {
-    return roles.some(role => this.hasRole(role));
-  }
-
-  public getPermittedRoutes(routes: any[]): any[] {
-    let permittedRoutes: any[] = [];
-    for (const route of routes) {
-      if(route.data && route.data.authorities) {
-        if (this.hasAnyRole(route.data.authorities)) {
-          permittedRoutes.unshift(route);
-        } 
-      }
-    }
-    return permittedRoutes;
-  }
-
-  public signup(user: IUser): Observable<ILoginResponse> {
-    return this.http.post<ILoginResponse>('auth/signup', user);
+  public signup(user: IPerson): Observable<ILoginResponseSkillSwap> {
+    return this.http.post<ILoginResponseSkillSwap>('auth/signup', user);
   }
 
   public logout() {
@@ -101,27 +76,88 @@ export class AuthService {
     localStorage.removeItem('auth_user');
   }
 
-  public getUserAuthorities (): IAuthority[] | undefined {
-    return this.getUser()?.authorities ? this.getUser()?.authorities : [];
+  // ========================================
+  // MÉTODOS ADAPTADOS DE SKILLSWAP
+  // ========================================
+
+  /**
+   * Verifica si el usuario es instructor
+   */
+  public isInstructor(): boolean {
+    return !!this.user.instructor;
   }
 
-  public areActionsAvailable(routeAuthorities: string[]): boolean  {
-    // definición de las variables de validación
-    let allowedUser: boolean = false;
-    let isAdmin: boolean = false;
-    // se obtienen los permisos del usuario
-    let userAuthorities = this.getUserAuthorities();
-    // se valida que sea una ruta permitida para el usuario
-    for (const authority of routeAuthorities) {
-      if (userAuthorities?.some(item => item.authority == authority) ) {
-        allowedUser = userAuthorities?.some(item => item.authority == authority)
-      }
-      if (allowedUser) break;
+  /**
+   * Verifica si el usuario es learner
+   */
+  public isLearner(): boolean {
+    return !!this.user.learner;
+  }
+
+  /**
+   * Verifica si es super admin (para compatibilidad con código del profesor)
+   * En SkillSwap no hay super admin, pero dejamos el método vacío
+   */
+  public isSuperAdmin(): boolean {
+    return false; // SkillSwap no tiene este rol
+  }
+
+  /**
+   * Verifica si tiene un rol específico (adaptado para SkillSwap)
+   * En SkillSwap solo hay instructor y learner
+   */
+  public hasRole(role: string): boolean {
+    if (role === 'ROLE_INSTRUCTOR') {
+      return this.isInstructor();
+    } else if (role === 'ROLE_LEARNER') {
+      return this.isLearner();
     }
-    // se valida que el usuario tenga un rol de administración
-    if (userAuthorities?.some(item => item.authority == IRoleType.admin || item.authority == IRoleType.superAdmin)) {
-      isAdmin = userAuthorities?.some(item => item.authority == IRoleType.admin || item.authority == IRoleType.superAdmin);
-    }          
-    return allowedUser && isAdmin;
+    return false;
+  }
+
+  /**
+   * Verifica si tiene alguno de los roles (para compatibilidad)
+   */
+  public hasAnyRole(roles: any[]): boolean {
+    return roles.some(role => this.hasRole(role));
+  }
+
+  /**
+   * Obtiene rutas permitidas según el tipo de usuario
+   */
+  public getPermittedRoutes(routes: any[]): any[] {
+    let permittedRoutes: any[] = [];
+    for (const route of routes) {
+      if (route.data && route.data.authorities) {
+        if (this.hasAnyRole(route.data.authorities)) {
+          permittedRoutes.unshift(route);
+        }
+      }
+    }
+    return permittedRoutes;
+  }
+
+  /**
+   * Obtiene "authorities" del usuario (adaptado para SkillSwap)
+   * Devuelve un array simulado basado en instructor/learner
+   */
+  public getUserAuthorities(): any[] {
+    const authorities = [];
+    if (this.isInstructor()) {
+      authorities.push({ authority: 'ROLE_INSTRUCTOR' });
+    }
+    if (this.isLearner()) {
+      authorities.push({ authority: 'ROLE_LEARNER' });
+    }
+    return authorities;
+  }
+
+  /**
+   * Verifica si las acciones están disponibles (para compatibilidad)
+   * En SkillSwap todos los usuarios autenticados pueden hacer acciones
+   */
+  public areActionsAvailable(routeAuthorities: string[]): boolean {
+    // Si es instructor o learner, tiene acceso
+    return this.isInstructor() || this.isLearner();
   }
 }

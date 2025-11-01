@@ -121,3 +121,62 @@ export interface IGift {
   updatedAt?: string;
   giftList?: IGiftList;
 }
+
+//aaaaaa
+// ========================================
+// INTERFACES DE SKILLSWAP
+// ========================================
+
+/**
+ * Entidad Person del sistema SkillSwap
+ */
+export interface IPerson {
+  id?: number;
+  email?: string;
+  passwordHash?: string;
+  fullName?: string;
+  profilePhotoUrl?: string;
+  preferredLanguage?: string;
+  googleOauthId?: string;
+  emailVerified?: boolean;
+  active?: boolean;
+  registrationDate?: string;
+  lastConnection?: string;
+  instructor?: IInstructor;
+  learner?: ILearner;
+}
+
+/**
+ * Perfil de Instructor (SkillSwapper)
+ */
+export interface IInstructor {
+  id?: number;
+  personId?: number;
+  paypalAccount?: string;
+  skillcoinsBalance?: number;
+  verifiedAccount?: boolean;
+  averageRating?: number;
+  sessionsTaught?: number;
+  totalEarnings?: number;
+  biography?: string;
+}
+
+/**
+ * Perfil de Learner (SkillSeeker)
+ */
+export interface ILearner {
+  id?: number;
+  personId?: number;
+  skillcoinsBalance?: number;
+  completedSessions?: number;
+  credentialsObtained?: number;
+}
+
+/**
+ * Respuesta de login de SkillSwap
+ */
+export interface ILoginResponseSkillSwap {
+  token: string;
+  expiresIn: number;
+  authPerson: IPerson;
+}
