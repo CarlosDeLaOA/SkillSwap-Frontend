@@ -1,66 +1,122 @@
 <div class="login-container">
-  <div class="d-flex align-items-center justify-content-center h-100">
-    <div class="login-card">
-      <div class="w-100">
-        <div class="text-center">
-          <a class="logo text-center" routerLink="/">
-            <img
-              width="250"
-              class="img-fluid mb-4"
-              src="../../../../assets/icons/logo@2x.png"
-              alt="Logo"
-            />
-          </a>
-        </div>
-        <div class="login-main">
-          <form (ngSubmit)="handleLogin($event)" autocomplete="off" #frm="ngForm">
-            <div class="mb-3">
-              <h4>Sign in to account</h4>
-              <small style="color: #4f4f4f">
-                Enter your email & password to login
-              </small>
-            </div>
+  <!-- Lado izquierdo - Hero Section -->
+  <div class="login-hero">
+    <div class="hero-content">
+      <h1 class="hero-title">
+        Habilidades<br />
+        en <span class="highlight">tiempo real</span>
+      </h1>
+    </div>
+  </div>
 
-            <div class="form-group mb-3">
-              <label for="email" class="form-label mb-2">
-                Email Address
-              </label>
-              <input #email="ngModel" type="text" class="form-control" id="email" name="email"
-                placeholder="agent@gmail.com" [(ngModel)]="loginForm.email" [ngClass]="{
-                  'is-invalid': email.invalid && email.touched,
-                  'is-valid': email.valid && email.touched
-                }" required />
-              <div *ngIf="email.invalid" class="invalid-feedback">
-                Please add a valid email
-              </div>
-            </div>
-
-            <div class="form-group mb-4">
-              <label for="password" class="form-label mb-2">Password</label>
-              <div class="form-input position-relative">
-                <input #password="ngModel" type="password" class="form-control" id="password" name="password"
-                placeholder="*****" [(ngModel)]="loginForm.password" [ngClass]="{
-                  'is-invalid': password.invalid && password.touched,
-                  'is-valid': password.valid && password.touched
-                }" required />
-                <div *ngIf="password.invalid" class="invalid-feedback">
-                  Please add a valid password
-                </div>
-              </div>
-            </div>
-
-            <div class="form-group mb-0">
-              <button class="btn btn-primary btn-block w-100" type="submit">
-                Sign in
-              </button>
-              @if(loginError) {
-                <p class="text-danger">{{loginError}}</p>
-              }
-            </div>
-            <a href="/signup">Go SignUp</a>
-          </form>
-        </div>
+  <!-- Lado derecho - Formulario -->
+  <div class="login-form-section">
+    <div class="form-wrapper">
+      <!-- Logo -->
+      <div class="logo-container">
+        <h1 class="logo">
+          <span class="logo-skill">Skill</span><span class="logo-swap">Swap</span>
+        </h1>
       </div>
+
+      <!-- Título -->
+      <h2 class="form-title">Inicio de sesión</h2>
+
+      <!-- Formulario -->
+      <form 
+        (ngSubmit)="handleLogin($event)" 
+        autocomplete="off" 
+        #loginFormRef="ngForm" 
+        class="login-form"
+      >
+        <!-- Campo Usuario/Email -->
+        <div class="form-group">
+          <input
+            #email="ngModel"
+            type="email"
+            class="form-control"
+            id="email"
+            name="email"
+            placeholder="Usuario"
+            [(ngModel)]="loginForm.email"
+            [ngClass]="{
+              'is-invalid': email.invalid && email.touched,
+              'is-valid': email.valid && email.touched
+            }"
+            required
+            email
+          />
+          <div *ngIf="email.invalid && email.touched" class="error-message">
+            <box-icon name='error-circle' size="16px" color="#ff4444"></box-icon>
+            <span>Por favor ingresa un email válido</span>
+          </div>
+        </div>
+
+        <!-- Campo Contraseña -->
+        <div class="form-group">
+          <input
+            #password="ngModel"
+            type="password"
+            class="form-control"
+            id="password"
+            name="password"
+            placeholder="Contraseña"
+            [(ngModel)]="loginForm.password"
+            (ngModelChange)="onPasswordChange()"
+            [ngClass]="{
+              'is-invalid': (password.invalid && password.touched) || passwordValidationError,
+              'is-valid': password.valid && password.touched && !passwordValidationError
+            }"
+            required
+            minlength="8"
+          />
+          
+          <!-- Error de validación básica -->
+          <div *ngIf="password.invalid && password.touched && !passwordValidationError" class="error-message">
+            <box-icon name='error-circle' size="16px" color="#ff4444"></box-icon>
+            <span>La contraseña es requerida</span>
+          </div>
+
+          <!-- Error de validación personalizada -->
+          <div *ngIf="passwordValidationError && password.touched" class="error-message">
+            <box-icon name='error-circle' size="16px" color="#ff4444"></box-icon>
+            <span>{{ passwordValidationError }}</span>
+          </div>
+        </div>
+
+        <!-- Mensaje de Error del Login -->
+        <div *ngIf="loginError" class="alert-error">
+          <box-icon name='error-circle' size="20px" color="#ff4444"></box-icon>
+          <span>{{ loginError }}</span>
+        </div>
+
+        <!-- Botón Ingresar -->
+        <button
+          type="submit"
+          class="btn-primary btn-ingresar"
+          [disabled]="loginFormRef.invalid || passwordValidationError"
+        >
+          Ingresar
+        </button>
+
+
+        <!-- Botón Google -->
+        <button type="button" class="btn-google">
+          <box-icon name='google' type='logo' size="20px" color="#ffffff"></box-icon>
+          <span>Iniciar Sesión con Google</span>
+        </button>
+
+        <!-- Enlaces -->
+        <div class="form-links">
+          <a routerLink="/forgot-password" class="link-forgot">
+            Olvide mi contraseña
+          </a>
+          <p class="signup-text">
+            ¿No estas registrado?
+            <a routerLink="/signup" class="link-signup">Regístrate</a>
+          </p>
+        </div>
+      </form>
     </div>
   </div>
 </div>
