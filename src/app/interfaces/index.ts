@@ -121,7 +121,49 @@ export interface IGift {
   updatedAt?: string;
   giftList?: IGiftList;
 }
+//#region Register Interfaces
 
+/**
+ * Datos temporales de registro guardados en el primer paso del onboarding
+ */
+export interface IRegisterData {
+  email: string;
+  password: string;
+  fullName: string;
+  role: 'LEARNER' | 'INSTRUCTOR';
+}
+
+/**
+ * Request completo para el registro final con categorías incluidas
+ */
+export interface IRegisterRequest extends IRegisterData {
+  categories: string[];
+  profilePhotoUrl?: string;
+  preferredLanguage?: string;
+}
+
+/**
+ * Response del backend después del registro exitoso
+ */
+export interface IRegisterResponse {
+  message: string;
+  userId: number;
+  email: string;
+  userType: string;
+  emailVerified?: boolean;
+}
+
+/**
+ * Response del endpoint de verificación de disponibilidad de email
+ */
+export interface IEmailCheckResponse {
+  email: string;
+  available: boolean;
+  message?: string;
+}
+
+//#endregion
+=======
 //aaaaaa
 // ========================================
 // INTERFACES DE SKILLSWAP
