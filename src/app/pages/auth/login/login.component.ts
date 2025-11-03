@@ -3,6 +3,7 @@ import { Component, ViewChild, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormsModule, NgModel } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { GoogleAuthService } from '../../../services/google-auth.service';
 
 /**
  * Componente de Login 
@@ -44,7 +45,8 @@ export class LoginComponent {
    */
   constructor(
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private googleAuthService: GoogleAuthService
   ) { }
   //#endregion
 
@@ -125,6 +127,15 @@ export class LoginComponent {
       this.validatePassword(this.loginForm.password);
     }
   }
+  
+  //#region Google Authentication
+/**
+ * Inicia el flujo de autenticación con Google OAuth2.
+ * Redirige al usuario a la página de autorización de Google.
+ */
+public loginWithGoogle(): void {
+  this.googleAuthService.initiateGoogleLogin();
+}
 
   /**
    * Maneja el evento de submit del formulario de login
@@ -162,7 +173,10 @@ export class LoginComponent {
           }
           console.error('Login error:', err);
         },
+
+        
       });
     }
   }
+  
 }

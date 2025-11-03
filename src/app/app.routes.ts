@@ -19,7 +19,7 @@ import { CalculatorComponent } from './pages/calculator/calculator.component';
 import { GiftComponent } from './pages/gift/gift.component';
 import { GiftListGiftsComponent } from './pages/gift-list-gifts/gift-list-gifts.component';
 import { GiftsComponent } from './pages/gifts/gifts.component';
-
+import { AuthCallbackComponent } from './pages/auth/auth-callback.component/auth-callback.component';
 
 export const routes: Routes = [
   {
@@ -33,7 +33,11 @@ export const routes: Routes = [
     canActivate: [GuestGuard],
   },
   {
-    path: 'register', // ← NUEVO
+    path: 'auth/callback',
+    component: AuthCallbackComponent
+  },
+  {
+    path: 'register', 
     component: RegisterComponent,
     canActivate: [GuestGuard],
   },
@@ -52,17 +56,17 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     children: [
       {
-        path: 'app',
-        redirectTo: 'users',
+        path: '',
+        redirectTo: 'dashboard',
         pathMatch: 'full',
       },
       {
         path: 'users',
         component: UsersComponent,
-        canActivate:[AdminRoleGuard],
-        data: { 
+        canActivate: [AdminRoleGuard],
+        data: {
           authorities: [
-            IRoleType.admin, 
+            IRoleType.admin,
             IRoleType.superAdmin
           ],
           name: 'Users',
@@ -72,9 +76,9 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         component: DashboardComponent,
-        data: { 
+        data: {
           authorities: [
-            IRoleType.admin, 
+            IRoleType.admin,
             IRoleType.superAdmin,
             IRoleType.user
           ],
@@ -85,9 +89,9 @@ export const routes: Routes = [
       {
         path: 'profile',
         component: ProfileComponent,
-        data: { 
+        data: {
           authorities: [
-            IRoleType.admin, 
+            IRoleType.admin,
             IRoleType.superAdmin,
             IRoleType.user
           ],
@@ -98,9 +102,9 @@ export const routes: Routes = [
       {
         path: 'orders',
         component: OrdersComponent,
-        data: { 
+        data: {
           authorities: [
-            IRoleType.admin, 
+            IRoleType.admin,
             IRoleType.superAdmin,
             IRoleType.user,
           ],
@@ -111,9 +115,9 @@ export const routes: Routes = [
       {
         path: 'preference-list',
         component: PreferenceListPageComponent,
-        data: { 
+        data: {
           authorities: [
-            IRoleType.admin, 
+            IRoleType.admin,
             IRoleType.superAdmin,
             IRoleType.user,
           ],
@@ -124,9 +128,9 @@ export const routes: Routes = [
       {
         path: 'sport-team',
         component: SportTeamComponent,
-        data: { 
+        data: {
           authorities: [
-            IRoleType.admin, 
+            IRoleType.admin,
             IRoleType.superAdmin,
             IRoleType.user,
           ],
