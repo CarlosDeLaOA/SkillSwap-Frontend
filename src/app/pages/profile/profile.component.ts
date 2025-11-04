@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-profile',
   standalone: true,
   imports: [CommonModule],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA], // ⚠️ ESTO ES LO QUE FALTABA
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })
@@ -52,5 +52,27 @@ export class ProfileComponent implements OnInit {
     const names = fullName.split(' ');
     if (names.length === 1) return names[0].charAt(0).toUpperCase();
     return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+  }
+
+  /**
+   * Obtiene el primer nombre del usuario
+   * @returns Primer nombre o cadena vacía
+   */
+  getFirstName(): string {
+    const fullName = this.profileService.person$().fullName;
+    if (!fullName) return '';
+    const parts = fullName.split(' ');
+    return parts[0] || '';
+  }
+
+  /**
+   * Obtiene los apellidos del usuario
+   * @returns Apellidos o cadena vacía
+   */
+  getLastNames(): string {
+    const fullName = this.profileService.person$().fullName;
+    if (!fullName) return '';
+    const parts = fullName.split(' ');
+    return parts.slice(1).join(' ') || '';
   }
 }

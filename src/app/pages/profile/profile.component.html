@@ -1,203 +1,154 @@
-<div class="profile-container">
-  <!-- Header del perfil -->
-  <div class="profile-header">
-    <p class="page-subtitle">Información de tu cuenta en SkillSwap</p>
-  </div>
-
-  <!-- Contenido principal -->
-  <div class="profile-content">
-    <!-- Columna izquierda: Información personal -->
-    <div class="profile-card">
-      <!-- Avatar -->
-      <div class="avatar-section">
-        <div class="avatar" *ngIf="profileService.person$().profilePhotoUrl; else initialsAvatar">
-          <img [src]="profileService.person$().profilePhotoUrl" [alt]="profileService.person$().fullName" />
+<div class="profile-wrapper">
+  <main class="profile-main">
+    <!-- Primera fila: Avatar e Información Personal -->
+    <div class="profile-grid-top">
+      <!-- COLUMNA IZQUIERDA: Avatar -->
+      <aside class="avatar-card">
+        <div class="avatar-circle">
+          <img 
+            *ngIf="profileService.person$().profilePhotoUrl; else initialsAvatar" 
+            [src]="profileService.person$().profilePhotoUrl" 
+            [alt]="profileService.person$().fullName"
+          />
+          <ng-template #initialsAvatar>
+            <div class="avatar-initials">
+              {{ getInitials(profileService.person$().fullName) }}
+            </div>
+          </ng-template>
         </div>
-        <ng-template #initialsAvatar>
-          <div class="avatar avatar-initials">
-            {{ getInitials(profileService.person$().fullName) }}
-          </div>
-        </ng-template>
-        
-        <!-- Badge de rol -->
-        <div class="role-badge" [class.instructor]="profileService.isInstructor()" [class.learner]="profileService.isLearner()">
-          <box-icon 
-            [name]="profileService.isInstructor() ? 'chalkboard' : 'book-open'" 
-            size="16px" 
-            color="#ffffff"
-          ></box-icon>
-          <span>{{ profileService.getUserRole() }}</span>
-        </div>
-      </div>
+        <h3 class="user-role">{{ profileService.getUserRole() }}</h3>
+      </aside>
 
-      <!-- Información básica -->
-      <div class="info-section">
-        <h2 class="section-title">Información Personal</h2>
-        
-        <div class="info-item">
-          <box-icon name='user' size="20px" color="#aae16b"></box-icon>
-          <div class="info-content">
-            <label>Nombre Completo</label>
-            <p>{{ profileService.person$().fullName || 'No especificado' }}</p>
-          </div>
+      <!-- COLUMNA DERECHA: Información Personal -->
+      <section class="info-card">
+        <div class="card-header">
+          <h3 class="section-title">Información personal</h3>
+          <button class="btn-check">
+            <box-icon name='check-circle' size="24px" color="#aae16b"></box-icon>
+          </button>
         </div>
 
-        <div class="info-item">
-          <box-icon name='envelope' size="20px" color="#aae16b"></box-icon>
-          <div class="info-content">
-            <label>Email</label>
-            <p>{{ profileService.person$().email || 'No especificado' }}</p>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nombre</label>
+            <input 
+              type="text" 
+              [value]="getFirstName()" 
+              placeholder="Nombre"
+            />
           </div>
-        </div>
 
-        <div class="info-item">
-          <box-icon name='world' size="20px" color="#aae16b"></box-icon>
-          <div class="info-content">
-            <label>Idioma Preferido</label>
-            <p>{{ profileService.person$().preferredLanguage === 'es' ? 'Español' : 'English' }}</p>
+          <div class="form-group">
+            <label>Apellidos</label>
+            <input 
+              type="text" 
+              [value]="getLastNames()" 
+              placeholder="Apellidos"
+            />
           </div>
-        </div>
 
-        <div class="info-item">
-          <box-icon name='calendar' size="20px" color="#aae16b"></box-icon>
-          <div class="info-content">
-            <label>Fecha de Registro</label>
-            <p>{{ formatDate(profileService.person$().registrationDate) }}</p>
+          <div class="form-group">
+            <label>Correo electrónico</label>
+            <input 
+              type="email" 
+              [value]="profileService.person$().email || ''" 
+              placeholder="Correo electrónico"
+            />
           </div>
-        </div>
 
-        <div class="info-item">
-          <box-icon name='time' size="20px" color="#aae16b"></box-icon>
-          <div class="info-content">
-            <label>Última Conexión</label>
-            <p>{{ formatDate(profileService.person$().lastConnection) }}</p>
+          <div class="form-group">
+            <label>Contraseña</label>
+            <input 
+              type="password" 
+              value="••••••••" 
+              placeholder="Contraseña"
+            />
           </div>
         </div>
-
-        <div class="info-item">
-          <box-icon [name]="profileService.person$().emailVerified ? 'check-circle' : 'x-circle'" 
-                    size="20px" 
-                    [color]="profileService.person$().emailVerified ? '#aae16b' : '#ff4444'">
-          </box-icon>
-          <div class="info-content">
-            <label>Email Verificado</label>
-            <p>{{ profileService.person$().emailVerified ? 'Sí' : 'No' }}</p>
-          </div>
-        </div>
-      </div>
+      </section>
     </div>
 
-    <!-- Columna derecha: Información de rol -->
-    <div class="profile-card">
-      <!-- Información de Instructor -->
-      <div class="info-section" *ngIf="profileService.isInstructor()">
-        <h2 class="section-title">
-          <box-icon name='chalkboard' size="24px" color="#504ab7"></box-icon>
-          Perfil de Instructor
-        </h2>
+    <!-- Segunda fila: Habilidades a explorar (ancho completo) -->
+    <section class="info-card skills-card">
+      <div class="card-header">
+        <h3 class="section-title">Habilidades a explorar</h3>
+        <button class="btn-check">
+          <box-icon name='check-circle' size="24px" color="#aae16b"></box-icon>
+        </button>
+      </div>
 
-        <div class="stats-grid">
-          <div class="stat-card">
-            <box-icon name='wallet' size="32px" color="#504ab7"></box-icon>
-            <div class="stat-content">
-              <span class="stat-value">{{ profileService.person$().instructor?.skillcoinsBalance || 0 }}</span>
-              <span class="stat-label">SkillCoins</span>
-            </div>
+      <p class="card-subtitle">
+        Ajusta tus habilidades a explorar para poder mostrarte contenido a tu medida.
+      </p>
+
+      <div class="skills-grid">
+        <!-- Tecnología -->
+        <div class="form-group">
+          <label>Tecnología</label>
+          <div class="select-wrapper">
+            <select>
+              <option value="">★ Seleccionada</option>
+            </select>
           </div>
-
-          <div class="stat-card">
-            <box-icon name='star' size="32px" color="#aae16b"></box-icon>
-            <div class="stat-content">
-              <span class="stat-value">{{ profileService.person$().instructor?.averageRating?.toFixed(1) || '0.0' }}</span>
-              <span class="stat-label">Rating Promedio</span>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <box-icon name='book-reader' size="32px" color="#504ab7"></box-icon>
-            <div class="stat-content">
-              <span class="stat-value">{{ profileService.person$().instructor?.sessionsTaught || 0 }}</span>
-              <span class="stat-label">Sesiones Impartidas</span>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <box-icon name='dollar-circle' size="32px" color="#aae16b"></box-icon>
-            <div class="stat-content">
-              <span class="stat-value">${{ profileService.person$().instructor?.totalEarnings || 0 }}</span>
-              <span class="stat-label">Ganancias Totales</span>
-            </div>
+          <div class="tags-container">
+            <span class="tag">★ Seleccionada</span>
+            <span class="tag">★ Seleccionada</span>
           </div>
         </div>
 
-        <div class="info-item" *ngIf="profileService.person$().instructor?.paypalAccount">
-          <box-icon name='paypal' type='logo' size="20px" color="#aae16b"></box-icon>
-          <div class="info-content">
-            <label>Cuenta PayPal</label>
-            <p>{{ profileService.person$().instructor?.paypalAccount }}</p>
+        <!-- Deportes -->
+        <div class="form-group">
+          <label>Deportes</label>
+          <div class="select-wrapper">
+            <select>
+              <option value="" selected>Selecciona opciones</option>
+            </select>
           </div>
         </div>
 
-        <div class="info-item" *ngIf="profileService.person$().instructor?.biography">
-          <box-icon name='file-blank' size="20px" color="#aae16b"></box-icon>
-          <div class="info-content">
-            <label>Biografía</label>
-            <p>{{ profileService.person$().instructor?.biography }}</p>
+        <!-- Cocina -->
+        <div class="form-group">
+          <label>Cocina</label>
+          <div class="select-wrapper">
+            <select>
+              <option value="">★ Seleccionada</option>
+            </select>
+          </div>
+          <div class="tags-container">
+            <span class="tag">★ Seleccionada</span>
           </div>
         </div>
 
-        <div class="info-item">
-          <box-icon [name]="profileService.person$().instructor?.verifiedAccount ? 'badge-check' : 'badge'" 
-                    size="20px" 
-                    [color]="profileService.person$().instructor?.verifiedAccount ? '#aae16b' : '#ff4444'">
-          </box-icon>
-          <div class="info-content">
-            <label>Cuenta Verificada</label>
-            <p>{{ profileService.person$().instructor?.verifiedAccount ? 'Sí' : 'No' }}</p>
+        <!-- Arte -->
+        <div class="form-group">
+          <label>Arte</label>
+          <div class="select-wrapper">
+            <select>
+              <option value="" selected>Selecciona opciones</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Idiomas -->
+        <div class="form-group">
+          <label>Idiomas</label>
+          <div class="select-wrapper">
+            <select>
+              <option value="" selected>Selecciona opciones</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Soft Skills -->
+        <div class="form-group">
+          <label>Soft Skills</label>
+          <div class="select-wrapper">
+            <select>
+              <option value="" selected>Selecciona opciones</option>
+            </select>
           </div>
         </div>
       </div>
-
-      <!-- Información de Learner -->
-      <div class="info-section" *ngIf="profileService.isLearner()">
-        <h2 class="section-title">
-          <box-icon name='book-open' size="24px" color="#504ab7"></box-icon>
-          Perfil de Learner
-        </h2>
-
-        <div class="stats-grid">
-          <div class="stat-card">
-            <box-icon name='wallet' size="32px" color="#504ab7"></box-icon>
-            <div class="stat-content">
-              <span class="stat-value">{{ profileService.person$().learner?.skillcoinsBalance || 0 }}</span>
-              <span class="stat-label">SkillCoins</span>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <box-icon name='check-circle' size="32px" color="#aae16b"></box-icon>
-            <div class="stat-content">
-              <span class="stat-value">{{ profileService.person$().learner?.completedSessions || 0 }}</span>
-              <span class="stat-label">Sesiones Completadas</span>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <box-icon name='award' size="32px" color="#504ab7"></box-icon>
-            <div class="stat-content">
-              <span class="stat-value">{{ profileService.person$().learner?.credentialsObtained || 0 }}</span>
-              <span class="stat-label">Credenciales Obtenidas</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Si no tiene ningún rol -->
-      <div class="info-section empty-state" *ngIf="!profileService.isInstructor() && !profileService.isLearner()">
-        <box-icon name='error-circle' size="48px" color="#ff4444"></box-icon>
-        <h3>Sin rol asignado</h3>
-        <p>Este usuario no tiene un rol de Instructor ni Learner asignado.</p>
-      </div>
-    </div>
-  </div>
+    </section>
+  </main>
 </div>
