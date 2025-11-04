@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { IAuthority, ILoginResponse, IRoleType, IUser } from '../interfaces';
+import { ILoginResponseSkillSwap, IPerson } from '../interfaces';
 import { Observable, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
@@ -7,198 +7,123 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root',
 })
 export class AuthService {
-  //#region Properties
   private accessToken!: string;
   private expiresIn!: number;
-  private user: IUser = { email: '', authorities: [] };
+  private user: IPerson = { email: '' };
   private http: HttpClient = inject(HttpClient);
-  //#endregion
 
-  //#region Constructor
   constructor() {
     this.load();
   }
-  //#endregion
 
-  //#region Storage Methods
   public save(): void {
     if (this.user) localStorage.setItem('auth_user', JSON.stringify(this.user));
-    if (this.accessToken) localStorage.setItem('access_token', this.accessToken);
-    if (this.expiresIn) localStorage.setItem('expiresIn', JSON.stringify(this.expiresIn));
+
+    if (this.accessToken)
+      localStorage.setItem('access_token', JSON.stringify(this.accessToken));
+
+    if (this.expiresIn)
+      localStorage.setItem('expiresIn', JSON.stringify(this.expiresIn));
   }
 
   private load(): void {
-    const token = localStorage.getItem('access_token');
-    if (token) this.accessToken = token;
-    
-    const exp = localStorage.getItem('expiresIn');
+    let token = localStorage.getItem('access_token');
+    if (token) this.accessToken = JSON.parse(token);
+    let exp = localStorage.getItem('expiresIn');
     if (exp) this.expiresIn = JSON.parse(exp);
-    
     const user = localStorage.getItem('auth_user');
     if (user) this.user = JSON.parse(user);
   }
-  //#endregion
 
-  //#region User and Token Methods
-  /**
-   * Obtiene el usuario actual
-   * @returns Usuario actual o undefined
-   */
-  public getUser(): IUser | undefined {
+  public getUser(): IPerson | undefined {
     return this.user;
   }
 
-  /**
-   * Establece el usuario actual
-   * @param user Datos del usuario
-   */
-  public setUser(user: any): void {
-    this.user = user;
-    localStorage.setItem('auth_user', JSON.stringify(user));
-  }
-
-  /**
-   * Obtiene el token de acceso
-   * @returns Token de acceso o null
-   */
   public getAccessToken(): string | null {
     return this.accessToken;
   }
 
-  /**
-   * Obtiene el token JWT (alias para compatibilidad con OAuth)
-   * @returns Token JWT o null
-   */
-  public getToken(): string | null {
-    return this.accessToken || localStorage.getItem('access_token');
-  }
-
-  /**
-   * Establece el token de acceso
-   * @param token Token de acceso
-   */
-  public setToken(token: string): void {
-    this.accessToken = token;
-    localStorage.setItem('access_token', token);
-  }
-
-  /**
-   * Verifica si el usuario está autenticado
-   * @returns true si está autenticado, false en caso contrario
-   */
   public check(): boolean {
-    return !!this.accessToken;
+    if (!this.accessToken) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
-  /**
-   * Verifica si el usuario está autenticado (alias)
-   * @returns true si está autenticado, false en caso contrario
-   */
-  public isAuthenticated(): boolean {
-    return this.check();
-  }
-  //#endregion
-
-  //#region Traditional Authentication
-  /**
-   * Inicia sesión con email y contraseña
-   * @param credentials Credenciales del usuario
-   * @returns Observable con la respuesta de login
-   */
-  public login(credentials: { email: string; password: string }): Observable<ILoginResponse> {
-    return this.http.post<ILoginResponse>('auth/login', credentials).pipe(
-      tap((response: any) => {
+  public login(credentials: {
+    email: string;
+    password: string;
+  }): Observable<ILoginResponseSkillSwap> {
+    return this.http.post<ILoginResponseSkillSwap>('auth/login', credentials).pipe(
+      tap((response: ILoginResponseSkillSwap) => {
         this.accessToken = response.token;
-        this.user.email = credentials.email;
         this.expiresIn = response.expiresIn;
-        this.user = response.authUser;
+        this.user = response.authPerson; // ⚠️ CAMBIO CLAVE
         this.save();
       })
     );
   }
 
-  /**
-   * Registra un nuevo usuario
-   * @param user Datos del usuario
-   * @returns Observable con la respuesta de registro
-   */
-  public signup(user: IUser): Observable<ILoginResponse> {
-    return this.http.post<ILoginResponse>('auth/signup', user);
+  public signup(user: IPerson): Observable<ILoginResponseSkillSwap> {
+    return this.http.post<ILoginResponseSkillSwap>('auth/signup', user);
   }
 
-  /**
-   * Cierra sesión del usuario
-   */
-  public logout(): void {
+  public logout() {
     this.accessToken = '';
     localStorage.removeItem('access_token');
     localStorage.removeItem('expiresIn');
     localStorage.removeItem('auth_user');
   }
 
-  /**
-   * Limpia la autenticación (alias de logout)
-   */
-  public clearAuth(): void {
-    this.logout();
-  }
-  //#endregion
+  // ========================================
+  // MÉTODOS ADAPTADOS DE SKILLSWAP
+  // ========================================
 
-  //#region Google OAuth Methods
   /**
-   * Inicia sesión con Google OAuth
-   * @param code Código de autorización de Google
-   * @param redirectUri URI de redirección
-   * @returns Observable con la respuesta de login
+   * Verifica si el usuario es instructor
    */
-  public loginWithGoogle(code: string, redirectUri: string): Observable<any> {
-    return this.http.post<any>('/auth/google', { code, redirectUri }).pipe(
-      tap((response: any) => {
-        this.accessToken = response.token;
-        this.expiresIn = response.expiresIn;
-        
-        this.user = response.authUser ?? {
-          email: response?.profile?.email ?? '',
-          authorities: response?.profile?.authorities ?? []
-        };
-        
-        this.save();
-      })
-    );
-  }
-  //#endregion
-
-  //#region Role Management
-  /**
-   * Verifica si el usuario tiene un rol específico
-   * @param role Rol a verificar
-   * @returns true si tiene el rol, false en caso contrario
-   */
-  public hasRole(role: string): boolean {
-    return this.user.authorities ? this.user?.authorities.some(authority => authority.authority == role) : false;
+  public isInstructor(): boolean {
+    return !!this.user.instructor;
   }
 
   /**
-   * Verifica si el usuario es super administrador
-   * @returns true si es super admin, false en caso contrario
+   * Verifica si el usuario es learner
+   */
+  public isLearner(): boolean {
+    return !!this.user.learner;
+  }
+
+  /**
+   * Verifica si es super admin (para compatibilidad con código del profesor)
+   * En SkillSwap no hay super admin, pero dejamos el método vacío
    */
   public isSuperAdmin(): boolean {
-    return this.user.authorities ? this.user?.authorities.some(authority => authority.authority == IRoleType.superAdmin) : false;
+    return false; // SkillSwap no tiene este rol
   }
 
   /**
-   * Verifica si el usuario tiene alguno de los roles especificados
-   * @param roles Array de roles a verificar
-   * @returns true si tiene alguno de los roles, false en caso contrario
+   * Verifica si tiene un rol específico (adaptado para SkillSwap)
+   * En SkillSwap solo hay instructor y learner
+   */
+  public hasRole(role: string): boolean {
+    if (role === 'ROLE_INSTRUCTOR') {
+      return this.isInstructor();
+    } else if (role === 'ROLE_LEARNER') {
+      return this.isLearner();
+    }
+    return false;
+  }
+
+  /**
+   * Verifica si tiene alguno de los roles (para compatibilidad)
    */
   public hasAnyRole(roles: any[]): boolean {
     return roles.some(role => this.hasRole(role));
   }
 
   /**
-   * Obtiene las rutas permitidas para el usuario actual
-   * @param routes Array de rutas
-   * @returns Array de rutas permitidas
+   * Obtiene rutas permitidas según el tipo de usuario
    */
   public getPermittedRoutes(routes: any[]): any[] {
     let permittedRoutes: any[] = [];
@@ -213,35 +138,26 @@ export class AuthService {
   }
 
   /**
-   * Obtiene las autoridades del usuario
-   * @returns Array de autoridades o undefined
+   * Obtiene "authorities" del usuario (adaptado para SkillSwap)
+   * Devuelve un array simulado basado en instructor/learner
    */
-  public getUserAuthorities(): IAuthority[] | undefined {
-    return this.getUser()?.authorities ? this.getUser()?.authorities : [];
+  public getUserAuthorities(): any[] {
+    const authorities = [];
+    if (this.isInstructor()) {
+      authorities.push({ authority: 'ROLE_INSTRUCTOR' });
+    }
+    if (this.isLearner()) {
+      authorities.push({ authority: 'ROLE_LEARNER' });
+    }
+    return authorities;
   }
 
   /**
-   * Verifica si las acciones están disponibles para el usuario
-   * @param routeAuthorities Array de autoridades de la ruta
-   * @returns true si las acciones están disponibles, false en caso contrario
+   * Verifica si las acciones están disponibles (para compatibilidad)
+   * En SkillSwap todos los usuarios autenticados pueden hacer acciones
    */
   public areActionsAvailable(routeAuthorities: string[]): boolean {
-    let allowedUser: boolean = false;
-    let isAdmin: boolean = false;
-
-    let userAuthorities = this.getUserAuthorities();
-
-    for (const authority of routeAuthorities) {
-      if (userAuthorities?.some(item => item.authority == authority)) {
-        allowedUser = userAuthorities?.some(item => item.authority == authority)
-      }
-      if (allowedUser) break;
-    }
-
-    if (userAuthorities?.some(item => item.authority == IRoleType.admin || item.authority == IRoleType.superAdmin)) {
-      isAdmin = userAuthorities?.some(item => item.authority == IRoleType.admin || item.authority == IRoleType.superAdmin);
-    }
-    return allowedUser && isAdmin;
+    // Si es instructor o learner, tiene acceso
+    return this.isInstructor() || this.isLearner();
   }
-  //#endregion
 }

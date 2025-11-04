@@ -19,7 +19,6 @@ import { CalculatorComponent } from './pages/calculator/calculator.component';
 import { GiftComponent } from './pages/gift/gift.component';
 import { GiftListGiftsComponent } from './pages/gift-list-gifts/gift-list-gifts.component';
 import { GiftsComponent } from './pages/gifts/gifts.component';
-import { AuthCallbackComponent } from './pages/auth/auth-callback.component/auth-callback.component';
 
 export const routes: Routes = [
   {
@@ -32,10 +31,7 @@ export const routes: Routes = [
     component: SigUpComponent,
     canActivate: [GuestGuard],
   },
-  {
-    path: 'auth/callback',
-    component: AuthCallbackComponent
-  },
+  
   {
     path: 'register', 
     component: RegisterComponent,
