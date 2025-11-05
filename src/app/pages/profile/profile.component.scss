@@ -15,22 +15,25 @@ $font-family: 'Epilogue', sans-serif;
   min-height: 100vh;
   background-color: $dark;
   font-family: $font-family;
-  padding: 40px 20px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .profile-main {
-  max-width: 1400px;
-  margin: 0 auto;
+  max-width: 1200px; 
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 }
 
 // ===== PRIMERA FILA: Avatar + Info Personal =====
 .profile-grid-top {
   display: grid;
-  grid-template-columns: 400px 1fr; // ⚠️ Avatar más pequeño (antes era 1fr 1fr)
-  gap: 24px;
+  grid-template-columns: 320px 1fr; 
+  gap: 16px;
   align-items: start;
 
   @media (max-width: 1024px) {
@@ -38,21 +41,22 @@ $font-family: 'Epilogue', sans-serif;
   }
 }
 
+// ===== AVATAR CARD (IZQUIERDA) =====
 .avatar-card {
   background-color: rgba(0, 0, 0, 0.4);
   border: 2px solid $border-color;
   border-radius: 16px;
-  padding: 32px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 24px;
+  gap: 16px;
   height: 100%;
 
   .avatar-circle {
-    width: 180px;
-    height: 180px;
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
     border: 3px solid $border-color;
     overflow: hidden;
@@ -68,14 +72,14 @@ $font-family: 'Epilogue', sans-serif;
     }
 
     .avatar-initials {
-      font-size: 64px;
+      font-size: 56px;
       font-weight: 700;
       color: $white;
     }
   }
 
   .user-role {
-    font-size: 22px;
+    font-size: 18px;
     font-weight: 600;
     color: $white;
     margin: 0;
@@ -84,19 +88,20 @@ $font-family: 'Epilogue', sans-serif;
     letter-spacing: 1px;
   }
 }
+
 // ===== INFO CARDS =====
 .info-card {
   background-color: rgba(0, 0, 0, 0.4);
   border: 2px solid $border-color;
   border-radius: 16px;
-  padding: 32px;
+  padding: 24px;
 
   @media (max-width: 768px) {
     padding: 20px;
   }
 }
 
-// Card de habilidades (ancho completo)
+// Card de habilidades 
 .skills-card {
   width: 100%;
 }
@@ -105,11 +110,11 @@ $font-family: 'Epilogue', sans-serif;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .section-title {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   color: $secondary;
   margin: 0;
@@ -131,15 +136,15 @@ $font-family: 'Epilogue', sans-serif;
 }
 
 .card-subtitle {
-  font-size: 14px;
+  font-size: 13px;
   color: rgba(255, 255, 255, 0.7);
-  margin: 0 0 24px 0;
+  margin: 0 0 16px 0;
 }
 
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(2, 1fr); 
+  gap: 16px;
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
@@ -148,8 +153,8 @@ $font-family: 'Epilogue', sans-serif;
 
 .skills-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(2, 1fr); 
+  gap: 16px;
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
@@ -159,10 +164,10 @@ $font-family: 'Epilogue', sans-serif;
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 
   label {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     color: rgba(255, 255, 255, 0.8);
   }
@@ -170,12 +175,12 @@ $font-family: 'Epilogue', sans-serif;
   input,
   select {
     width: 100%;
-    padding: 12px 16px;
+    padding: 8px 12px;
     background-color: transparent;
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 8px;
     color: $white;
-    font-size: 14px;
+    font-size: 13px;
     font-family: $font-family;
     transition: all 0.3s ease;
 
@@ -213,17 +218,17 @@ $font-family: 'Epilogue', sans-serif;
 .tags-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   margin-top: 4px;
 
   .tag {
     display: inline-flex;
     align-items: center;
-    padding: 6px 12px;
+    padding: 4px 10px;
     background-color: rgba(80, 74, 183, 0.4);
     border: 1px solid $primary;
     border-radius: 20px;
-    font-size: 12px;
+    font-size: 11px;
     color: $white;
     font-weight: 500;
   }
