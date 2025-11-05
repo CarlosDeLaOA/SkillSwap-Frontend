@@ -94,7 +94,7 @@ $font-family: 'Epilogue', sans-serif;
   background-color: rgba(0, 0, 0, 0.4);
   border: 2px solid $border-color;
   border-radius: 16px;
-  padding: 24px;
+  padding: 24px 32px;
 
   @media (max-width: 768px) {
     padding: 20px;
@@ -109,16 +109,16 @@ $font-family: 'Epilogue', sans-serif;
 .card-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
+  align-items: center; 
+
 }
 
 .section-title {
-  font-size: 18px;
+  font-size: 24px;
   font-weight: 600;
   color: $secondary;
-  margin: 0;
 }
+
 
 .btn-check {
   background: none;
@@ -136,9 +136,15 @@ $font-family: 'Epilogue', sans-serif;
 }
 
 .card-subtitle {
-  font-size: 13px;
+  font-size: 16px;
   color: rgba(255, 255, 255, 0.7);
   margin: 0 0 16px 0;
+  padding-left: 50px;
+  text-align: left;
+
+  @media (max-width: 768px) {
+    padding-left: 0;
+  }
 }
 
 .form-grid {
@@ -167,7 +173,7 @@ $font-family: 'Epilogue', sans-serif;
   gap: 6px;
 
   label {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 500;
     color: rgba(255, 255, 255, 0.8);
   }
