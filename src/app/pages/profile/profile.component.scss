@@ -121,17 +121,31 @@ $font-family: 'Epilogue', sans-serif;
 
 
 .btn-check {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s ease;
+  background: rgba(80, 74, 183, 0.3) !important; 
+  border: 2px solid $primary !important; 
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  padding: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.3s ease !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  flex-shrink: 0 !important;
 
   &:hover {
-    transform: scale(1.1);
+    transform: scale(1.05);
+    background: rgba(80, 74, 183, 0.5) !important;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  box-icon {
+    display: block !important;
+    pointer-events: none;
   }
 }
 
@@ -181,17 +195,18 @@ $font-family: 'Epilogue', sans-serif;
   input,
   select {
     width: 100%;
-    padding: 8px 12px;
+    padding: 10px 14px; // ⚠️ Aumentado el padding también
     background-color: transparent;
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 8px;
     color: $white;
-    font-size: 13px;
+    font-size: 15px; // ⚠️ Aumentado de 13px a 15px
     font-family: $font-family;
     transition: all 0.3s ease;
 
     &::placeholder {
       color: rgba(255, 255, 255, 0.5);
+      font-size: 15px; // ⚠️ Placeholder también más grande
     }
 
     &:focus {
@@ -216,6 +231,7 @@ $font-family: 'Epilogue', sans-serif;
         background-color: $dark;
         color: $white;
         padding: 10px;
+        font-size: 15px; // ⚠️ Opciones también más grandes
       }
     }
   }
