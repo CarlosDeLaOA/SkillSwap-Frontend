@@ -195,18 +195,18 @@ $font-family: 'Epilogue', sans-serif;
   input,
   select {
     width: 100%;
-    padding: 10px 14px; // ⚠️ Aumentado el padding también
+    padding: 10px 14px;
     background-color: transparent;
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 8px;
     color: $white;
-    font-size: 15px; // ⚠️ Aumentado de 13px a 15px
+    font-size: 15px;
     font-family: $font-family;
     transition: all 0.3s ease;
 
     &::placeholder {
       color: rgba(255, 255, 255, 0.5);
-      font-size: 15px; // ⚠️ Placeholder también más grande
+      font-size: 15px;
     }
 
     &:focus {
@@ -231,7 +231,7 @@ $font-family: 'Epilogue', sans-serif;
         background-color: $dark;
         color: $white;
         padding: 10px;
-        font-size: 15px; // ⚠️ Opciones también más grandes
+        font-size: 15px; 
       }
     }
   }
