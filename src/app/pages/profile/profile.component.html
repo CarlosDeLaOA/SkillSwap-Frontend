@@ -1,76 +1,194 @@
+<div class="profile-wrapper">
+  <main class="profile-main">
+    <!-- Primera fila: Avatar e Información Personal -->
+    <div class="profile-grid-top">
+      <!-- COLUMNA IZQUIERDA: Avatar -->
+      <aside class="avatar-card">
+        <div class="avatar-circle">
+          <img 
+            *ngIf="profileService.person$().profilePhotoUrl; else initialsAvatar" 
+            [src]="profileService.person$().profilePhotoUrl" 
+            [alt]="profileService.person$().fullName"
+          />
+          <ng-template #initialsAvatar>
+            <div class="avatar-initials">
+              {{ getInitials(profileService.person$().fullName) }}
+            </div>
+          </ng-template>
+        </div>
+        <h3 class="user-role">{{ profileService.getUserRole() }}</h3>
+      </aside>
 
-<div class="row info-container">
-  <div class="col-6">
-    <div class="shadow-sm bg-body rounded px-4 py-4 h-100">
-      <div>
-        <i class="fa-solid fa-user-tie"></i>
-      </div>
-      <div class="border-bottom my-3">
-        <label>Name:</label>
-        <p>{{profileService.user$().name}}</p>
-      </div>
-      <div class="border-bottom my-3">
-        <label>Lastname:</label>
-        <p>{{profileService.user$().lastname}}</p>
-      </div>
-      <div class="border-bottom my-3">
-        <label>email:</label>
-        <p>{{profileService.user$().email}}</p>
-      </div>
-      <div class=" my-3">
-        <label>Last update:</label>
-        <p>{{profileService.user$().updatedAt | date:'dd/MM/YYYY'}}</p>
-      </div>
+      <!-- COLUMNA DERECHA: Información Personal -->
+      <section class="info-card">
+        <div class="card-header">
+          <h3 class="section-title">Información personal</h3>
+          <button class="btn-check">
+            <box-icon name='check-circle' size="24px" color="#aae16b"></box-icon>
+          </button>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nombre</label>
+            <input 
+              type="text" 
+              [value]="getFirstName()" 
+              placeholder="Nombre"
+              readonly
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Apellidos</label>
+            <input 
+              type="text" 
+              [value]="getLastNames()" 
+              placeholder="Apellidos"
+              readonly
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Correo electrónico</label>
+            <input 
+              type="email" 
+              [value]="profileService.person$().email || ''" 
+              placeholder="Correo electrónico"
+              readonly
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Contraseña</label>
+            <input 
+              type="password" 
+              value="••••••••" 
+              placeholder="Contraseña"
+              readonly
+            />
+          </div>
+        </div>
+      </section>
     </div>
+
+    <!-- Segunda fila: Habilidades a explorar (ancho completo) -->
+    <section class="info-card skills-card">
+      <div class="card-header">
+        <h3 class="section-title">Habilidades a explorar</h3>
+        <button class="btn-check">
+          <box-icon name='check-circle' size="24px" color="#504ab7"></box-icon>
+        </button>
+      </div>
+
+      <p class="card-subtitle">
+        Ajusta tus habilidades a explorar para poder mostrarte contenido a tu medida.
+      </p>
+
+      <div class="skills-grid">
+        <!-- Tecnología -->
+        <div class="form-group">
+          <label>Tecnología</label>
+          <div class="select-wrapper">
+            <select>
+              <option value="" disabled selected>Selecciona opciones</option>
+              <option value="programming">Programación</option>
+              <option value="web-dev">Desarrollo Web</option>
+              <option value="mobile-dev">Desarrollo Móvil</option>
+              <option value="data-science">Ciencia de Datos</option>
+              <option value="ai-ml">Inteligencia Artificial</option>
+              <option value="cybersecurity">Ciberseguridad</option>
+              <option value="cloud">Computación en la Nube</option>
+              <option value="devops">DevOps</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Deportes -->
+        <div class="form-group">
+          <label>Deportes</label>
+          <div class="select-wrapper">
+            <select>
+              <option value="" disabled selected>Selecciona opciones</option>
+              <option value="soccer">Fútbol</option>
+              <option value="basketball">Baloncesto</option>
+              <option value="tennis">Tenis</option>
+              <option value="swimming">Natación</option>
+              <option value="running">Running</option>
+              <option value="yoga">Yoga</option>
+              <option value="gym">Gimnasio</option>
+              <option value="martial-arts">Artes Marciales</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Cocina -->
+        <div class="form-group">
+          <label>Cocina</label>
+          <div class="select-wrapper">
+            <select>
+              <option value="" disabled selected>Selecciona opciones</option>
+              <option value="italian">Cocina Italiana</option>
+              <option value="mexican">Cocina Mexicana</option>
+              <option value="asian">Cocina Asiática</option>
+              <option value="pastry">Repostería</option>
+              <option value="bakery">Panadería</option>
+              <option value="vegan">Cocina Vegana</option>
+              <option value="gourmet">Alta Cocina</option>
+              <option value="bbq">Barbacoa</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Arte -->
+        <div class="form-group">
+          <label>Arte</label>
+          <div class="select-wrapper">
+            <select>
+              <option value="" disabled selected>Selecciona opciones</option>
+              <option value="painting">Pintura</option>
+              <option value="drawing">Dibujo</option>
+              <option value="sculpture">Escultura</option>
+              <option value="photography">Fotografía</option>
+              <option value="digital-art">Arte Digital</option>
+              <option value="music">Música</option>
+              <option value="dance">Danza</option>
+              <option value="theater">Teatro</option>
+            </select>
+          </div>
+        </div>
+
+      <!-- Idioma preferido  -->
+<div class="form-group">
+  <label>Idioma preferido</label>
+  <div class="select-wrapper">
+    <select [value]="profileService.person$().preferredLanguage || ''" (change)="onLanguageChange($event)">
+      <option value="" disabled>Selecciona un idioma</option>
+      @for (lang of getLanguageOptions(); track lang.code) {
+        <option [value]="lang.code">{{ lang.name }}</option>
+      }
+    </select>
   </div>
-  <div class="col-6">
-    <div class="row">
-      <div class="col-12 shadow-sm bg-body rounded px-4 py-4 mb-3">
-        <label>Rol:</label>
-        <div class="border-bottom my-3">
-          <label>Name:</label>
-          <p>{{profileService.user$().role?.name}}</p>
-        </div>
-        <div class="border-bottom my-3">
-          <label>Description:</label>
-          <p>{{profileService.user$().role?.description}}</p>
-        </div>
-        <div class=" my-3">
-          <label>Last update:</label>
-          <p>{{profileService.user$().role?.updatedAt | date:'dd/MM/YYYY'}}</p>
+</div>
+
+        <!-- Soft Skills -->
+        <div class="form-group">
+          <label>Soft Skills</label>
+          <div class="select-wrapper">
+            <select>
+              <option value="" disabled selected>Selecciona opciones</option>
+              <option value="leadership">Liderazgo</option>
+              <option value="communication">Comunicación</option>
+              <option value="teamwork">Trabajo en Equipo</option>
+              <option value="problem-solving">Resolución de Problemas</option>
+              <option value="creativity">Creatividad</option>
+              <option value="time-management">Gestión del Tiempo</option>
+              <option value="adaptability">Adaptabilidad</option>
+              <option value="critical-thinking">Pensamiento Crítico</option>
+            </select>
+          </div>
         </div>
       </div>
-      <div class="col-12 shadow-sm bg-body rounded px-4 py-4">
-        <label>Last actions:</label>
-        <div>
-          <table class="table">
-            <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Date</th>
-                <th scope="col">Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="row">1</th>
-                <td>10/06/2024</td>
-                <td>Deleted user</td>
-              </tr>
-              <tr>
-                <th scope="row">1</th>
-                <td>10/06/2024</td>
-                <td>Deleted user</td>
-              </tr>
-              <tr>
-                <th scope="row">1</th>
-                <td>10/06/2024</td>
-                <td>Deleted user</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
+    </section>
+  </main>
 </div>
