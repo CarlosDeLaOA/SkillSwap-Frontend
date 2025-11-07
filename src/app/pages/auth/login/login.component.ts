@@ -1,15 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, ViewChild, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, ViewChild, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { FormsModule, NgModel } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { GoogleAuthService } from '../../../services/google-auth.service';
 
-/**
- * Componente de Login 
- * Maneja la autenticación de usuarios
- * 
- */
+
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -18,77 +14,85 @@ import { GoogleAuthService } from '../../../services/google-auth.service';
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent {
-  //#region Properties
-  /** Mensaje de error mostrado al usuario */
+export class LoginComponent implements OnInit {
+
   public loginError!: string;
 
-  /** Mensaje de error de validación de contraseña */
+
   public passwordValidationError: string = '';
 
-  /** Referencia al campo de email para validación */
+
   @ViewChild('email') emailModel!: NgModel;
 
-  /** Referencia al campo de password para validación */
+ 
   @ViewChild('password') passwordModel!: NgModel;
 
-  /** Datos del formulario de login */
+
   public loginForm: { email: string; password: string } = {
     email: '',
     password: '',
   };
 
   /**
-   * Constructor del componente
-   * @param router - Servicio de enrutamiento de Angular
-   * @param authService - Servicio de autenticación
+   * 
+   * @param router 
+   * @param authService 
+   * @param googleAuthService 
    */
   constructor(
     private router: Router,
     private authService: AuthService,
     private googleAuthService: GoogleAuthService
   ) { }
-  //#endregion
+ 
+  ngOnInit(): void {
+    this.checkExistingAuth();
+  }
 
-  //#region Password Validation Methods
-  /**
-   * Verifica si la contraseña tiene al menos 8 caracteres
-   */
+
+  private checkExistingAuth(): void {
+    const token = this.authService.getToken();
+    
+    if (token) {
+      const user = this.authService.getUser();
+      
+      
+      if (user && user.email) {
+        console.log('🔵 Usuario ya autenticado, redirigiendo...');
+        this.router.navigate(['/app/dashboard']);
+      } else {
+        
+        console.warn('⚠️ Token existe pero usuario inválido, limpiando...');
+        this.authService.clearAuth();
+      }
+    }
+  }
+  
   public hasMinLength(): boolean {
     return this.loginForm.password.length >= 8;
   }
 
-  /**
-   * Verifica si la contraseña contiene al menos una mayúscula
-   */
+ 
   public hasUpperCase(): boolean {
     return /[A-Z]/.test(this.loginForm.password);
   }
 
-  /**
-   * Verifica si la contraseña contiene al menos una minúscula
-   */
+ 
   public hasLowerCase(): boolean {
     return /[a-z]/.test(this.loginForm.password);
   }
 
-  /**
-   * Verifica si la contraseña contiene al menos un número
-   */
+  
   public hasNumber(): boolean {
     return /\d/.test(this.loginForm.password);
   }
 
-  /**
-   * Verifica si la contraseña contiene al menos un carácter especial
-   */
+ 
   public hasSpecialChar(): boolean {
     return /[@$!%*?&]/.test(this.loginForm.password);
   }
 
-  /**
-   * Valida que la contraseña cumpla con todos los requisitos
-   */
+
   private validatePassword(password: string): boolean {
     if (!password || password.length < 8) {
       this.passwordValidationError = 'La contraseña debe tener al menos 8 caracteres';
@@ -119,28 +123,23 @@ export class LoginComponent {
     return true;
   }
 
-  /**
-   * Maneja el cambio en el campo de contraseña
-   */
   public onPasswordChange(): void {
     if (this.loginForm.password && this.passwordModel.touched) {
       this.validatePassword(this.loginForm.password);
     }
   }
+ 
+  public loginWithGoogle(): void {
+    console.log('🔵 Iniciando login con Google...');
+    this.googleAuthService.initiateGoogleLogin();
+  }
   
-  //#region Google Authentication
-/**
- * Inicia el flujo de autenticación con Google OAuth2.
- * Redirige al usuario a la página de autorización de Google.
- */
-public loginWithGoogle(): void {
-  this.googleAuthService.initiateGoogleLogin();
-}
+
 
   /**
-   * Maneja el evento de submit del formulario de login
    * 
-   * @param event - Evento del formulario
+   * 
+   * @param event 
    */
   public handleLogin(event: Event): void {
     event.preventDefault();
@@ -160,23 +159,26 @@ public loginWithGoogle(): void {
 
     if (this.emailModel.valid && this.passwordModel.valid && isPasswordValid) {
       this.authService.login(this.loginForm).subscribe({
-        next: () => this.router.navigateByUrl('/app/dashboard'),
+        next: () => {
+          console.log(' Login tradicional exitoso');
+          this.router.navigateByUrl('/app/dashboard');
+        },
         error: (err: any) => {
+          console.error(' Login error:', err);
+          
           if (err.error && err.error.message) {
             this.loginError = err.error.message;
           } else if (err.error && err.error.description) {
             this.loginError = err.error.description;
           } else if (err.status === 401) {
             this.loginError = 'Email o contraseña incorrectos';
+          } else if (err.status === 0) {
+            this.loginError = 'No se pudo conectar con el servidor';
           } else {
             this.loginError = 'Error al iniciar sesión. Intenta de nuevo.';
           }
-          console.error('Login error:', err);
-        },
-
-        
+        }
       });
     }
   }
-  
 }

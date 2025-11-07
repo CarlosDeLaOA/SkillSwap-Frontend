@@ -4,7 +4,6 @@ import { GoogleAuthService } from '../../../services/google-auth.service';
 import { AuthService } from '../../../services/auth.service';
 import { CommonModule } from '@angular/common';
 
-
 @Component({
   selector: 'app-auth-callback',
   standalone: true,
@@ -15,12 +14,14 @@ import { CommonModule } from '@angular/common';
         <div *ngIf="loading" class="loading-state">
           <div class="spinner"></div>
           <p>Autenticando con Google...</p>
+          <!-- ✅ ELIMINADO: debugInfo ya no se muestra -->
         </div>
         
         <div *ngIf="error" class="error-state">
           <div class="error-icon">⚠️</div>
           <h2>Error de autenticación</h2>
           <p>{{ error }}</p>
+          <p class="error-detail" *ngIf="errorDetail">{{ errorDetail }}</p>
           <button (click)="redirectToLogin()" class="btn-primary">
             Volver al inicio de sesión
           </button>
@@ -45,7 +46,7 @@ import { CommonModule } from '@angular/common';
       padding: 40px;
       background-color: #141414;
       border-radius: 16px;
-      max-width: 400px;
+      max-width: 500px;
     }
 
     .loading-state {
@@ -99,6 +100,14 @@ import { CommonModule } from '@angular/common';
       margin: 0;
     }
 
+    .error-detail {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 12px;
+      font-family: monospace;
+      max-width: 400px;
+      word-break: break-all;
+    }
+
     .btn-primary {
       margin-top: 16px;
       padding: 14px 24px;
@@ -124,16 +133,8 @@ export class AuthCallbackComponent implements OnInit {
   
   public loading: boolean = true;
   public error: string = '';
+  public errorDetail: string = '';
   
-
-  //#region Constructor
-  /**
-   * Constructor del componente
-   * @param route Ruta activada para obtener parámetros de la URL
-   * @param router Servicio de enrutamiento
-   * @param googleAuthService Servicio de autenticación de Google
-   * @param authService Servicio de autenticación general
-   */
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -141,14 +142,15 @@ export class AuthCallbackComponent implements OnInit {
     private authService: AuthService
   ) { }
   
-  
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       const code = params['code'];
       const error = params['error'];
 
+      console.log('🔵 Callback params:', { code: code?.substring(0, 20) + '...', error });
+
       if (error) {
-        this.handleError('Autenticación cancelada o rechazada');
+        this.handleError('Autenticación cancelada o rechazada', error);
         return;
       }
 
@@ -156,27 +158,39 @@ export class AuthCallbackComponent implements OnInit {
         this.handleError('No se recibió el código de autorización');
         return;
       }
-
       this.processGoogleCallback(code);
     });
   }
   
-
-  //#region Private Methods
-  /**
-   * Procesa el código de autorización de Google
-   * @param code Código de autorización
-   */
   private processGoogleCallback(code: string): void {
+    console.log('🔵 Procesando código de Google...');
+    
     this.googleAuthService.authenticateWithGoogle(code).subscribe({
       next: (response) => {
-        this.authService.setToken(response.token);
+        console.log(' Respuesta exitosa del backend:', response);
         
-        const userData = response.profile || response.user;
+        if (response.token) {
+          this.authService.setToken(response.token);
+        } else {
+          console.error(' No se recibió token en la respuesta');
+          this.handleError('No se recibió token de autenticación');
+          return;
+        }
+        
+        const userData = response.authUser || response.profile || response.user;
         if (userData) {
-          this.authService.setUser(userData);
+         
+          const normalizedUser = {
+            email: userData.email || '',
+            authorities: Array.isArray(userData.authorities) ? userData.authorities : []
+          };
+          this.authService.setUser(normalizedUser);
+          console.log(' Usuario establecido:', normalizedUser);
+        } else {
+          console.warn(' No se recibió información del usuario');
         }
 
+      
         if (response.requiresOnboarding) {
           this.router.navigate(['/onboarding']);
         } else {
@@ -184,28 +198,36 @@ export class AuthCallbackComponent implements OnInit {
         }
       },
       error: (err) => {
-        console.error('Error en autenticación con Google:', err);
-        this.handleError(
-          err.error?.error ||
-          err.error?.message ||
-          'Error al autenticar con Google. Intenta de nuevo.'
-        );
+        console.error(' Error en autenticación:', err);
+        
+        let errorMessage = 'Error al autenticar con Google';
+        let errorDetails = '';
+        
+        if (err.status === 0) {
+          errorMessage = 'No se pudo conectar con el servidor';
+          errorDetails = 'Verifica que el backend esté corriendo en http://localhost:8080';
+        } else if (err.error?.error) {
+          errorMessage = err.error.error;
+          errorDetails = err.error.message || '';
+        } else if (err.error?.message) {
+          errorMessage = err.error.message;
+        } else if (err.message) {
+          errorDetails = err.message;
+        }
+        
+        this.handleError(errorMessage, errorDetails);
       }
     });
   }
 
-  /**
-   * Maneja los errores de autenticación
-   * @param message Mensaje de error
-   */
-  private handleError(message: string): void {
+  private handleError(message: string, detail?: string): void {
     this.loading = false;
     this.error = message;
+    this.errorDetail = detail || '';
+    console.error(' Error:', message, detail);
   }
 
- 
   public redirectToLogin(): void {
     this.router.navigate(['/login']);
   }
-  
 }
