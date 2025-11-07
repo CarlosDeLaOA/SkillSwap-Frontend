@@ -1,41 +1,255 @@
-.profile-main-container {
-  padding: 0px 10%;
-  .my-info-container {
-    box-shadow: 0px 2px 10px 2px rgba(0,0,0,0.09);
-    -webkit-box-shadow: 0px 2px 10px 2px rgba(0,0,0,0.09);
-    -moz-box-shadow: 0px 2px 10px 2px rgba(0,0,0,0.09);
-    padding: 0% 20%;
-    border-radius: 20px;
-    .fa-user-pen {
-      color: rgb(52, 73, 94);
-      font-size: 140px;
-      margin-bottom: 20px;
+@import url('https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;700&display=swap');
+
+// Paleta de colores SkillSwap
+$primary: #504ab7;
+$secondary: #aae16b;
+$neutral: #3e3e43;
+$dark: #141414;
+$white: #ffffff;
+$border-color: rgba(170, 225, 107, 0.5);
+
+// Tipografía
+$font-family: 'Epilogue', sans-serif;
+
+.profile-wrapper {
+  min-height: 100vh;
+  background-color: $dark;
+  font-family: $font-family;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-main {
+  max-width: 1200px; 
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+// ===== PRIMERA FILA: Avatar + Info Personal =====
+.profile-grid-top {
+  display: grid;
+  grid-template-columns: 320px 1fr; 
+  gap: 16px;
+  align-items: start;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ===== AVATAR CARD (IZQUIERDA) =====
+.avatar-card {
+  background-color: rgba(0, 0, 0, 0.4);
+  border: 2px solid $border-color;
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  height: 100%;
+
+  .avatar-circle {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 3px solid $border-color;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(80, 74, 183, 0.3), rgba(170, 225, 107, 0.3));
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
-    .info-text {
-      font-size: 11px;
-      color: rgb(149, 165, 166);
-    }
-    p {
-      margin-bottom: 0px;
+
+    .avatar-initials {
+      font-size: 56px;
+      font-weight: 700;
+      color: $white;
     }
   }
-  .rol-info-container {
-    box-shadow: 0px 2px 10px 2px rgba(0,0,0,0.09);
-    -webkit-box-shadow: 0px 2px 10px 2px rgba(0,0,0,0.09);
-    -moz-box-shadow: 0px 2px 10px 2px rgba(0,0,0,0.09);
-    padding: 0% 20%;
-    border-radius: 20px;
+
+  .user-role {
+    font-size: 18px;
+    font-weight: 600;
+    color: $white;
+    margin: 0;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
-  .not-info-container {
-    box-shadow: 0px 2px 10px 2px rgba(0,0,0,0.09);
-    -webkit-box-shadow: 0px 2px 10px 2px rgba(0,0,0,0.09);
-    -moz-box-shadow: 0px 2px 10px 2px rgba(0,0,0,0.09);
-    padding: 0% 20%;
-    border-radius: 20px;
+}
+
+// ===== INFO CARDS =====
+.info-card {
+  background-color: rgba(0, 0, 0, 0.4);
+  border: 2px solid $border-color;
+  border-radius: 16px;
+  padding: 24px 32px;
+
+  @media (max-width: 768px) {
+    padding: 20px;
   }
-  .title {
-    font-size: 14px;
-    color: rgb(68, 76, 77);
-    font-weight: bold;
+}
+
+// Card de habilidades 
+.skills-card {
+  width: 100%;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; 
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: $secondary;
+}
+
+.btn-check {
+  background: rgba(80, 74, 183, 0.3) !important; 
+  border: 2px solid $primary !important; 
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  padding: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.3s ease !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  flex-shrink: 0 !important;
+
+  &:hover {
+    transform: scale(1.05);
+    background: rgba(80, 74, 183, 0.5) !important;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  box-icon {
+    display: block !important;
+    pointer-events: none;
+  }
+}
+
+.card-subtitle {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 16px 0;
+  padding-left: 50px;
+  text-align: left;
+
+  @media (max-width: 768px) {
+    padding-left: 0;
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); 
+  gap: 16px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); 
+  gap: 16px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 15px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  input,
+  select {
+    width: 100%;
+    padding: 10px 14px;
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    color: $white;
+    font-size: 15px;
+    font-family: $font-family;
+    transition: all 0.3s ease;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 15px;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $secondary;
+      background-color: rgba(170, 225, 107, 0.05);
+    }
+  }
+
+  .select-wrapper {
+    position: relative;
+
+    select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23aae16b' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 40px;
+      cursor: pointer;
+
+      option {
+        background-color: $dark;
+        color: $white;
+        padding: 10px;
+        font-size: 15px; 
+      }
+    }
+  }
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    background-color: rgba(80, 74, 183, 0.4);
+    border: 1px solid $primary;
+    border-radius: 20px;
+    font-size: 11px;
+    color: $white;
+    font-weight: 500;
   }
 }
