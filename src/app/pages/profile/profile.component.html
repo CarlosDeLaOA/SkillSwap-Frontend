@@ -20,66 +20,66 @@
       </aside>
 
       <!-- COLUMNA DERECHA: Información Personal -->
-<section class="info-card">
-  <div class="card-header">
-    <h3 class="section-title">Información personal</h3>
-    <button class="btn-check">
-      <box-icon name='check-circle' size="24px" color="#aae16b"></box-icon>
-    </button>
-  </div>
+      <section class="info-card">
+        <div class="card-header">
+          <h3 class="section-title">Información personal</h3>
+          <button class="btn-check">
+            <box-icon name='check-circle' size="24px" color="#aae16b"></box-icon>
+          </button>
+        </div>
 
-  <div class="form-grid">
-    <div class="form-group">
-      <label>Nombre</label>
-      <input 
-        type="text" 
-        [value]="getFirstName()" 
-        placeholder="Nombre"
-        readonly
-      />
-    </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nombre</label>
+            <input 
+              type="text" 
+              [value]="getFirstName()" 
+              placeholder="Nombre"
+              readonly
+            />
+          </div>
 
-    <div class="form-group">
-      <label>Apellidos</label>
-      <input 
-        type="text" 
-        [value]="getLastNames()" 
-        placeholder="Apellidos"
-        readonly
-      />
-    </div>
+          <div class="form-group">
+            <label>Apellidos</label>
+            <input 
+              type="text" 
+              [value]="getLastNames()" 
+              placeholder="Apellidos"
+              readonly
+            />
+          </div>
 
-    <div class="form-group">
-      <label>Correo electrónico</label>
-      <input 
-        type="email" 
-        [value]="profileService.person$().email || ''" 
-        placeholder="Correo electrónico"
-        readonly
-      />
-    </div>
+          <div class="form-group">
+            <label>Correo electrónico</label>
+            <input 
+              type="email" 
+              [value]="profileService.person$().email || ''" 
+              placeholder="Correo electrónico"
+              readonly
+            />
+          </div>
 
-    <div class="form-group">
-      <label>Contraseña</label>
-      <input 
-        type="password" 
-        value="••••••••" 
-        placeholder="Contraseña"
-        readonly
-      />
-    </div>
-  </div>
-</section>
+          <div class="form-group">
+            <label>Contraseña</label>
+            <input 
+              type="password" 
+              value="••••••••" 
+              placeholder="Contraseña"
+              readonly
+            />
+          </div>
+        </div>
+      </section>
     </div>
 
     <!-- Segunda fila: Habilidades a explorar (ancho completo) -->
     <section class="info-card skills-card">
-  <div class="card-header">
-    <h3 class="section-title">Habilidades a explorar</h3>
-    <button class="btn-check">
-    </button>
-  </div>
-
+      <div class="card-header">
+        <h3 class="section-title">Habilidades a explorar</h3>
+        <button class="btn-check">
+          <box-icon name='check-circle' size="24px" color="#504ab7"></box-icon>
+        </button>
+      </div>
 
       <p class="card-subtitle">
         Ajusta tus habilidades a explorar para poder mostrarte contenido a tu medida.
@@ -158,23 +158,18 @@
           </div>
         </div>
 
-        <!-- Idiomas -->
-        <div class="form-group">
-          <label>Idiomas</label>
-          <div class="select-wrapper">
-            <select>
-              <option value="" disabled selected>Selecciona opciones</option>
-              <option value="english">Inglés</option>
-              <option value="spanish">Español</option>
-              <option value="french">Francés</option>
-              <option value="german">Alemán</option>
-              <option value="portuguese">Portugués</option>
-              <option value="italian">Italiano</option>
-              <option value="chinese">Chino</option>
-              <option value="japanese">Japonés</option>
-            </select>
-          </div>
-        </div>
+      <!-- Idioma preferido  -->
+<div class="form-group">
+  <label>Idioma preferido</label>
+  <div class="select-wrapper">
+    <select [value]="profileService.person$().preferredLanguage || ''" (change)="onLanguageChange($event)">
+      <option value="" disabled>Selecciona un idioma</option>
+      @for (lang of getLanguageOptions(); track lang.code) {
+        <option [value]="lang.code">{{ lang.name }}</option>
+      }
+    </select>
+  </div>
+</div>
 
         <!-- Soft Skills -->
         <div class="form-group">

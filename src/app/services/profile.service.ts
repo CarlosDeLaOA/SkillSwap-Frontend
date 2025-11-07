@@ -7,8 +7,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
  * Servicio para gestionar el perfil de usuario en SkillSwap
  * Obtiene información del usuario autenticado desde el backend
  * 
- * @author SkillSwap Team
- * @version 1.0.0
  */
 @Injectable({
   providedIn: 'root'
@@ -17,15 +15,14 @@ export class ProfileService extends BaseService<IPerson> {
   /** Endpoint del backend para obtener perfil */
   protected override source: string = 'persons/me';
   
-  /** Signal reactivo con los datos del usuario */
-  private personSignal = signal<IPerson>({});
+  private personSignal = signal<IPerson>({
+    preferredLanguage: '' 
+  });
   
-  /** Inyección del servicio de notificaciones */
   private snackBar = inject(MatSnackBar);
 
   /**
    * Getter para acceder al signal del usuario
-   * @returns Signal con los datos de Person
    */
   get person$() {
     return this.personSignal;
@@ -41,15 +38,17 @@ export class ProfileService extends BaseService<IPerson> {
         // El backend devuelve { data: {...}, message: "..." }
         if (response.data) {
           this.personSignal.set(response.data);
-          console.log('✅ Perfil cargado:', response.data);
+          console.log('Perfil cargado:', response.data);
+          console.log('Idioma preferido:', response.data.preferredLanguage); 
         } else {
           // Si viene directo sin wrapper
           this.personSignal.set(response);
-          console.log('✅ Perfil cargado:', response);
+          console.log('Perfil cargado:', response);
+          console.log('Idioma preferido:', response.preferredLanguage); 
         }
       },
       error: (error: any) => {
-        console.error('❌ Error obteniendo perfil:', error);
+        console.error('Error obteniendo perfil:', error);
         this.snackBar.open(
           `Error al cargar el perfil: ${error.error?.message || error.message || 'Error desconocido'}`,
           'Cerrar', 
@@ -81,12 +80,25 @@ export class ProfileService extends BaseService<IPerson> {
   /**
    * Obtiene el rol del usuario como string
    */
-  getUserRole(): string {
-    if (this.isInstructor()) {
-      return 'INSTRUCTOR';
-    } else if (this.isLearner()) {
-      return 'LEARNER';
-    }
-    return 'UNKNOWN';
+  /**
+ * Obtiene el rol del usuario como string
+ */
+getUserRole(): string {
+  if (this.isInstructor() && this.isLearner()) {
+    return 'SkillSwapper'; // Si es ambos
+  } else if (this.isInstructor()) {
+    return 'SkillSwapper'; // Solo instructor
+  } else if (this.isLearner()) {
+    return 'SkillSeeker'; // Solo learner
+  }
+  return 'Usuario';
+}
+
+  /**
+   * Obtiene el idioma preferido del usuario
+   * @returns El idioma preferido o 'No especificado' si es null/undefined
+   */
+  getPreferredLanguage(): string {
+    return this.personSignal().preferredLanguage || 'No especificado';
   }
 }

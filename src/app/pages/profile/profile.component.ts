@@ -75,4 +75,77 @@ export class ProfileComponent implements OnInit {
     const parts = fullName.split(' ');
     return parts.slice(1).join(' ') || '';
   }
+
+  /**
+   * Obtiene el idioma preferido del usuario
+   * @returns Idioma preferido o 'No especificado' si es null/undefined
+   */
+  getPreferredLanguage(): string {
+    return this.profileService.person$().preferredLanguage || 'No especificado';
+  }
+
+  /**
+ * Obtiene la lista de idiomas disponibles
+ * @returns Array de objetos con código y nombre del idioma
+ */
+/**
+ * Obtiene la lista de idiomas disponibles
+ * @returns Array de objetos con código y nombre del idioma
+ */
+getLanguageOptions() {
+  return [
+    { code: 'es', name: 'Español' },
+    { code: 'en', name: 'Inglés' },
+    { code: 'fr', name: 'Francés' },
+    { code: 'de', name: 'Alemán' },
+    { code: 'it', name: 'Italiano' },
+    { code: 'pt', name: 'Portugués' },
+    { code: 'ru', name: 'Ruso' },
+    { code: 'zh', name: 'Chino' },
+    { code: 'ja', name: 'Japonés' },
+    { code: 'ko', name: 'Coreano' },
+    { code: 'ar', name: 'Árabe' },
+    { code: 'hi', name: 'Hindi' },
+    { code: 'nl', name: 'Holandés' },
+    { code: 'sv', name: 'Sueco' },
+    { code: 'pl', name: 'Polaco' },
+    { code: 'tr', name: 'Turco' },
+    { code: 'gr', name: 'Griego' },
+    { code: 'he', name: 'Hebreo' },
+    { code: 'no', name: 'Noruego' },
+    { code: 'da', name: 'Danés' },
+    { code: 'fi', name: 'Finlandés' },
+    { code: 'cs', name: 'Checo' },
+    { code: 'ro', name: 'Rumano' },
+    { code: 'hu', name: 'Húngaro' },
+    { code: 'th', name: 'Tailandés' },
+    { code: 'vi', name: 'Vietnamita' },
+    { code: 'id', name: 'Indonesio' },
+    { code: 'ms', name: 'Malayo' },
+    { code: 'uk', name: 'Ucraniano' },
+    { code: 'bg', name: 'Búlgaro' }
+  ];
+}
+
+/**
+ * Obtiene el nombre completo del idioma preferido
+ * @returns Nombre del idioma o 'No especificado'
+ */
+getPreferredLanguageName(): string {
+  const code = this.profileService.person$().preferredLanguage;
+  if (!code) return 'No especificado';
+  
+  const language = this.getLanguageOptions().find(lang => lang.code === code);
+  return language ? language.name : code;
+}
+
+/**
+ * Maneja el cambio de idioma preferido
+ */
+onLanguageChange(event: Event): void {
+  const select = event.target as HTMLSelectElement;
+  const newLanguage = select.value;
+  console.log('Nuevo idioma seleccionado:', newLanguage);
+  // Aquí puedes llamar a un servicio para guardar el cambio en el backend
+}
 }
