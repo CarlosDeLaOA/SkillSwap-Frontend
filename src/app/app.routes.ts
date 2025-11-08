@@ -2,7 +2,8 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './pages/auth/login/login.component';
 import { AppLayoutComponent } from './components/app-layout/app-layout.component';
 import { SigUpComponent } from './pages/auth/sign-up/signup.component';
-import { RegisterComponent } from './pages/register/register.component'; 
+import { RegisterComponent } from './pages/register/register.component';
+import { UsersComponent } from './pages/users/users.component';
 import { AuthGuard } from './guards/auth.guard';
 import { AccessDeniedComponent } from './pages/access-denied/access-denied.component';
 import { AdminRoleGuard } from './guards/admin-role.guard';
@@ -11,6 +12,7 @@ import { GuestGuard } from './guards/guest.guard';
 import { IRoleType } from './interfaces';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { AuthCallbackComponent } from './pages/auth/auth-callback.component/auth-callback.component';
+import { ForgotPasswordComponent } from './pages/auth/forgotpassword/forgot-password.component';
 
 export const routes: Routes = [
   {
@@ -27,11 +29,27 @@ export const routes: Routes = [
     path: 'auth/callback',
     component: AuthCallbackComponent
   },
+
   {
-    path: 'register', 
+    path: 'forgot-password',
+    component: ForgotPasswordComponent,
+    canActivate: [GuestGuard],
+  },
+  {
+    path: 'register',
     component: RegisterComponent,
     canActivate: [GuestGuard],
   },
+
+  
+{
+  path: 'onboarding',
+  canActivate: [AuthGuard], //solo para usuarios autenticados
+  loadComponent: () =>
+    import('./pages/onboarding/onboarding.component')
+      .then(m => m.OnboardingComponent),
+},
+
   {
     path: 'access-denied',
     component: AccessDeniedComponent,
@@ -52,14 +70,20 @@ export const routes: Routes = [
         pathMatch: 'full',
       },
       {
+        path: 'users',
+        component: UsersComponent,
+        canActivate: [AdminRoleGuard],
+        data: {
+          authorities: [IRoleType.admin, IRoleType.superAdmin],
+          name: 'Users',
+          showInSidebar: true
+        }
+      },
+      {
         path: 'dashboard',
         component: DashboardComponent,
         data: {
-          authorities: [
-            IRoleType.admin,
-            IRoleType.superAdmin,
-            IRoleType.user
-          ] ,
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
           name: 'Dashboard',
           showInSidebar: true
         }
@@ -68,11 +92,7 @@ export const routes: Routes = [
         path: 'profile',
         component: ProfileComponent,
         data: {
-          authorities: [
-            IRoleType.admin,
-            IRoleType.superAdmin,
-            IRoleType.user
-          ],
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
           name: 'profile',
           showInSidebar: false
         }
@@ -80,4 +100,6 @@ export const routes: Routes = [
       
     ],
   },
+  // Fallback
+  { path: '**', redirectTo: 'login' }
 ];
