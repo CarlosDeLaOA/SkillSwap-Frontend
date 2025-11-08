@@ -221,3 +221,48 @@ export interface ILoginResponseSkillSwap {
   expiresIn: number;
   authPerson: IPerson;
 }
+/** 
+ * Respuesta del endpoint de horas de aprendizaje
+ */
+export interface ILearningHoursResponse {
+  totalMinutes: number;
+  totalHours: number;
+  role: 'INSTRUCTOR' | 'LEARNER';
+}
+
+/**
+ * Entidad UpcomingSession para sesiones próximas
+ */
+export interface IUpcomingSession {
+  id: number;
+  title: string;
+  description: string;
+  scheduledDatetime: string;
+  durationMinutes: number;
+  status: string;
+  videoCallLink: string;
+  skillName: string;
+}
+
+/**
+ * Entidad Credential para certificaciones obtenidas
+ */
+export interface ICredential {
+  id: number;
+  skillName: string;
+  percentageAchieved: number;
+  badgeUrl: string;
+  obtainedDate: string;
+}
+
+/** 
+ * Entidad Feedback para valoraciones de sesiones
+ */
+export interface IFeedback {
+  id: number;
+  rating: number;
+  comment: string;
+  creationDate: string;
+  learnerName: string;
+  sessionTitle: string;
+}
