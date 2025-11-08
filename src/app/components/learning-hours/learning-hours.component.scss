@@ -1,150 +1,46 @@
-.reviews-section {
+.learning-hours {
   background-color: #39434B;
   border-radius: 15px;
-  padding: 30px;
+  padding: 25px;
   height: 100%;
-  min-height: 400px;
-}
-
-.title {
-  font-size: 35px;
-  color: #FFFFFF;
-  text-align: center;
-  margin: 0 0 30px 0;
-  font-weight: 600;
-}
-
-.carousel-container {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  position: relative;
-}
-
-.carousel-btn {
-  background: none;
-  border: none;
-  color: #AAE16B;
-  font-size: 40px;
-  cursor: pointer;
-  padding: 10px;
+  min-height: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s ease;
-  z-index: 10;
 }
 
-.carousel-btn:hover {
-  transform: scale(1.2);
-}
-
-.carousel-content {
-  display: flex;
-  gap: 20px;
-  overflow: hidden;
-  flex: 1;
-}
-
-/* Feedback Cards (Instructor - Horizontal) */
-.feedback-card.feedback {
-  background-color: #FFFFFF;
-  border-radius: 15px;
-  padding: 20px;
-  min-width: calc(33.333% - 14px);
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.feedback-header {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.logo-circle {
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #AAE16B 0%, #504AB7 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.logo-image {
-  width: 20px;
-  height: 20px;
-  object-fit: contain;
-}
-
-.session-title {
-  color: #141414;
-  font-weight: 700;
-  font-size: 16px;
-  flex: 1;
-}
-
-.feedback-comment {
-  color: #141414;
-  text-align: justify;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-/* Credential Cards (Learner - Vertical) */
-.feedback-card.credential {
-  background-color: #FFFFFF;
-  border-radius: 15px;
-  padding: 20px;
-  min-width: calc(20% - 16px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
+.content {
   text-align: center;
-}
-
-.credential-badge {
   width: 100%;
-  height: 80px;
-  border-radius: 15px;
-  background: linear-gradient(135deg, #AAE16B 0%, #504AB7 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.credential-badge .logo-image {
-  width: 50px;
-  height: 50px;
-}
-
-.skill-name {
-  color: #141414;
+.hours-number {
+  font-size: 60px;
+  color: #AAE16B;
   font-weight: 700;
-  font-size: 16px;
+  line-height: 1.2;
 }
 
-.credential-label {
-  color: #141414;
-  font-size: 14px;
+.hours-text {
+  font-size: 40px;
+  color: #AAE16B;
+  font-weight: 500;
+  margin-top: 5px;
 }
 
-.no-achievements {
-  text-align: center;
+.description {
+  font-size: 30px;
   color: #FFFFFF;
-  padding: 60px 20px;
-  font-size: 16px;
+  margin-top: 10px;
+  font-weight: 400;
 }
 
 .loading {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 60px;
+  width: 100%;
+  height: 100%;
 }
 
 .spinner {
