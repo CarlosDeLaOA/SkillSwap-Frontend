@@ -51,21 +51,7 @@ export interface IRole {
   updatedAt: string;
 }
 
-export interface IGame {
-  id?: number;
-  name?: string;
-  imgURL?: string;
-  status?: string;
-  description?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
 
-export interface IOrder {
-  id?: number;
-  description?: string;
-  total?: number;
-}
 
 export interface ISearch {
   page?: number;
@@ -76,51 +62,6 @@ export interface ISearch {
   totalPages?:number;
 }
 
-export interface IMovie {
-  id?: number;
-  title?: string;
-  director?: string;
-  description?: string;
-}
-
-export interface IPreferenceList {
-  id?: number;
-  name?: string;
-  movies?: IMovie[];
-}
-
-export interface ISportTeam {
-  id?: number;
-  name?: string;
-  players?: IPlayer[];
-  stadium?: string;
-  founded?: number;
-  coach?: string;
-  isInClubsWorldCup?: boolean;
-  teamLogo?: string;
-}
-
-export interface IPlayer {
-  id?: number;
-  name?: string;
-}
-
-export interface IGiftList {
-  id?: number;
-  name?: string;
-  description?: string;
-}
-
-export interface IGift {
-  id?: number;
-  name?: string;
-  description?: string;
-  price?: number;
-  imageUrl?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  giftList?: IGiftList;
-}
 //#region Register Interfaces
 
 /**
@@ -220,4 +161,49 @@ export interface ILoginResponseSkillSwap {
   token: string;
   expiresIn: number;
   authPerson: IPerson;
+}
+/** 
+ * Respuesta del endpoint de horas de aprendizaje
+ */
+export interface ILearningHoursResponse {
+  totalMinutes: number;
+  totalHours: number;
+  role: 'INSTRUCTOR' | 'LEARNER';
+}
+
+/**
+ * Entidad UpcomingSession para sesiones próximas
+ */
+export interface IUpcomingSession {
+  id: number;
+  title: string;
+  description: string;
+  scheduledDatetime: string;
+  durationMinutes: number;
+  status: string;
+  videoCallLink: string;
+  skillName: string;
+}
+
+/**
+ * Entidad Credential para certificaciones obtenidas
+ */
+export interface ICredential {
+  id: number;
+  skillName: string;
+  percentageAchieved: number;
+  badgeUrl: string;
+  obtainedDate: string;
+}
+
+/** 
+ * Entidad Feedback para valoraciones de sesiones
+ */
+export interface IFeedback {
+  id: number;
+  rating: number;
+  comment: string;
+  creationDate: string;
+  learnerName: string;
+  sessionTitle: string;
 }
