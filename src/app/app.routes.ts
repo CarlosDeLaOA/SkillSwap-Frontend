@@ -3,7 +3,6 @@ import { LoginComponent } from './pages/auth/login/login.component';
 import { AppLayoutComponent } from './components/app-layout/app-layout.component';
 import { SigUpComponent } from './pages/auth/sign-up/signup.component';
 import { RegisterComponent } from './pages/register/register.component';
-import { UsersComponent } from './pages/users/users.component';
 import { AuthGuard } from './guards/auth.guard';
 import { AccessDeniedComponent } from './pages/access-denied/access-denied.component';
 import { AdminRoleGuard } from './guards/admin-role.guard';
@@ -68,16 +67,6 @@ export const routes: Routes = [
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full',
-      },
-      {
-        path: 'users',
-        component: UsersComponent,
-        canActivate: [AdminRoleGuard],
-        data: {
-          authorities: [IRoleType.admin, IRoleType.superAdmin],
-          name: 'Users',
-          showInSidebar: true
-        }
       },
       {
         path: 'dashboard',
