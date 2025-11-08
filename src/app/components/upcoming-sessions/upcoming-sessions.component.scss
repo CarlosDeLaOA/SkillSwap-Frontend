@@ -5,3 +5,109 @@
   height: 100%;
   min-height: 300px;
 }
+
+.title {
+  font-size: 35px;
+  color: #FFFFFF;
+  text-align: center;
+  margin: 0 0 20px 0;
+  font-weight: 600;
+}
+
+.sessions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.session-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid #FFFFFF;
+}
+
+.session-item:last-child {
+  border-bottom: none;
+}
+
+.session-info {
+  flex: 1;
+}
+
+.session-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 5px;
+  text-align: left;
+}
+
+.session-datetime {
+  font-size: 14px;
+  color: #FFFFFF;
+  font-weight: 400;
+  text-align: left;
+}
+
+.session-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn-edit,
+.btn-cancel {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.btn-edit:hover,
+.btn-cancel:hover {
+  transform: scale(1.1);
+}
+
+.btn-edit i {
+  font-size: 24px;
+  color: #CFCC02;
+}
+
+.btn-cancel i {
+  font-size: 24px;
+  color: #B30202;
+}
+
+.no-sessions {
+  text-align: center;
+  color: #FFFFFF;
+  padding: 40px 20px;
+  font-size: 16px;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #39434B;
+  border-top: 4px solid #AAE16B;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

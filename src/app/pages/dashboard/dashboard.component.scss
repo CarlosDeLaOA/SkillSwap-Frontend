@@ -1,0 +1,92 @@
+.dashboard-page {
+  background-color: #141414;
+  min-height: 100vh;
+  padding: 20px;
+  padding-left: 90px; /* Espacio para el menú lateral */
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding: 0 10px;
+
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+  
+}
+
+.title-mi {
+  color: #FFFFFF;
+}
+
+.title-skilltrip {
+  background: linear-gradient(135deg, #AAE16B 0%, #504AB7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.export-button {
+  background-color: #AAE16B;
+  color: #141414;
+  border: none;
+  border-radius: 20px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.2s ease;
+}
+
+.export-button:hover {
+  transform: scale(1.05);
+}
+
+.export-icon {
+  font-size: 1.2rem;
+}
+
+.dashboard-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+/* Balance Dashboard ocupa 2 columnas */
+app-balance-dashboard {
+  grid-column: span 2;
+}
+
+/* Attendance Chart ocupa 1 columna */
+app-attendance-chart {
+  grid-column: span 1;
+}
+
+/* Skills Progress ocupa 1 columna */
+app-skills-progress {
+  grid-column: span 1;
+}
+
+/* Learning Hours ocupa 1 columna */
+app-learning-hours {
+  grid-column: span 1;
+}
+
+/* Upcoming Sessions ocupa 1 columna */
+app-upcoming-sessions {
+  grid-column: span 1;
+}
+
+/* Reviews Section ocupa 3 columnas */
+app-reviews-section {
+  grid-column: span 3;
+}
