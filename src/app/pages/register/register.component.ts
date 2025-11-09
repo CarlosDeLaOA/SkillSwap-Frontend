@@ -1,163 +1,204 @@
-//#region Imports
-import { Component, OnDestroy } from '@angular/core';
-import { FormBuilder, Validators, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subject, takeUntil } from 'rxjs';
-import { AuthService } from '../../services/auth.service';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-//#endregion
+import { RegisterService } from '../../services/register.service';
+import { IRegisterData, IFeedBackMessage, IFeedbackStatus } from '../../interfaces';
 
+/**
+ * Componente de registro de usuarios - Primer paso del onboarding
+ * Captura datos básicos y valida disponibilidad de email
+ */
 @Component({
   selector: 'app-register',
-  templateUrl: './register.component.html',
-  styleUrls: ['./register.component.scss'],
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule
-  ]
+  imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: './register.component.html',
+  styleUrls: ['./register.component.scss']
 })
-export class RegisterComponent implements OnDestroy {
-  //#region Properties
-  public registerForm!: FormGroup;
-  public isLoading = false;
-  public showPassword = false;
-  public selectedRole: 'LEARNER' | 'INSTRUCTOR' = 'LEARNER';
-  public feedbackMessage = { type: '', message: '' };
-
-  private destroy$ = new Subject<void>();
+export class RegisterComponent {
+  //#region Dependencies
+  private fb: FormBuilder = inject(FormBuilder);
+  private router: Router = inject(Router);
+  private registerService: RegisterService = inject(RegisterService);
   //#endregion
 
-  //#region Constructor
-  constructor(
-    private fb: FormBuilder,
-    private auth: AuthService,
-    private router: Router
-  ) {
-    this.registerForm = this.fb.group({
-      firstName: ['', [Validators.required, Validators.minLength(2)]],
-      lastName:  ['', [Validators.required, Validators.minLength(2)]],
-      email:     ['', [Validators.required, Validators.email]],
-      password:  ['', [Validators.required, Validators.minLength(6)]]
-    });
+  //#region Properties
+  public registerForm!: FormGroup;
+  public selectedRole: 'LEARNER' | 'INSTRUCTOR' = 'LEARNER';
+  public isLoading: boolean = false;
+  public feedbackMessage: IFeedBackMessage = { type: IFeedbackStatus.default, message: '' };
+  public showPassword: boolean = false;
+  //#endregion
+
+  //#region Lifecycle
+  constructor() {
+    this.initForm();
   }
   //#endregion
 
-  //#region UI Methods
+  //#region Form Initialization
+
+  /**
+   * Inicializa el formulario con validaciones
+   */
+  private initForm(): void {
+    this.registerForm = this.fb.group({
+      firstName: ['', [Validators.required, Validators.minLength(2)]],
+      lastName: ['', [Validators.required, Validators.minLength(2)]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)
+      ]]
+    });
+  }
+
+  //#endregion
+
+  //#region Role Selection
+
+  /**
+   * Selecciona el rol del usuario
+   * @param role - Rol seleccionado (LEARNER o INSTRUCTOR)
+   */
+  public selectRole(role: 'LEARNER' | 'INSTRUCTOR'): void {
+    this.selectedRole = role;
+    this.clearFeedback();
+  }
+
+  //#endregion
+
+  //#region Form Validation
+
+  /**
+   * Verifica si un campo tiene errores y fue tocado
+   * @param fieldName - Nombre del campo a validar
+   * @returns true si el campo es inválido y fue tocado
+   */
+  public isFieldInvalid(fieldName: string): boolean {
+    const field = this.registerForm.get(fieldName);
+    return !!(field && field.invalid && (field.dirty || field.touched));
+  }
+
+  /**
+   * Obtiene el mensaje de error para un campo específico
+   * @param fieldName - Nombre del campo
+   * @returns Mensaje de error correspondiente
+   */
+  public getErrorMessage(fieldName: string): string {
+    const field = this.registerForm.get(fieldName);
+    if (!field || !field.errors) return '';
+
+    if (field.errors['required']) return 'Este campo es requerido';
+    if (field.errors['email']) return 'El formato del correo electrónico no es válido';
+    if (field.errors['minlength']) {
+      const minLength = field.errors['minlength'].requiredLength;
+      return `Debe tener al menos ${minLength} caracteres`;
+    }
+    if (field.errors['pattern'] && fieldName === 'password') {
+      return 'La contraseña debe contener al menos: 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial (@$!%*?&)';
+    }
+    return 'Campo inválido';
+  }
+
+  //#endregion
+
+  //#region Email Validation
+
+  /**
+   * Verifica si el email ya está registrado
+   */
+  public checkEmailAvailability(): void {
+    const email = this.registerForm.get('email')?.value;
+    if (!email || this.registerForm.get('email')?.invalid) return;
+
+    this.registerService.checkEmailAvailability(email).subscribe({
+      next: (response) => {
+        if (!response.available) {
+          this.registerForm.get('email')?.setErrors({ emailTaken: true });
+          this.showFeedback(IFeedbackStatus.error, 'El correo electrónico ya está registrado');
+        } else {
+          this.clearFeedback();
+        }
+      },
+      error: () => {
+        this.showFeedback(IFeedbackStatus.error, 'Error al verificar el correo electrónico');
+      }
+    });
+  }
+
+  //#endregion
+
+  //#region Form Submission
+
+  /**
+   * Maneja el envío del formulario
+   * Guarda los datos temporalmente y navega al siguiente paso
+   */
+  public onSubmit(): void {
+    if (this.registerForm.invalid) {
+      this.registerForm.markAllAsTouched();
+      this.showFeedback(IFeedbackStatus.error, 'Por favor completa todos los campos correctamente');
+      return;
+    }
+
+    this.isLoading = true;
+
+    const email = this.registerForm.get('email')?.value;
+    this.registerService.checkEmailAvailability(email).subscribe({
+      next: (response) => {
+        if (!response.available) {
+          this.isLoading = false;
+          this.showFeedback(IFeedbackStatus.error, 'El correo electrónico ya está registrado');
+          return;
+        }
+
+        const registerData: IRegisterData = {
+          email: email,
+          password: this.registerForm.get('password')?.value,
+          fullName: `${this.registerForm.get('firstName')?.value} ${this.registerForm.get('lastName')?.value}`,
+          role: this.selectedRole
+        };
+
+        this.registerService.saveTemporaryData(registerData);
+        this.isLoading = false;
+        this.router.navigate(['/onboarding']);
+      },
+      error: () => {
+        this.isLoading = false;
+        this.showFeedback(IFeedbackStatus.error, 'Error al procesar el registro. Por favor intente nuevamente.');
+      }
+    });
+  }
+
+  //#endregion
+
+  //#region UI Helpers
+
+  /**
+   * Alterna la visibilidad de la contraseña
+   */
   public togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }
 
-  public selectRole(role: 'LEARNER' | 'INSTRUCTOR'): void {
-    this.selectedRole = role;
+  /**
+   * Muestra un mensaje de feedback al usuario
+   * @param type - Tipo de mensaje (success, error)
+   * @param message - Mensaje a mostrar
+   */
+  private showFeedback(type: IFeedbackStatus, message: string): void {
+    this.feedbackMessage = { type, message };
   }
 
-  public isFieldInvalid(controlName: string): boolean {
-    const c = this.registerForm.get(controlName);
-    return !!c && c.invalid && (c.dirty || c.touched);
+  /**
+   * Limpia el mensaje de feedback
+   */
+  private clearFeedback(): void {
+    this.feedbackMessage = { type: IFeedbackStatus.default, message: '' };
   }
 
-  public getErrorMessage(controlName: string): string {
-    const c = this.registerForm.get(controlName);
-    if (!c) return '';
-    if (c.hasError('required'))   return 'Este campo es obligatorio';
-    if (c.hasError('email'))      return 'Correo inválido';
-    if (c.hasError('minlength'))  return `Debe tener al menos ${c.getError('minlength').requiredLength} caracteres`;
-    if (c.hasError('emailTaken')) return 'Este correo ya está registrado';
-    return 'Campo inválido';
-  }
-  //#endregion
-
-  //#region Email Validation
-  public checkEmailAvailability(): void {
-    const emailCtrl = this.registerForm.get('email');
-    const email = (emailCtrl?.value || '').trim();
-    if (!emailCtrl || !emailCtrl.valid) return;
-
-    this.auth
-      .checkEmail(email)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: ({ exists }) => {
-          if (exists) {
-            emailCtrl.setErrors({ ...(emailCtrl.errors || {}), emailTaken: true });
-            this.feedbackMessage = { type: 'error', message: 'Este correo ya está registrado.' };
-          } else {
-            if (emailCtrl.hasError('emailTaken')) {
-              const { emailTaken, ...rest } = emailCtrl.errors || {};
-              emailCtrl.setErrors(Object.keys(rest).length ? rest : null);
-            }
-            this.feedbackMessage = { type: '', message: '' };
-          }
-        },
-        error: () => {
-          this.feedbackMessage = { type: 'error', message: 'No se pudo verificar el correo.' };
-        }
-      });
-  }
-  //#endregion
-
-  //#region Form Submit
-  public onSubmit(): void {
-    if (this.registerForm.invalid) {
-      this.registerForm.markAllAsTouched();
-      return;
-    }
-
-    if (this.registerForm.get('email')?.hasError('emailTaken')) {
-      this.feedbackMessage = { type: 'error', message: 'El correo ya está registrado.' };
-      return;
-    }
-
-    const { firstName, lastName, email, password } = this.registerForm.value;
-    const payload = {
-      name: firstName,
-      lastname: lastName,
-      email,
-      password,
-      role: this.selectedRole
-    };
-
-    this.isLoading = true;
-    this.feedbackMessage = { type: '', message: '' };
-
-    this.auth
-      .signup(payload as any)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (res: any) => {
-          this.isLoading = false;
-          this.feedbackMessage = { type: 'success', message: 'Registro completado correctamente.' };
-
-          //#region Onboarding (redirect post-registro)
-          try {
-            
-            if (res?.token) {
-             
-              this.auth['accessToken'] = res.token;
-              localStorage.setItem('access_token', res.token);
-            }
-          } catch {  }
-
-          // Redirige al flujo de onboarding
-          this.router.navigate(['/onboarding']);
-          //#endregion
-        },
-        error: (err) => {
-          this.isLoading = false;
-          this.feedbackMessage = {
-            type: 'error',
-            message: err?.error?.error || 'No se pudo completar el registro.'
-          };
-        }
-      });
-  }
-  //#endregion
-
-  //#region Lifecycle
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
   //#endregion
 }

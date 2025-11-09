@@ -41,13 +41,7 @@ export const routes: Routes = [
   },
 
   
-{
-  path: 'onboarding',
-  canActivate: [AuthGuard], //solo para usuarios autenticados
-  loadComponent: () =>
-    import('./pages/onboarding/onboarding.component')
-      .then(m => m.OnboardingComponent),
-},
+
 
   {
     path: 'access-denied',
