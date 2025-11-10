@@ -1,0 +1,11 @@
+<div class="learning-hours">
+  <div class="content" *ngIf="!isLoading">
+    <div class="hours-number">{{ learningHours }}</div>
+    <div class="hours-text">horas</div>
+    <div class="description">{{ getDescriptionText() }}</div>
+  </div>
+  
+  <div class="loading" *ngIf="isLoading">
+    <div class="spinner"></div>
+  </div>
+</div>

@@ -1,0 +1,159 @@
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 70px;
+  height: 100vh;
+  background-color: #1A1A1A;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px 0;
+  z-index: 1000;
+}
+
+.logo-container {
+  margin-bottom: 30px;
+}
+
+.logo {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--theme-secondary);
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(170, 225, 107, 0.3);
+  }
+}
+.logo-image {
+  width: 35px;
+  height: 35px;
+}
+.menu-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0;
+}
+
+.spinner-small {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #39434B;
+  border-top: 3px solid var(--theme-secondary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.menu-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  flex: 1;
+}
+
+.menu-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  margin-top: auto;
+}
+
+.menu-item {
+  width: 40px;
+  height: 40px;
+  background-color: transparent;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7B8794;
+  font-size: 22px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.menu-item.spacer {
+  margin-bottom: auto;
+}
+
+.menu-item.profile {
+  border-radius: 50%;
+  border: 2px solid #7B8794;
+  background-color: #39434B;
+}
+
+.menu-item:hover {
+  background-color: #39434B;
+  color: var(--theme-secondary);
+  transform: scale(1.05);
+}
+
+.menu-item.active {
+  background-color: #39434B;
+  color: var(--theme-secondary);
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: -15px;
+    width: 3px;
+    height: 40px;
+    background-color: var(--theme-secondary);
+    border-radius: 0 3px 3px 0;
+  }
+}
+
+.menu-item.profile:hover {
+  border-color: var(--theme-secondary);
+}
+
+.menu-item.logout:hover {
+  color: #ff6b6b;
+}
+
+.menu-item i {
+  font-size: 22px;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 60px;
+  }
+
+  .logo {
+    width: 30px;
+    height: 30px;
+    font-size: 18px;
+  }
+
+  .menu-item {
+    width: 35px;
+    height: 35px;
+
+    i {
+      font-size: 20px;
+    }
+  }
+}

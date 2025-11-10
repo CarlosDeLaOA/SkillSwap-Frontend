@@ -1,0 +1,28 @@
+<div class="upcoming-sessions">
+  <h2 class="title">Próximas sesiones</h2>
+  
+  <div class="sessions-list" *ngIf="!isLoading && sessions.length > 0">
+    <div class="session-item" *ngFor="let session of sessions">
+      <div class="session-info">
+        <div class="session-name">{{ session.title }}</div>
+        <div class="session-datetime">{{ formatDateTime(session.scheduledDatetime) }}</div>
+      </div>
+      <div class="session-actions">
+        <button class="btn-edit" *ngIf="isInstructor()" (click)="onEdit(session)">
+          <i class='bx bx-edit'></i>
+        </button>
+        <button class="btn-cancel" (click)="onCancel(session)">
+          <i class='bx bx-x'></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="no-sessions" *ngIf="!isLoading && sessions.length === 0">
+    <p>No hay sesiones próximas</p>
+  </div>
+  
+  <div class="loading" *ngIf="isLoading">
+    <div class="spinner"></div>
+  </div>
+</div>
