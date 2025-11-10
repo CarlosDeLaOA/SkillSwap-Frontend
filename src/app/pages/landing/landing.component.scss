@@ -112,13 +112,14 @@ $hero-bg-gradient: linear-gradient(180deg, #a6e6fa 0%, #d4a5f5 50%, #fa9deb 100%
 // ===================================
 
 .hero {
-  position: relative;
+   position: relative;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   background: linear-gradient(180deg, #a6e6fa 0%, #d4a5f5 50%, #fa9deb 100%);
+  padding-top: 0;
 
   // Onda inferior negra
   .hero-wave-bottom {
@@ -136,34 +137,39 @@ $hero-bg-gradient: linear-gradient(180deg, #a6e6fa 0%, #d4a5f5 50%, #fa9deb 100%
   }
 
   .hero-content {
-    position: relative;
-    z-index: 2;
-    text-align: center;
-  }
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  margin-top: -80px; // Subir el contenido para compensar el navbar
+}
 
   .hero-text {
-    h1 {
-      font-size: clamp(3rem, 8vw, 6rem);
-      font-weight: 800;
-      margin-bottom: 1.5rem;
-      line-height: 1.1;
-      color: #fff;
+  h1 {
+    font-size: clamp(3rem, 8vw, 5rem);
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+    color: #fff;
 
-      .text-gradient {
-        background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
+    .text-gradient {
+      background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    .hero-subtitle {
-      font-size: clamp(1.1rem, 2vw, 1.5rem);
-      color: rgba(255, 255, 255, 0.95);
-      font-weight: 400;
-      letter-spacing: 0.5px;
+    .text-celeste {
+      color: #a6e6fa; // Celeste claro
     }
   }
+
+  .hero-subtitle {
+    font-size: clamp(1.1rem, 2vw, 1.4rem);
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 400;
+    letter-spacing: 0.5px;
+  }
+}
 }
 
 // ===================================
