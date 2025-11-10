@@ -16,7 +16,6 @@ export class LandingComponent {
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
-    // Detectar si pasó del hero (aprox 100vh)
     this.isScrolled = window.scrollY > window.innerHeight * 0.8;
   }
 
