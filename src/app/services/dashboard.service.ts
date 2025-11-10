@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ILearningHoursResponse, IUpcomingSession, ICredential, IFeedback  } from '../interfaces';
+import { ILearningHoursResponse, IUpcomingSession, ICredential, IFeedback, IAccountBalance, IMonthlyAchievement, ISkillSessionStats  } from '../interfaces';
 
 /**
  * Service to handle dashboard-related API calls
@@ -58,6 +58,30 @@ export class DashboardService {
       map(response => response.data)
     );
   }
+
+  /**
+ * Gets account balance
+ * @returns Observable with account balance data
+ */
+getAccountBalance(): Observable<IAccountBalance> {
+  return this.http.get<IAccountBalance>(`${this.API_URL}/account-balance`);
+}
+
+/**
+ * Gets monthly achievements for last 4 months
+ * @returns Observable with monthly achievements list
+ */
+getMonthlyAchievements(): Observable<IMonthlyAchievement[]> {
+  return this.http.get<IMonthlyAchievement[]>(`${this.API_URL}/monthly-achievements`);
+}
+
+/**
+ * Gets skill session statistics
+ * @returns Observable with skill session stats list
+ */
+getSkillSessionStats(): Observable<ISkillSessionStats[]> {
+  return this.http.get<ISkillSessionStats[]>(`${this.API_URL}/skill-session-stats`);
+}
   //#endregion
 
   //#region Private Methods

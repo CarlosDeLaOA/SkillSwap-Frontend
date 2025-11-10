@@ -1,0 +1,31 @@
+[33m00cfbbe[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdev-jose[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/dev-jose[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m HEAD@{0}: merge main: Fast-forward
+[33md36fb73[m HEAD@{1}: reset: moving to HEAD
+[33md36fb73[m HEAD@{2}: checkout: moving from main to dev-jose
+[33md36fb73[m HEAD@{3}: checkout: moving from dev-jose to main
+[33md36fb73[m HEAD@{4}: checkout: moving from main to dev-jose
+[33md36fb73[m HEAD@{5}: checkout: moving from dev-jose to main
+[33md36fb73[m HEAD@{6}: checkout: moving from main to dev-jose
+[33md36fb73[m HEAD@{7}: checkout: moving from dev-jose to main
+[33md36fb73[m HEAD@{8}: merge main: Fast-forward
+[33m6839848[m HEAD@{9}: checkout: moving from main to dev-jose
+[33m4b82fa4[m HEAD@{10}: checkout: moving from dev-jose to main
+[33m6839848[m HEAD@{11}: merge main: Fast-forward
+[33m0a821ae[m HEAD@{12}: merge main: Fast-forward
+[33m87bfe8e[m HEAD@{13}: commit: Login
+[33mb2e470b[m HEAD@{14}: merge main: Fast-forward
+[33m259916e[m[33m ([m[1;31morigin/qa[m[33m, [m[1;31morigin/development[m[33m)[m HEAD@{15}: checkout: moving from main to dev-jose
+[33m146b3af[m HEAD@{16}: commit: Remove unnecessary line separator in index.ts
+[33mfc320fa[m HEAD@{17}: commit (merge): Merge branch 'main' of https://github.com/CarlosDeLaOA/SkillSwap-Frontend
+[33m263b257[m HEAD@{18}: checkout: moving from main to main
+[33m263b257[m HEAD@{19}: commit: Se suben cambios de Google OAuth
+[33m79d5348[m HEAD@{20}: reset: moving to origin/main
+[33m79d5348[m HEAD@{21}: checkout: moving from main to main
+[33m79d5348[m HEAD@{22}: checkout: moving from main to main
+[33m79d5348[m HEAD@{23}: pull --ff --recurse-submodules --progress origin: Fast-forward
+[33ma56f4b6[m HEAD@{24}: reset: moving to origin/main
+[33ma56f4b6[m HEAD@{25}: checkout: moving from main to main
+[33ma56f4b6[m HEAD@{26}: reset: moving to origin/main
+[33ma56f4b6[m HEAD@{27}: pull --ff --recurse-submodules --progress origin: Fast-forward
+[33m45f108b[m HEAD@{28}: reset: moving to HEAD
+[33m45f108b[m HEAD@{29}: commit: Commit inicial del proyecto SkillSwap-Frontend
+[33m259916e[m[33m ([m[1;31morigin/qa[m[33m, [m[1;31morigin/development[m[33m)[m HEAD@{30}: clone: from https://github.com/CarlosDeLaOA/SkillSwap-Frontend.git

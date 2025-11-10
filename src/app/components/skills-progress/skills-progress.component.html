@@ -1,3 +1,55 @@
 <div class="skills-progress">
- <!--JOSE-->
+  <div class="content" *ngIf="!isLoading && hasData()">
+    <div class="dropdown-container">
+      <select class="skill-dropdown" [(ngModel)]="selectedSkill" (change)="onSkillChange()">
+        <option *ngFor="let skill of skillsData; let i = index" [value]="i">
+          {{ skill.skillName }}
+        </option>
+      </select>
+    </div>
+
+    <div class="chart-container" *ngIf="selectedSkill !== null">
+      <svg class="pie-chart" viewBox="0 0 200 200">
+        <circle
+          class="pie-segment completed"
+          cx="100"
+          cy="100"
+          r="80"
+          [attr.stroke-dasharray]="getStrokeDasharray()"
+          [attr.stroke-dashoffset]="0"
+        ></circle>
+        <circle
+          class="pie-segment pending"
+          cx="100"
+          cy="100"
+          r="80"
+          [attr.stroke-dasharray]="getStrokeDasharray()"
+          [attr.stroke-dashoffset]="getCompletedCircumference()"
+        ></circle>
+      </svg>
+      
+      <div class="percentage-label">
+        {{ getCompletedPercentage() }}%
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item">
+        <span class="legend-color completed"></span>
+        <span class="legend-label">Completado</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-color pending"></span>
+        <span class="legend-label">Pendiente</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="no-data" *ngIf="!isLoading && !hasData()">
+    <p>No hay datos de sesiones disponibles</p>
+  </div>
+  
+  <div class="loading" *ngIf="isLoading">
+    <div class="spinner"></div>
+  </div>
 </div>
