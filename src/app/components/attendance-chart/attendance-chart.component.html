@@ -1,3 +1,40 @@
 <div class="attendance-chart">
-     <!--JOSE-->
+  <h2 class="title">Logros obtenidos</h2>
+  
+  <div class="chart-container" *ngIf="!isLoading && hasData()">
+    <div class="legend">
+      <div class="legend-item">
+        <span class="legend-color credentials"></span>
+        <span class="legend-label">Credenciales</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-color certificates"></span>
+        <span class="legend-label">Certificados</span>
+      </div>
+    </div>
+
+    <div class="chart">
+      <div class="bars-container">
+        <div class="month-group" *ngFor="let data of monthlyData">
+          <div class="bars">
+            <div class="bar credentials" [style.height.%]="getBarHeight(data.credentials)">
+              <span class="bar-value" *ngIf="data.credentials > 0">{{ data.credentials }}</span>
+            </div>
+            <div class="bar certificates" [style.height.%]="getBarHeight(data.certificates)">
+              <span class="bar-value" *ngIf="data.certificates > 0">{{ data.certificates }}</span>
+            </div>
+          </div>
+          <div class="month-label">{{ data.month }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="no-data" *ngIf="!isLoading && !hasData()">
+    <p>No hay logros disponibles</p>
+  </div>
+  
+  <div class="loading" *ngIf="isLoading">
+    <div class="spinner"></div>
+  </div>
 </div>
