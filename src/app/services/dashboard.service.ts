@@ -64,7 +64,8 @@ export class DashboardService {
  * @returns Observable with account balance data
  */
 getAccountBalance(): Observable<IAccountBalance> {
-  return this.http.get<IAccountBalance>(`${this.API_URL}/account-balance`);
+  const headers = this.getAuthHeaders();
+  return this.http.get<IAccountBalance>(`${this.API_URL}/account-balance`, { headers });
 }
 
 /**
@@ -72,7 +73,8 @@ getAccountBalance(): Observable<IAccountBalance> {
  * @returns Observable with monthly achievements list
  */
 getMonthlyAchievements(): Observable<IMonthlyAchievement[]> {
-  return this.http.get<IMonthlyAchievement[]>(`${this.API_URL}/monthly-achievements`);
+  const headers = this.getAuthHeaders();
+  return this.http.get<IMonthlyAchievement[]>(`${this.API_URL}/monthly-achievements`, { headers });
 }
 
 /**
@@ -80,7 +82,8 @@ getMonthlyAchievements(): Observable<IMonthlyAchievement[]> {
  * @returns Observable with skill session stats list
  */
 getSkillSessionStats(): Observable<ISkillSessionStats[]> {
-  return this.http.get<ISkillSessionStats[]>(`${this.API_URL}/skill-session-stats`);
+  const headers = this.getAuthHeaders();
+  return this.http.get<ISkillSessionStats[]>(`${this.API_URL}/skill-session-stats`, { headers });
 }
   //#endregion
 

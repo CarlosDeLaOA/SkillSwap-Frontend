@@ -62,24 +62,27 @@ export class AttendanceChartComponent implements OnInit {
   /**
    * Loads monthly achievements from the API
    */
+
 private loadMonthlyAchievements(): void {
   this.isLoading = true;
   this.dashboardService.getMonthlyAchievements().subscribe({
     next: (data: any) => {
-      console.log('Monthly achievements data received:', data);
+      console.log('✅ Datos de logros mensuales:', data);
       
-      // Verificar que data sea un array
-      if (Array.isArray(data)) {
-        this.monthlyData = [...data].reverse();
+      // Maneja si viene envuelto en { data: [...] }
+      let logrosData = data && data.data ? data.data : (Array.isArray(data) ? data : []);
+      
+      if (logrosData.length > 0) {
+        this.monthlyData = [...logrosData].reverse();
         this.calculateMaxValue();
       } else {
-        console.error('Expected array but got:', data);
+        console.warn('⚠️ No hay datos de logros mensuales');
         this.monthlyData = [];
       }
       this.isLoading = false;
     },
     error: (error) => {
-      console.error('Error loading monthly achievements:', error);
+      console.error('❌ Error cargando logros:', error);
       this.monthlyData = [];
       this.isLoading = false;
     }

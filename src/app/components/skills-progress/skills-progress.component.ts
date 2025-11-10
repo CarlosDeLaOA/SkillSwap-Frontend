@@ -95,20 +95,28 @@ export class SkillsProgressComponent implements OnInit {
    * Loads skill session statistics from the API
    */
   private loadSkillSessionStats(): void {
-    this.isLoading = true;
-    this.dashboardService.getSkillSessionStats().subscribe({
-      next: (data: ISkillSessionStats[]) => {
-        this.skillsData = data;
-        if (this.skillsData.length > 0) {
-          this.selectedSkill = 0;
-        }
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error loading skill session stats:', error);
-        this.isLoading = false;
+  this.isLoading = true;
+  this.dashboardService.getSkillSessionStats().subscribe({
+    next: (data: any) => {
+      console.log('✅ Datos de habilidades:', data);
+      
+      // Maneja si viene envuelto en { data: [...] }
+      let estadisticas = data && data.data ? data.data : (Array.isArray(data) ? data : []);
+      
+      this.skillsData = estadisticas;
+      if (this.skillsData.length > 0) {
+        this.selectedSkill = 0;
+      } else {
+        console.warn('⚠️ No hay estadísticas disponibles');
       }
-    });
-  }
+      this.isLoading = false;
+    },
+    error: (error) => {
+      console.error('❌ Error cargando estadísticas:', error);
+      this.skillsData = [];
+      this.isLoading = false;
+    }
+  });
+}
   //#endregion
 }
