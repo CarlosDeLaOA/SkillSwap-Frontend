@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 
@@ -10,8 +10,15 @@ import { RouterModule, Router } from '@angular/router';
   styleUrls: ['./landing.component.scss'],
 })
 export class LandingComponent {
-  
+  isScrolled = false;
+
   constructor(private router: Router) {}
+
+  @HostListener('window:scroll', [])
+  onWindowScroll() {
+    // Detectar si pasó del hero (aprox 100vh)
+    this.isScrolled = window.scrollY > window.innerHeight * 0.8;
+  }
 
   goToProject(): void {
     this.router.navigate(['/login']);

@@ -34,27 +34,28 @@ $hero-bg-gradient: linear-gradient(180deg, #a6e6fa 0%, #d4a5f5 50%, #fa9deb 100%
   left: 0;
   right: 0;
   display: flex;
-  justify-content: center;
+  justify-content: center; // Cambiar de space-between a center
   align-items: center;
   padding: 1.5rem 3rem;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: transparent !important;
+  backdrop-filter: none;
+  border-bottom: none;
   z-index: 1000;
   transition: all 0.3s ease;
-  gap: 4rem;
+  gap: 4rem; // Espacio entre logo y nav-links
 
   .logo {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: 700;
     color: #0a0a0a;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    transition: color 0.3s ease;
 
     .logo-accent {
       color: #ec4899;
-      font-size: 1.8rem;
+      font-size: 1.2rem;
+      margin: 0 0.3rem;
     }
   }
 
@@ -63,40 +64,43 @@ $hero-bg-gradient: linear-gradient(180deg, #a6e6fa 0%, #d4a5f5 50%, #fa9deb 100%
     gap: 2.5rem;
 
     .nav-link {
-      color: white(10, 10, 10, 0.7);
+      color: rgba(10, 10, 10, 0.7);
       text-decoration: none;
       font-size: 0.95rem;
       font-weight: 500;
       transition: all 0.3s ease;
       position: relative;
 
-      &::after {
-        content: '';
-        position: absolute;
-        bottom: -5px;
-        left: 0;
-        width: 0;
-        height: 2px;
-        background: linear-gradient(90deg, #ec4899, #8b5cf6);
-        transition: width 0.3s ease;
-      }
-
-      &:hover,
-      &.active {
-        color: white;
-
-        &::after {
-          width: 100%;
-        }
+      &:hover {
+        color: #ec4899;
       }
 
       &.active {
+        color: #ec4899;
+        font-weight: 600;
+      }
+    }
+  }
+
+  // Cuando scrollea
+  &.scrolled {
+    .logo {
+      color: #ffffff;
+    }
+
+    .nav-links .nav-link {
+      color: rgba(255, 255, 255, 0.7);
+
+      &.active {
+        color: #ec4899;
+      }
+
+      &:hover {
         color: #ec4899;
       }
     }
   }
 }
-
 // ===================================
 // CONTENEDOR GENERAL
 // ===================================
