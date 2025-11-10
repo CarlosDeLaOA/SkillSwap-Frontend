@@ -207,3 +207,19 @@ export interface IFeedback {
   learnerName: string;
   sessionTitle: string;
 }
+
+export interface IAccountBalance {
+  skillCoins: number;
+}
+
+export interface IMonthlyAchievement {
+  month: string;
+  credentials: number;
+  certificates: number;
+}
+
+export interface ISkillSessionStats {
+  skillName: string;
+  completed: number;
+  pending: number;
+}
