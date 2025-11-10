@@ -1,100 +1,78 @@
-<div class="logo-wrapper">
-  <a routerLink="/">
-    <img
-      class="img-fluid"
-      src="../../../../../assets/icons/logo@2x.png"
-      width="50"
-      alt="Logo"
-    />
-  </a>
-
-  <div class="back-btn" (click)="layoutService.toggleSidebar()">
-    <i class="fa-solid fa-arrow-left"></i>
+<aside class="sidebar">
+  <!-- Logo superior -->
+  <div class="logo-container">
+    <div class="logo" (click)="navigateTo('/dashboard')">
+     <img src="assets/img/Imagotipo.png" alt="Logo" class="logo-image">
+    </div>
   </div>
 
-  <div class="toggle-sidebar" (click)="layoutService.toggleSidebar()">
-    <i class="fa-solid fa fa-thumb-tack"></i>
-  </div>
-</div>
-
-<div class="logo-icon-wrapper">
-  <a href="javascript:void(0)">
-    <img
-      class="img-fluid"
-      src="../../../../../assets/icons/logo@2x.png"
-      width="35"
-      alt=""
-    />
-  </a>
-</div>
-
-<nav class="sidebar-main">
-  <div
-    id="left-arrow"
-    class="left-arrow"
-    [ngClass]="{ 'd-none': !showLeftArrow }"
-  >
-    <!-- <app-feather-icon icon="arrow-left"></app-feather-icon> -->
+  <div class="menu-loading" *ngIf="isLoading">
+    <div class="spinner-small"></div>
   </div>
 
-  <div id="sidebar-menu" style="margin-left: 0px">
-    <ul class="sidebar-links custom-scrollbar">
-      <div class="simplebar-wrapper">
-        <div class="simplebar-mask">
-          <div class="simplebar-offset">
-            <div class="simplebar-content-wrapper">
-              <div class="simplebar-content">
-                <li class="back-btn">
-                  <a href="javascript:void(0)">
-                    <img
-                      class="img-fluid"
-                      src="../../../../../assets/img/login/login-bg.jpg"
-                      alt="Logo"
-                    />
-                  </a>
+  <nav class="menu-top" *ngIf="!isLoading">
+    <!-- Dashboard icon -->
+    <button 
+      class="menu-item" 
+      [class.active]="isActive('/dashboard')"
+      (click)="navigateTo('/dashboard')"
+      title="Dashboard">
+      <i class='bx bxs-dashboard'></i>
+    </button>
 
-                  <div
-                    class="mobile-back text-end"
-                    (click)="layoutService.toggleSidebar()"
-                  >
-                    <span>Atrás</span>
-                    <i class="fa fa-angle-right ps-2" ></i>
-                  </div>
-                </li>
+    <button 
+      class="menu-item" 
+      *ngIf="isInstructor()"
+      [class.active]="isActive('/create-session')"
+      (click)="navigateTo('/create-session')"
+      title="Crear sesión">
+      <i class='bx bx-plus'></i>
+    </button>
 
-                <li class="sidebar-main-title">
-                  <div>
-                    <h6>General</h6>
-                  </div>
-                </li>
+    <button 
+      class="menu-item" 
+      *ngIf="isLearner()"
+      [class.active]="isActive('/explore')"
+      (click)="navigateTo('/explore')"
+      title="Explorar sesiones">
+      <i class='bx bx-compass'></i>
+    </button>
 
-                @for (route of permittedRoutes; track $index) {
-                  @if (route.data && route.data['showInSidebar']) {
-                  <li class="sidebar-list">
-                    <a
-                      routerLink="{{route.path}}"
-                      routerLinkActive="active"
-                      class="sidebar-link sidebar-title"
-                    >
-                        <span>{{route.data['name']}}</span>
-                      </a>
-                    </li>
-                  }
-                }
+    <button 
+      class="menu-item spacer" 
+      *ngIf="isInstructor()"
+      [class.active]="isActive('/calendar')"
+      (click)="navigateTo('/calendar')"
+      title="Mi calendario">
+      <i class='bx bx-calendar'></i>
+    </button>
 
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </ul>
-  </div>
+    <button 
+      class="menu-item spacer" 
+      *ngIf="isLearner()"
+      [class.active]="isActive('/communities')"
+      (click)="navigateTo('/communities')"
+      title="Mis comunidades">
+      <i class='bx bx-group'></i>
+    </button>
+  </nav>
 
-  <div
-    class="right-arrow"
-    id="right-arrow"
-    [ngClass]="{ 'd-none': !showRigthArrow }"
-  >
-    <!-- <app-feather-icon icon="arrow-right"></app-feather-icon> -->
-  </div>
-</nav>
+  <nav class="menu-bottom" *ngIf="!isLoading">
+
+    <button 
+      class="menu-item profile"
+      [class.active]="isActive('/app/profile')"
+      (click)="navigateTo('/app/profile')"
+      title="Mi perfil">
+      <i class='bx bx-user'> </i>
+      
+    </button>
+
+    <button 
+      class="menu-item logout"
+      (click)="logout()"
+      title="Cerrar sesión">
+      <i class='bx bx-log-out'></i>
+    </button>
+  </nav>
+</aside>
