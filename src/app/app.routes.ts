@@ -87,6 +87,15 @@ export const routes: Routes = [
           showInSidebar: true
         }
       },
+      {
+        path: 'sessions',
+        component: SessionListComponent,
+        data: {
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+          name: 'Sesiones',
+          showInSidebar: true
+        }
+      },
     ],
   },
   { path: '**', redirectTo: 'login' }
