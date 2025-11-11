@@ -13,6 +13,7 @@ import { ProfileComponent } from './pages/profile/profile.component';
 import { AuthCallbackComponent } from './pages/auth/auth-callback.component/auth-callback.component';
 import { ForgotPasswordComponent } from './pages/auth/forgotpassword/forgot-password.component';
 import { LandingComponent } from './pages/landing/landing.component';
+import { LandingskillswapComponent } from './pages/landingskillswap/landingskillswap.component';
 
 
 export const routes: Routes = [
@@ -52,6 +53,10 @@ export const routes: Routes = [
   {
   path: '',
   component: LandingComponent,
+},
+{
+  path: 'skillswap',
+  component: LandingskillswapComponent,
 },
 
   {
