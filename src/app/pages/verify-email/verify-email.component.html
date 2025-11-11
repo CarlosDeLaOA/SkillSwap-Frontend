@@ -1,0 +1,121 @@
+<div class="verify-email-container">
+  <!-- Background -->
+  <div class="background-wrapper">
+    <img src="assets/img/onboardingbg.svg" alt="Background" class="background-image">
+  </div>
+
+  <!-- Content -->
+  <div class="content-wrapper">
+    <div class="verification-card" [ngClass]="getStatusClass()">
+      
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="status-content">
+        <div class="spinner"></div>
+        <h1 class="title">Verificando tu cuenta...</h1>
+        <p class="message">Por favor espera un momento</p>
+      </div>
+
+      <!-- Success State -->
+      <div *ngIf="!isLoading && verificationSuccess" class="status-content">
+        <!-- Success Icon -->
+        <div class="icon-wrapper success-icon">
+          <svg width="80" height="80" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="#a8ff35" stroke-width="2"/>
+            <path d="M8 12l3 3l5-6" stroke="#a8ff35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <h1 class="title success-title">¡Cuenta Verificada!</h1>
+        <p class="message">{{ verificationMessage }}</p>
+
+        <div class="countdown-wrapper">
+          <p class="countdown-text">
+            Serás redirigido al inicio de sesión en <strong>{{ countdown }}</strong> segundos
+          </p>
+        </div>
+
+        <button class="action-btn primary-btn" (click)="navigateToLogin()">
+          <span>Ir a Iniciar Sesión</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="!isLoading && !verificationSuccess" class="status-content">
+        <!-- Error Icon -->
+        <div class="icon-wrapper error-icon">
+          <svg width="80" height="80" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="#ff4444" stroke-width="2"/>
+            <path d="M15 9l-6 6M9 9l6 6" stroke="#ff4444" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <h1 class="title error-title">Error de Verificación</h1>
+        <p class="message">{{ verificationMessage }}</p>
+
+        <!-- Different error messages based on status -->
+        <div class="error-details" [ngSwitch]="verificationStatus">
+          <div *ngSwitchCase="'EXPIRED_TOKEN'" class="error-info">
+            <p class="error-subtitle">Tu token de verificación ha expirado</p>
+            <p class="error-description">
+              Los tokens de verificación son válidos por 24 horas. 
+              Puedes solicitar un nuevo correo de verificación desde la página de inicio de sesión.
+            </p>
+          </div>
+
+          <div *ngSwitchCase="'ALREADY_VERIFIED'" class="error-info">
+            <p class="error-subtitle">Esta cuenta ya está verificada</p>
+            <p class="error-description">
+              Puedes iniciar sesión directamente con tu correo y contraseña.
+            </p>
+          </div>
+
+          <div *ngSwitchCase="'TOKEN_USED'" class="error-info">
+            <p class="error-subtitle">Este token ya fue utilizado</p>
+            <p class="error-description">
+              Si necesitas verificar tu cuenta nuevamente, solicita un nuevo correo de verificación.
+            </p>
+          </div>
+
+          <div *ngSwitchCase="'INVALID_TOKEN'" class="error-info">
+            <p class="error-subtitle">Token inválido o no encontrado</p>
+            <p class="error-description">
+              El enlace de verificación no es válido. Verifica que hayas copiado el enlace completo.
+            </p>
+          </div>
+
+          <div *ngSwitchCase="'NETWORK_ERROR'" class="error-info">
+            <p class="error-subtitle">Error de conexión</p>
+            <p class="error-description">
+              No se pudo conectar con el servidor. Verifica que el backend esté corriendo en http://localhost:8080
+            </p>
+          </div>
+
+          <div *ngSwitchDefault class="error-info">
+            <p class="error-subtitle">Ha ocurrido un error</p>
+            <p class="error-description">
+              Por favor intenta nuevamente o contacta a soporte.
+            </p>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button class="action-btn secondary-btn" (click)="navigateToLogin()">
+            <span>Ir a Iniciar Sesión</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- SkillSwap Logo/Branding -->
+    <div class="branding">
+      <h2 class="brand-name">
+        <span class="brand-skill">Skill</span><span class="brand-swap">Swap</span>
+      </h2>
+    </div>
+  </div>
+</div>

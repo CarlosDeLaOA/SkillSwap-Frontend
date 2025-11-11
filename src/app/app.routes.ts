@@ -14,7 +14,8 @@ import { AuthCallbackComponent } from './pages/auth/auth-callback.component/auth
 import { ForgotPasswordComponent } from './pages/auth/forgotpassword/forgot-password.component';
 import { SessionListComponent} from './pages/session-list/session-list.component';  
 import { LandingComponent } from './pages/landing/landing.component';
-import { LandingskillswapComponent } from './pages/landingskillswap/landingskillswap.component';
+import { SkillOnboardingComponent } from './pages/skill-onboarding/skill-onboarding.component';
+import { VerifyEmailComponent } from './pages/verify-email/verify-email.component';import { LandingskillswapComponent } from './pages/landingskillswap/landingskillswap.component';
 
 
 export const routes: Routes = [
@@ -43,13 +44,23 @@ export const routes: Routes = [
     canActivate: [GuestGuard],
   },
   {
+    path: 'onboarding/skills',
+    component: SkillOnboardingComponent
+    // SIN canActivate - permite acceso sin autenticación
+  },
+  {
+    path: 'verify-email',
+    component: VerifyEmailComponent
+   
+  },
+  {
     path: 'access-denied',
     component: AccessDeniedComponent,
   },
   {
-  path: '',
-  component: LandingComponent,
-},
+    path: '',
+    component: LandingComponent,
+  },
 {
   path: 'skillswap',
   component: LandingskillswapComponent,
@@ -81,15 +92,6 @@ export const routes: Routes = [
           authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
           name: 'profile',
           showInSidebar: false
-        }
-      },
-      {
-        path: 'sessions',
-        component: SessionListComponent,
-        data: {
-          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
-          name: 'Sesiones',
-          showInSidebar: true
         }
       },
       {

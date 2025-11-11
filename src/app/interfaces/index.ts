@@ -261,3 +261,32 @@ export interface ISessionFilters {
   categoryId?: number;
   language?: string;
 }
+
+/**
+ * Interfaz para Skill (Habilidad)
+ */
+export interface ISkill {
+  id: number;
+  name: string;
+  description?: string;
+  active: boolean;
+  knowledgeArea?: IKnowledgeArea;
+}
+
+/**
+ * Interfaz para UserSkill (Habilidad del Usuario)
+ */
+export interface IUserSkill {
+  id: number;
+  person: IPerson;
+  skill: ISkill;
+  selectedDate: string;
+  active: boolean;
+}
+
+/**
+ * Request para guardar habilidades del usuario
+ */
+export interface ISaveUserSkillsRequest {
+  skillIds: number[];
+}

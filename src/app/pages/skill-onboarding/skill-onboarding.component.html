@@ -1,0 +1,94 @@
+<div class="onboarding-container">
+  <!-- Background -->
+  <div class="background-wrapper">
+    <img src="assets/img/onboardingbg.svg" alt="Background" class="background-image">
+  </div>
+
+  <!-- Main Content -->
+  <div class="content-wrapper">
+    <!-- Title -->
+    <h1 class="main-title">
+      Selecciona tus <span class="highlight">habilidades</span>
+    </h1>
+
+    <!-- 3D Carousel -->
+    <div class="carousel-container">
+      <div class="banner">
+        <div class="slider" [style.--quantity]="knowledgeAreas.length">
+          <div 
+            *ngFor="let area of knowledgeAreas; let i = index" 
+            class="item"
+            [style.--position]="i + 1"
+            [class.active]="i === currentCategoryIndex"
+          >
+            <div class="category-card">
+              <img [src]="area.iconUrl" [alt]="area.name" class="category-icon">
+              <h3 class="category-name">{{ area.name }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Buttons -->
+      <button class="nav-btn prev-btn" (click)="previousCategory()" [disabled]="isLoading">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+      </button>
+      <button class="nav-btn next-btn" (click)="nextCategory()" [disabled]="isLoading">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 18l6-6-6-6"/>
+        </svg>
+      </button>
+
+      <!-- Complete Button -->
+      <button 
+        class="complete-btn" 
+        (click)="completeOnboarding()"
+        [disabled]="isLoading || selectedSkills.length === 0"
+      >
+        <span>Listo</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 13l4 4L19 7"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Skills Section -->
+    <div class="skills-section">
+      <div class="skills-grid">
+        <button
+          *ngFor="let skill of currentCategorySkills"
+          class="skill-btn"
+          [class.selected]="isSkillSelected(skill.id)"
+          (click)="toggleSkillSelection(skill)"
+          [disabled]="isLoading"
+        >
+          {{ skill.name }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Selected Skills Tags -->
+    <div class="selected-skills-container">
+      <div class="selected-tag" *ngFor="let skill of selectedSkills">
+        <button class="remove-btn" (click)="removeSelectedSkill(skill)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+        <span class="tag-text">{{ skill.name }}</span>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" *ngIf="isLoading">
+      <div class="spinner"></div>
+    </div>
+  </div>
+</div>
