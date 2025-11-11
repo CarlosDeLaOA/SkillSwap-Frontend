@@ -58,8 +58,12 @@ export const routes: Routes = [
     component: AccessDeniedComponent,
   },
   {
-  path: '',
-  component: LandingComponent,
+    path: '',
+    component: LandingComponent,
+  },
+{
+  path: 'skillswap',
+  component: LandingskillswapComponent,
 },
 
   {
