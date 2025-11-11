@@ -1,0 +1,62 @@
+<div class="modal-header">
+  <h5 class="modal-title">
+    <i class="bi bi-funnel me-2"></i>
+    Filtrar sesiones
+  </h5>
+  <button type="button" class="btn-close btn-close-white" (click)="dismiss()"></button>
+</div>
+
+<div class="modal-body">
+  <!-- Filtro por Categoría -->
+  <div class="filter-section">
+    <h6 class="filter-title">
+      <i class="bi bi-tag me-2"></i>
+      Categorías
+    </h6>
+    <div class="filter-options">
+      <div class="form-check" *ngFor="let category of categories">
+        <input 
+          class="form-check-input" 
+          type="checkbox" 
+          [id]="'category-' + category"
+          [(ngModel)]="selectedCategories[category]"
+          (change)="onFilterChange()">
+        <label class="form-check-label" [for]="'category-' + category">
+          {{ category }}
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtro por Idioma -->
+  <div class="filter-section">
+    <h6 class="filter-title">
+      <i class="bi bi-translate me-2"></i>
+      Idiomas
+    </h6>
+    <div class="filter-options">
+      <div class="form-check" *ngFor="let language of languages">
+        <input 
+          class="form-check-input" 
+          type="checkbox" 
+          [id]="'language-' + language"
+          [(ngModel)]="selectedLanguages[language]"
+          (change)="onFilterChange()">
+        <label class="form-check-label" [for]="'language-' + language">
+          {{ language }}
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-light" (click)="clearFilters()">
+    <i class="bi bi-x-circle me-2"></i>
+    Limpiar
+  </button>
+  <button type="button" class="btn btn-primary" (click)="applyFilters()">
+    <i class="bi bi-check-circle me-2"></i>
+    Aplicar filtros
+  </button>
+</div>
