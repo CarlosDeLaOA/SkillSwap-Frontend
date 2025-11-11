@@ -12,6 +12,7 @@ import { IRoleType } from './interfaces';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { AuthCallbackComponent } from './pages/auth/auth-callback.component/auth-callback.component';
 import { ForgotPasswordComponent } from './pages/auth/forgotpassword/forgot-password.component';
+import { SessionListComponent} from './pages/session-list/session-list.component';  
 import { LandingComponent } from './pages/landing/landing.component';
 
 
@@ -30,7 +31,6 @@ export const routes: Routes = [
     path: 'auth/callback',
     component: AuthCallbackComponent
   },
-
   {
     path: 'forgot-password',
     component: ForgotPasswordComponent,
@@ -41,10 +41,6 @@ export const routes: Routes = [
     component: RegisterComponent,
     canActivate: [GuestGuard],
   },
-
-  
-
-
   {
     path: 'access-denied',
     component: AccessDeniedComponent,
@@ -82,9 +78,16 @@ export const routes: Routes = [
           showInSidebar: false
         }
       },
-      
+      {
+        path: 'sessions',
+        component: SessionListComponent,
+        data: {
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+          name: 'Sesiones',
+          showInSidebar: true
+        }
+      },
     ],
   },
-  // Fallback
   { path: '**', redirectTo: 'login' }
 ];

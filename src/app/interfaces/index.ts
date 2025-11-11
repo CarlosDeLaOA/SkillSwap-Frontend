@@ -207,3 +207,57 @@ export interface IFeedback {
   learnerName: string;
   sessionTitle: string;
 }
+
+export interface ILearningSession {
+  id: number;
+  title: string;
+  description: string;
+  scheduledDatetime: string;
+  durationMinutes: number;
+  type: string;
+  maxCapacity: number;
+  isPremium: boolean;
+  skillcoinsCost: number;
+  language: string;
+  status: string;
+  videoCallLink?: string;
+  creationDate: string;
+  
+  instructor: {
+    id: number;
+    person: {
+      id: number;
+      fullName: string;
+      profilePhotoUrl?: string;
+      email: string;
+    };
+  };
+  
+  skill: {
+    id: number;
+    name: string;
+    knowledgeArea: {
+      id: number;
+      name: string;
+      iconUrl?: string;
+    };
+  };
+  
+  bookings: any[];
+  
+  currentBookings?: number;
+  availableSpots?: number;
+}
+
+export interface IKnowledgeArea {
+  id: number;
+  name: string;
+  description?: string;
+  iconUrl?: string;
+  active: boolean;
+}
+
+export interface ISessionFilters {
+  categoryId?: number;
+  language?: string;
+}
