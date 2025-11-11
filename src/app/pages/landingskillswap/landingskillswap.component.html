@@ -1,0 +1,186 @@
+<header class="landing-nav" [class.scrolled]="isScrolled">
+  <div class="logo">
+    <div class="logo-icon">
+      <img src="assets/img/LOGO (1).png" alt="SkillSwap"> 
+    </div>
+    
+  </div>
+
+  <nav class="nav-links">
+    <a href="#inicio" class="nav-link active">Inicio</a>
+    <a href="#beneficios" class="nav-link">Beneficios</a>
+     <a href="#ser-skillswapper" class="nav-link">Ser SkillSwapper</a>
+    <a href="#conocenos" class="nav-link">Conócenos</a>
+  </nav>
+
+  <div class="nav-buttons">
+    <button class="btn btn-primary" (click)="goToRegister()">Registrarse</button>
+    <button class="btn btn-outline" (click)="goToLogin()">Iniciar Sesión</button>
+  </div>
+</header>
+
+<main class="landing-page">
+
+  <!-- HERO SECTION -->
+  <section id="inicio" class="hero">
+    <div class="hero-wave-bottom">
+      <svg width="100%" height="100%" viewBox="0 0 1440 590" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+        <path d="M 0,600 L 0,225 C 156,157.26666666666665 312,89.53333333333333 492,119 C 672,148.46666666666667 876,275.1333333333333 1038,309 C 1200,342.8666666666667 1320,283.93333333333334 1440,225 L 1440,600 L 0,600 Z" 
+              stroke="none" 
+              stroke-width="0" 
+              fill="#0a0a0a" 
+              fill-opacity="1">
+        </path>
+      </svg>
+    </div>
+
+    <div class="hero-robot">
+      <img src="assets/img/Skilo.png" alt="Robot SkillSwap">
+    </div>
+
+    <div class="hero-content container">
+      <div class="hero-text">
+        <h1>
+          Habilidades<br>
+          en <span class="text-gradient">tiempo real</span>
+        </h1>
+      </div>
+    </div>
+  </section>
+
+  <!-- ¿POR QUÉ SKILLSWAP? -->
+  <section id="beneficios" class="section why-section">
+    <div class="container">
+      <h2 class="section-title">¿Por qué SkillSwap?</h2>
+      <p class="section-subtitle">
+        Somos la plataforma que te permitirá llevar tus <span class="highlight">conocimientos a otro nivel.</span>
+      </p>
+
+      <div class="features-grid">
+        <div class="feature-card">
+        <div class="feature-icon">
+          <img src="assets/img/transmision-en-vivo 1.png" alt="Sesiones en vivo">
+        </div>
+          <h3>Sesiones en vivo<br>por expertos</h3>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+          <img src="assets/img/nota 1.png" alt="Notas de sesiones">
+        </div>
+          <h3>Notas de sesiones<br>generadas por IA</h3>
+        </div>
+
+        <div class="feature-card feature-large">
+             <div class="feature-icon">
+          <img src="assets/img/usuario (2) 1.png" alt="Conocimiento compartido">
+        </div>
+          <h3>Conocimiento compartido<br>en grupos privados</h3>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONVIÉRTETE EN SKILLSWAPPER -->
+<section id="ser-skillswapper" class="section become-section">
+  <div class="container">
+    <div class="become-content">
+      <div class="become-text">
+        <h2>Conviértete en <span class="highlight">SkillSwapper</span></h2>
+        <ul class="steps-list">
+          <li>
+            <span class="step-number">1.</span>
+            <span>Regístrate con tu <strong>correo</strong> o con <strong>google</strong>.</span>
+          </li>
+          <li>
+            <span class="step-number">2.</span>
+            <span>Completa tu <strong>perfil</strong>.</span>
+          </li>
+          <li>
+            <span class="step-number">3.</span>
+            <span>Crea tu <strong>primera sesión</strong>.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="become-image">
+        <div class="image-wrapper">
+          <img src="assets/img/Bg image.png" alt="Conviértete en SkillSwapper">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <!-- ÚNETE A SKILLSWAP -->
+  <section id="conocenos" class="section join-section">
+    <div class="container">
+      <h2 class="section-title">Únete a <span class="highlight">SkillSwap</span></h2>
+      <p class="section-subtitle">
+        Somos la plataforma <span class="highlight">#1</span> en aprendizaje en tiempo real.
+      </p>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number">+200 mil</div>
+          <br>
+          <div class="stat-label">SkillSwappers</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-number">+200</div>
+          <br>
+          <div class="stat-label">sesiones activas</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-number">+100 mil</div>
+          <br>
+          <div class="stat-label">SkillSeekers</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIOS -->
+  <section class="section testimonials-section">
+    <div class="container">
+      <h2 class="section-title">Testimonios de nuestros SkillSeekers</h2>
+<br><br>
+      <div class="testimonials-grid">
+        <div class="testimonial-card" *ngFor="let testimonial of testimonials">
+          <div class="testimonial-header">
+            <div class="testimonial-avatar">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
+                <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="testimonial-name">{{ testimonial.name }}</div>
+          </div>
+          <p class="testimonial-text">{{ testimonial.text }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="landing-footer">
+  <svg class="footer-wave-svg" viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="footer-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="1%" style="stop-color:#a3e635;stop-opacity:1" />
+        <stop offset="350%" style="stop-color:#8b5cf6;stop-opacity:1" />
+        <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+      </linearGradient>
+    </defs>
+    <path d="M0,160 L48,144 C96,128 192,96 288,90.7 C384,85 480,107 576,122.7 C672,139 768,149 864,138.7 C960,128 1056,96 1152,85.3 C1248,75 1344,85 1392,90.7 L1440,96 L1440,320 L0,320 Z" 
+          fill="url(#footer-gradient)">
+    </path>
+  </svg>
+
+  <div class="footer-inner">
+    <p class="footer-text">© 2025 Byte and Bite. Todos los derechos reservados.</p>
+  </div>
+</footer>
