@@ -6,14 +6,16 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   let token = authService.getToken?.() ?? localStorage.getItem('access_token');
 
-  if (!token || token === 'null' || token === 'undefined' || token === '' || token === ' ') {
-    const cleanReq = req.clone({
-      headers: req.headers.delete('Authorization'),
-    });
-    return next(cleanReq);
-  }
+  // #region Rutas públicas (no añadir Authorization)
+  const isPublic =
+    req.url.includes('/auth/login') ||
+    req.url.includes('/auth/register') ||
+    req.url.includes('/auth/status') ||
+    req.url.includes('/auth/google') ||
+    req.url.includes('/auth/password/reset');
+  // #endregion
 
-  if (token.split('.').length === 3) {
+  if (token && !isPublic) {
     const cloned = req.clone({
       setHeaders: { Authorization: `Bearer ${token}` }
     });

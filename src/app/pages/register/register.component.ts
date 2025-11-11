@@ -4,11 +4,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router } from '@angular/router';
 import { RegisterService } from '../../services/register.service';
 import { IRegisterData, IFeedBackMessage, IFeedbackStatus } from '../../interfaces';
+import { finalize } from 'rxjs/operators'; // #region NUEVO
 
-/**
- * Componente de registro de usuarios - Primer paso del onboarding
- * Captura datos básicos y valida disponibilidad de email
- */
 @Component({
   selector: 'app-register',
   standalone: true,
@@ -32,16 +29,10 @@ export class RegisterComponent {
   //#endregion
 
   //#region Lifecycle
-  constructor() {
-    this.initForm();
-  }
+  constructor() { this.initForm(); }
   //#endregion
 
   //#region Form Initialization
-
-  /**
-   * Inicializa el formulario con validaciones
-   */
   private initForm(): void {
     this.registerForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.minLength(2)]],
@@ -54,39 +45,21 @@ export class RegisterComponent {
       ]]
     });
   }
-
   //#endregion
 
   //#region Role Selection
-
-  /**
-   * Selecciona el rol del usuario
-   * @param role - Rol seleccionado (LEARNER o INSTRUCTOR)
-   */
   public selectRole(role: 'LEARNER' | 'INSTRUCTOR'): void {
     this.selectedRole = role;
     this.clearFeedback();
   }
-
   //#endregion
 
   //#region Form Validation
-
-  /**
-   * Verifica si un campo tiene errores y fue tocado
-   * @param fieldName - Nombre del campo a validar
-   * @returns true si el campo es inválido y fue tocado
-   */
   public isFieldInvalid(fieldName: string): boolean {
     const field = this.registerForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
   }
 
-  /**
-   * Obtiene el mensaje de error para un campo específico
-   * @param fieldName - Nombre del campo
-   * @returns Mensaje de error correspondiente
-   */
   public getErrorMessage(fieldName: string): string {
     const field = this.registerForm.get(fieldName);
     if (!field || !field.errors) return '';
@@ -102,16 +75,11 @@ export class RegisterComponent {
     }
     return 'Campo inválido';
   }
-
   //#endregion
 
   //#region Email Validation
-
-  /**
-   * Verifica si el email ya está registrado
-   */
   public checkEmailAvailability(): void {
-    const email = this.registerForm.get('email')?.value;
+    const email = this.registerForm.get('email')?.value?.trim();
     if (!email || this.registerForm.get('email')?.invalid) return;
 
     this.registerService.checkEmailAvailability(email).subscribe({
@@ -123,20 +91,12 @@ export class RegisterComponent {
           this.clearFeedback();
         }
       },
-      error: () => {
-        this.showFeedback(IFeedbackStatus.error, 'Error al verificar el correo electrónico');
-      }
+      error: () => this.showFeedback(IFeedbackStatus.error, 'Error al verificar el correo electrónico')
     });
   }
-
   //#endregion
 
   //#region Form Submission
-
-  /**
-   * Maneja el envío del formulario
-   * Guarda los datos temporalmente y navega al siguiente paso
-   */
   public onSubmit(): void {
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
@@ -146,59 +106,56 @@ export class RegisterComponent {
 
     this.isLoading = true;
 
-    const email = this.registerForm.get('email')?.value;
-    this.registerService.checkEmailAvailability(email).subscribe({
-      next: (response) => {
-        if (!response.available) {
-          this.isLoading = false;
-          this.showFeedback(IFeedbackStatus.error, 'El correo electrónico ya está registrado');
-          return;
+    const firstName = String(this.registerForm.get('firstName')?.value ?? '').trim();
+    const lastName  = String(this.registerForm.get('lastName')?.value ?? '').trim();
+    const email     = String(this.registerForm.get('email')?.value ?? '').trim();
+    const password  = String(this.registerForm.get('password')?.value ?? '');
+
+    this.registerService.checkEmailAvailability(email)
+      .pipe(finalize(() => this.isLoading = false)) // #region NUEVO
+      .subscribe({
+        next: (response) => {
+          if (!response.available) {
+            this.showFeedback(IFeedbackStatus.error, 'El correo electrónico ya está registrado');
+            return;
+          }
+
+          // Guardado temporal solo para el siguiente paso (NO se crea usuario aún)
+          const registerData: IRegisterData = {
+            email,
+            password,
+            fullName: `${firstName} ${lastName}`.replace(/\s+/g, ' ').trim(),
+            role: this.selectedRole
+          };
+          this.registerService.saveTemporaryData(registerData);
+
+          // Pasar contexto al onboarding
+          this.router.navigate(['/onboarding/skills'], {
+            replaceUrl: true,                         // #region NUEVO
+            state: {
+              fromRegister: true,
+              email,
+              fullName: registerData.fullName,
+              role: this.selectedRole
+            }
+          });
+        },
+        error: () => {
+          this.showFeedback(IFeedbackStatus.error, 'Error al procesar el registro. Por favor intente nuevamente.');
         }
-
-        const registerData: IRegisterData = {
-          email: email,
-          password: this.registerForm.get('password')?.value,
-          fullName: `${this.registerForm.get('firstName')?.value} ${this.registerForm.get('lastName')?.value}`,
-          role: this.selectedRole
-        };
-
-        this.registerService.saveTemporaryData(registerData);
-        this.isLoading = false;
-        this.router.navigate(['/onboarding/skills']);
-      },
-      error: () => {
-        this.isLoading = false;
-        this.showFeedback(IFeedbackStatus.error, 'Error al procesar el registro. Por favor intente nuevamente.');
-      }
-    });
+      });
   }
-
   //#endregion
 
   //#region UI Helpers
+  public togglePasswordVisibility(): void { this.showPassword = !this.showPassword; }
 
-  /**
-   * Alterna la visibilidad de la contraseña
-   */
-  public togglePasswordVisibility(): void {
-    this.showPassword = !this.showPassword;
-  }
-
-  /**
-   * Muestra un mensaje de feedback al usuario
-   * @param type - Tipo de mensaje (success, error)
-   * @param message - Mensaje a mostrar
-   */
   private showFeedback(type: IFeedbackStatus, message: string): void {
     this.feedbackMessage = { type, message };
   }
 
-  /**
-   * Limpia el mensaje de feedback
-   */
   private clearFeedback(): void {
     this.feedbackMessage = { type: IFeedbackStatus.default, message: '' };
   }
-
   //#endregion
 }

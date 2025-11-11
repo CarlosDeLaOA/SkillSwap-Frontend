@@ -1,0 +1,88 @@
+<div class="onb">
+  <!-- Encabezado -->
+  <header class="hero">
+    <h1>Selecciona tus <span>habilidades</span></h1>
+  </header>
+
+  <!-- Botones superiores -->
+  <div class="top-actions">
+    <button class="btn ghost cancel" (click)="navigateToLogin()">
+      ← Cancelar y volver
+    </button>
+    <button class="fab-done" (click)="save()" [disabled]="!selectedCategoryIds().size">
+  Listo <span>✓</span>
+</button>
+  </div>
+
+  <!-- Categorías -->
+  <section class="cats">
+    <div class="cats__inner">
+      <button
+        class="cat"
+        *ngFor="let c of categories(); index as i"
+        [class.active]="isCategorySelected(c.id)"
+        (click)="toggleCategory(c)"
+      >
+        <div
+          class="cat__img"
+          [class.i1]="i % 4 === 0"
+          [class.i2]="i % 4 === 1"
+          [class.i3]="i % 4 === 2"
+          [class.i4]="i % 4 === 3"
+        ></div>
+        <div class="cat__name">{{ c.name }}</div>
+      </button>
+    </div>
+  </section>
+
+  <!-- Bandeja de categorías seleccionadas -->
+  <section class="selected-cats" *ngIf="selectedCategories().length > 0">
+    <h3>Categorías seleccionadas</h3>
+    <div class="chips">
+      <div class="chip" *ngFor="let cat of selectedCategories()">
+        {{ cat.name }}
+        <button type="button" (click)="removeCategory(cat)" aria-label="Quitar">✕</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills -->
+  <section class="skills-wrap" *ngIf="skills().length > 0">
+    <h2 class="skills-title">{{ focusedCategoryTitle() }}</h2>
+
+    <div class="skills-grid">
+      <button
+        class="skill-card"
+        *ngFor="let s of skills()"
+        [class.sel]="isSelected(s.id)"
+        (click)="toggleSkill(s)"
+      >
+        <div class="skill-card__img" aria-hidden="true"></div>
+        <div class="skill-card__name">{{ s.name }}</div>
+      </button>
+    </div>
+  </section>
+
+  <!-- Bandeja inferior -->
+  <footer class="tray">
+    <div class="tray__chips">
+      <div class="chip" *ngFor="let s of selectedAll()">
+        <button type="button" (click)="removeFromTray(s.id)" aria-label="Quitar">✕</button>
+        {{ s.name }}
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn ghost" (click)="clearSelection()" [disabled]="!selectedSkillIds().size">
+        Limpiar
+      </button>
+      <button class="btn primary" (click)="save()" [disabled]="!selectedCategoryIds().size">
+        Guardar y continuar ✓
+      </button>
+    </div>
+    </footer>
+
+  <!-- Mensajes -->
+  <div *ngIf="errorMsg()" class="msg err">{{ errorMsg() }}</div>
+  <div *ngIf="okMsg()" class="msg ok">{{ okMsg() }}</div>
+</div>
