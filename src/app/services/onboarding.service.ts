@@ -1,47 +1,46 @@
+
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+
+//#region Tipos base
 export interface KnowledgeArea {
   id: number;
   name: string;
+  description?: string | null;
+  iconUrl?: string | null;
   active: boolean;
 }
 
 export interface Skill {
   id: number;
   name: string;
+  description?: string | null;
   active: boolean;
-  knowledgeAreaId: number;
 }
+//#endregion
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class OnboardingService {
-  private readonly http = inject(HttpClient);
+  //#region Deps
+  private http = inject(HttpClient);
+  private apiBase = '/api'; 
+  //#endregion
 
-  /**
-   * 🔹 Carga todas las categorías activas (sin prefijo /api)
-   */
+  //#region Endpoints
   getCategories(): Observable<KnowledgeArea[]> {
-    return this.http.get<KnowledgeArea[]>('/onboarding/categories');
+    return this.http.get<KnowledgeArea[]>(`${this.apiBase}/onboarding/categories`);
   }
 
-  /**
-   * 🔹 Obtiene las habilidades de una categoría
-   */
   getSkillsByCategory(categoryId: number): Observable<Skill[]> {
-    return this.http.get<Skill[]>(`/onboarding/skills?categoryId=${categoryId}`);
+    const params = new HttpParams().set('categoryId', String(categoryId));
+    return this.http.get<Skill[]>(`${this.apiBase}/onboarding/skills`, { params });
   }
 
-  /**
-   * 🔹 Guarda la selección del usuario
-   */
-  saveSelection(personId: number, skillIds: number[]): Observable<any> {
-    return this.http.post('/onboarding/save-selection', {
-      personId,
-      skillIds,
-    });
+  saveSelection(personId: number, skillIds: number[]): Observable<number> {
+    const params = new HttpParams().set('personId', String(personId));
+    return this.http.post<number>(`${this.apiBase}/onboarding/selection`, skillIds, { params });
   }
+  //#endregion
 }
