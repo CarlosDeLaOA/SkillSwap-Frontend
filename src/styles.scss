@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;600;700&display=swap');
+
 :root { 
   --theme-primary: #504ab7; 
   --theme-secondary: #aae16b; 
@@ -19,7 +21,7 @@ html, body {
 } 
 
 body { 
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-family: 'Epilogue', sans-serif !important;
   color: #ffffff;
 } 
 

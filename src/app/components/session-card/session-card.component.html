@@ -1,0 +1,54 @@
+<div class="session-card">
+  <div class="session-content">
+    <div class="session-header">
+      <h3 class="session-title">{{ session.title }}</h3>
+      <span class="session-category badge" *ngIf="session.skill?.knowledgeArea?.name">
+        {{ session.skill.knowledgeArea.name }}
+      </span>
+    </div>
+    <p class="session-description">{{ session.description }}</p>
+    
+    <div class="session-meta">
+      <span class="meta-item" *ngIf="session.instructor?.person?.fullName">
+        <i class="bi bi-person-circle"></i>
+        {{ session.instructor.person.fullName }}
+      </span>
+      <span class="meta-item" *ngIf="session.skill?.name">
+        <i class="bi bi-tag"></i>
+        {{ session.skill.name }}
+      </span>
+      <span class="meta-item" *ngIf="session.language">
+        <i class="bi bi-translate"></i>
+        {{ getLanguageName(session.language) }}
+      </span>
+      <span class="meta-item" *ngIf="getAvailableSpots() > 0">
+        <i class="bi bi-people"></i>
+        {{ getAvailableSpots() }} cupos disponibles
+      </span>
+    </div>
+  </div>
+  
+  <div class="session-info">
+    <div class="session-datetime">
+      <div class="info-item" *ngIf="session.scheduledDatetime">
+        <span class="info-label">Fecha:</span>
+        <span class="info-value">{{ formatDate(session.scheduledDatetime) }}</span>
+      </div>
+      <div class="info-item" *ngIf="session.scheduledDatetime">
+        <span class="info-label">Hora:</span>
+        <span class="info-value">{{ formatTime(session.scheduledDatetime) }}</span>
+      </div>
+      <div class="info-item" *ngIf="session.durationMinutes">
+        <span class="info-label">Duración:</span>
+        <span class="info-value">{{ session.durationMinutes }} min</span>
+      </div>
+    </div>
+    
+    <button 
+      class="btn btn-register" 
+      (click)="onRegister()"
+      [disabled]="getAvailableSpots() === 0">
+      {{ getAvailableSpots() === 0 ? 'Lleno' : 'Registrarme' }}
+    </button>
+  </div>
+</div>
