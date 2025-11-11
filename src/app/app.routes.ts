@@ -15,7 +15,8 @@ import { ForgotPasswordComponent } from './pages/auth/forgotpassword/forgot-pass
 import { SessionListComponent} from './pages/session-list/session-list.component';  
 import { LandingComponent } from './pages/landing/landing.component';
 import { SkillOnboardingComponent } from './pages/skill-onboarding/skill-onboarding.component';
-import { VerifyEmailComponent } from './pages/verify-email/verify-email.component';
+import { VerifyEmailComponent } from './pages/verify-email/verify-email.component';import { LandingskillswapComponent } from './pages/landingskillswap/landingskillswap.component';
+
 
 export const routes: Routes = [
   {
@@ -57,9 +58,9 @@ export const routes: Routes = [
     component: AccessDeniedComponent,
   },
   {
-    path: '',
-    component: LandingComponent,
-  },
+  path: '',
+  component: LandingComponent,
+},
 
   {
     path: 'app',
