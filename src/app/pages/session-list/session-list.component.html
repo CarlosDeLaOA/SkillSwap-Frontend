@@ -1,0 +1,62 @@
+<div class="sessions-page">
+  <!-- Header con imagen de fondo -->
+  <div class="sessions-header">
+    <h1 class="header-title">
+      <span class="title-span">Explora</span> 
+      todas las 
+      <span class="title-span">sesiones</span>
+    </h1>
+    <p class="header-subtitle">que están disponibles para ti</p>
+    
+    <!-- Barra de búsqueda y filtro -->
+    <div class="search-container">
+      <div class="search-wrapper">
+        <input 
+          type="text" 
+          class="form-control search-input" 
+          placeholder="Buscar sesión..."
+          [(ngModel)]="searchTerm"
+          (input)="onSearch()">
+        <i class="bi bi-search search-icon"></i>
+      </div>
+      <button class="btn btn-filter" (click)="openFilterModal()">
+        <i class="bi bi-funnel"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="loading-text">Cargando sesiones...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage && !isLoading" class="error-container">
+    <div class="alert alert-danger" role="alert">
+      <i class="bi bi-exclamation-triangle me-2"></i>
+      {{ errorMessage }}
+    </div>
+  </div>
+
+  <!-- Lista de sesiones -->
+  <div *ngIf="!isLoading && !errorMessage" class="sessions-list">
+    <!-- Cuando hay sesiones -->
+    <ng-container *ngIf="filteredSessions && filteredSessions.length > 0">
+      <app-session-card 
+        *ngFor="let session of filteredSessions"
+        [session]="session"
+        (register)="onRegister($event)">
+      </app-session-card>
+    </ng-container>
+
+    <!-- Cuando no hay sesiones -->
+    <div *ngIf="!filteredSessions || filteredSessions.length === 0" class="no-sessions">
+      <i class="bi bi-calendar-x"></i>
+      <h3>No hay sesiones disponibles</h3>
+      <p>No se encontraron sesiones que coincidan con tus criterios de búsqueda.</p>
+    </div>
+  </div>
+</div>
