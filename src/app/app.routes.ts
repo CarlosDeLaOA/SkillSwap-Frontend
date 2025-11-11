@@ -12,15 +12,9 @@ import { IRoleType } from './interfaces';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { AuthCallbackComponent } from './pages/auth/auth-callback.component/auth-callback.component';
 import { ForgotPasswordComponent } from './pages/auth/forgotpassword/forgot-password.component';
+import { SessionListComponent} from './pages/session-list/session-list.component';  
+import { LandingComponent } from './pages/landing/landing.component';
 
-import { inject } from '@angular/core';
-import { RegisterService } from './services/register.service';
-
-const OnboardingGuard = () => {
-  const reg = inject(RegisterService);
-  const tmp = reg.getTemporaryData?.();
-  return !!tmp; // true permite entrar; false bloquea y el componente puede redirigir si quieres
-};
 
 export const routes: Routes = [
   {
@@ -37,7 +31,6 @@ export const routes: Routes = [
     path: 'auth/callback',
     component: AuthCallbackComponent
   },
-
   {
     path: 'forgot-password',
     component: ForgotPasswordComponent,
@@ -48,26 +41,15 @@ export const routes: Routes = [
     component: RegisterComponent,
     canActivate: [GuestGuard],
   },
-
-  
-{
-    path: 'onboarding',
-    // ❌ Antes: canActivate: [AuthGuard]
-    // ✅ Ahora: sólo deja pasar si hay datos temporales
-    canActivate: [OnboardingGuard],
-    loadComponent: () =>
-      import('./pages/onboarding/onboarding.component').then(m => m.OnboardingComponent),
-  },
-
   {
     path: 'access-denied',
     component: AccessDeniedComponent,
   },
   {
-    path: '',
-    redirectTo: 'login',
-    pathMatch: 'full',
-  },
+  path: '',
+  component: LandingComponent,
+},
+
   {
     path: 'app',
     component: AppLayoutComponent,
@@ -96,9 +78,25 @@ export const routes: Routes = [
           showInSidebar: false
         }
       },
-      
+      {
+        path: 'sessions',
+        component: SessionListComponent,
+        data: {
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+          name: 'Sesiones',
+          showInSidebar: true
+        }
+      },
+      {
+        path: 'sessions',
+        component: SessionListComponent,
+        data: {
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+          name: 'Sesiones',
+          showInSidebar: true
+        }
+      },
     ],
   },
-  // Fallback
   { path: '**', redirectTo: 'login' }
 ];
