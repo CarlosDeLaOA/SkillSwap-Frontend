@@ -12,6 +12,8 @@ import { IRoleType } from './interfaces';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { AuthCallbackComponent } from './pages/auth/auth-callback.component/auth-callback.component';
 import { ForgotPasswordComponent } from './pages/auth/forgotpassword/forgot-password.component';
+import { LandingComponent } from './pages/landing/landing.component';
+
 
 export const routes: Routes = [
   {
@@ -48,10 +50,10 @@ export const routes: Routes = [
     component: AccessDeniedComponent,
   },
   {
-    path: '',
-    redirectTo: 'login',
-    pathMatch: 'full',
-  },
+  path: '',
+  component: LandingComponent,
+},
+
   {
     path: 'app',
     component: AppLayoutComponent,
