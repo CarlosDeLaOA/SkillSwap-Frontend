@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardService } from '../../services/dashboard.service';
-import { IMonthlyAchievement } from '../../interfaces';
+import { ProfileService } from '../../services/profile.service';
+import { IMonthlyAchievement, IMonthlyAttendance } from '../../interfaces';
 
-/**
- * Component to display monthly achievements chart
- */
 @Component({
   selector: 'app-attendance-chart',
   standalone: true,
@@ -15,91 +13,161 @@ import { IMonthlyAchievement } from '../../interfaces';
 })
 export class AttendanceChartComponent implements OnInit {
 
-  //#region Properties
-  monthlyData: IMonthlyAchievement[] = [];
+  monthlyData: Array<{month: string, credentials: number, certificates: number}> = [];
   isLoading: boolean = true;
-  maxValue: number = 0;
-  //#endregion
+  maxValue: number = 10;
+  isInstructor: boolean = false;
+  chartTitle: string = 'Logros obtenidos';
+  legend1Label: string = 'Credenciales';
+  legend2Label: string = 'Certificados';
 
-  //#region Constructor
-  /**
-   * Creates an instance of AttendanceChartComponent
-   * @param dashboardService Service to fetch dashboard data
-   */
-  constructor(private dashboardService: DashboardService) { }
-  //#endregion
+  constructor(
+    private dashboardService: DashboardService,
+    private profileService: ProfileService
+  ) { }
 
-  //#region Lifecycle Hooks
-  /**
-   * Initializes the component and fetches monthly achievements
-   */
   ngOnInit(): void {
-    this.loadMonthlyAchievements();
+    this.determineUserRole();
+    this.loadData();
   }
-  //#endregion
 
-  //#region Public Methods
-  /**
-   * Calculates bar height percentage
-   * @param value Value to calculate height for
-   * @returns Height percentage
-   */
   getBarHeight(value: number): number {
     if (this.maxValue === 0) return 0;
-    return (value / this.maxValue) * 100;
+    const height = (value / this.maxValue) * 100;
+    return Math.max(height, 0);
   }
 
-  /**
-   * Checks if there is data to display
-   * @returns True if there is data
-   */
   hasData(): boolean {
-    return this.monthlyData.length > 0;
+    return true;
   }
-  //#endregion
 
-  //#region Private Methods
-  /**
-   * Loads monthly achievements from the API
-   */
-
-private loadMonthlyAchievements(): void {
-  this.isLoading = true;
-  this.dashboardService.getMonthlyAchievements().subscribe({
-    next: (data: any) => {
-      console.log('✅ Datos de logros mensuales:', data);
-      
-      // Maneja si viene envuelto en { data: [...] }
-      let logrosData = data && data.data ? data.data : (Array.isArray(data) ? data : []);
-      
-      if (logrosData.length > 0) {
-        this.monthlyData = [...logrosData].reverse();
-        this.calculateMaxValue();
-      } else {
-        console.warn('⚠️ No hay datos de logros mensuales');
-        this.monthlyData = [];
-      }
-      this.isLoading = false;
-    },
-    error: (error) => {
-      console.error('❌ Error cargando logros:', error);
-      this.monthlyData = [];
-      this.isLoading = false;
+  private determineUserRole(): void {
+    const profile = this.profileService.person$();
+    this.isInstructor = profile.instructor !== null && profile.instructor !== undefined;
+    
+    if (this.isInstructor) {
+      this.chartTitle = 'Asistentes';
+      this.legend1Label = 'Presentes';
+      this.legend2Label = 'Registrados';
+    } else {
+      this.chartTitle = 'Logros obtenidos';
+      this.legend1Label = 'Credenciales';
+      this.legend2Label = 'Certificados';
     }
-  });
-}
+    
+    console.log('👤 Rol determinado:', this.isInstructor ? 'INSTRUCTOR' : 'LEARNER');
+  }
 
-  /**
-   * Calculates the maximum value for scaling the chart
-   */
-  private calculateMaxValue(): void {
-    this.maxValue = 0;
-    this.monthlyData.forEach(data => {
-      const total = data.credentials + data.certificates;
-      if (total > this.maxValue) {
-        this.maxValue = total;
+  private loadData(): void {
+    this.isLoading = true;
+
+    if (this.isInstructor) {
+      this.loadMonthlyAttendance();
+    } else {
+      this.loadMonthlyAchievements();
+    }
+  }
+
+  private loadMonthlyAttendance(): void {
+    this.dashboardService.getMonthlyAttendance().subscribe({
+      next: (data: any) => {
+        console.log('✅ Datos de asistencia mensual recibidos:', data);
+        
+        let attendanceData: IMonthlyAttendance[] = [];
+        
+        if (data && data.data && Array.isArray(data.data)) {
+          attendanceData = data.data;
+        } else if (Array.isArray(data)) {
+          attendanceData = data;
+        }
+        
+        this.monthlyData = this.generateLast4Months(attendanceData.map(a => ({
+          month: a.month,
+          credentials: a.presentes || 0,
+          certificates: a.registrados || 0
+        })));
+        
+        this.calculateMaxValue();
+        console.log('📊 Datos finales de asistencia:', this.monthlyData);
+        this.isLoading = false;
+      },
+      error: (error: any) => {
+        console.error('❌ Error cargando asistencia:', error);
+        this.monthlyData = this.generateLast4Months([]);
+        this.isLoading = false;
       }
     });
   }
-  //#endregion
+
+  private loadMonthlyAchievements(): void {
+    this.dashboardService.getMonthlyAchievements().subscribe({
+      next: (data: any) => {
+        console.log('✅ Datos de logros mensuales recibidos:', data);
+        
+        let logrosData: IMonthlyAchievement[] = [];
+        
+        if (data && data.data && Array.isArray(data.data)) {
+          logrosData = data.data;
+        } else if (Array.isArray(data)) {
+          logrosData = data;
+        }
+        
+        this.monthlyData = this.generateLast4Months(logrosData);
+        this.calculateMaxValue();
+        
+        console.log('📊 Datos finales de logros:', this.monthlyData);
+        this.isLoading = false;
+      },
+      error: (error: any) => {
+        console.error('❌ Error cargando logros mensuales:', error);
+        this.monthlyData = this.generateLast4Months([]);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  private generateLast4Months(backendData: Array<{month: string, credentials: number, certificates: number}>): Array<{month: string, credentials: number, certificates: number}> {
+    const months: Array<{month: string, credentials: number, certificates: number}> = [];
+    const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const currentDate = new Date();
+    
+    for (let i = 3; i >= 0; i--) {
+      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+      const monthName = monthNames[date.getMonth()];
+      
+      const backendMonth = backendData.find(m => 
+        m.month.toLowerCase() === monthName.toLowerCase() ||
+        m.month.toLowerCase().startsWith(monthName.toLowerCase().substring(0, 3))
+      );
+      
+      if (backendMonth) {
+        months.push({
+          month: monthName,
+          credentials: backendMonth.credentials || 0,
+          certificates: backendMonth.certificates || 0
+        });
+      } else {
+        months.push({
+          month: monthName,
+          credentials: 0,
+          certificates: 0
+        });
+      }
+    }
+    
+    return months;
+  }
+
+  private calculateMaxValue(): void {
+    let max = 0;
+    this.monthlyData.forEach(data => {
+      const total = data.credentials + data.certificates;
+      if (total > max) {
+        max = total;
+      }
+    });
+    
+    this.maxValue = max > 0 ? max : 10;
+    console.log('📈 Valor máximo calculado:', this.maxValue);
+  }
 }

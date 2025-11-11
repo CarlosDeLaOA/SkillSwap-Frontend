@@ -223,3 +223,8 @@ export interface ISkillSessionStats {
   completed: number;
   pending: number;
 }
+export interface IMonthlyAttendance {
+  month: string;
+  presentes: number;
+  registrados: number;
+}

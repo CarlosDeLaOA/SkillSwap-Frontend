@@ -1,15 +1,15 @@
 <div class="attendance-chart">
-  <h2 class="title">Logros obtenidos</h2>
+  <h2 class="title">{{ chartTitle }}</h2>
   
   <div class="chart-container" *ngIf="!isLoading && hasData()">
     <div class="legend">
       <div class="legend-item">
         <span class="legend-color credentials"></span>
-        <span class="legend-label">Credenciales</span>
+        <span class="legend-label">{{ legend1Label }}</span>
       </div>
       <div class="legend-item">
         <span class="legend-color certificates"></span>
-        <span class="legend-label">Certificados</span>
+        <span class="legend-label">{{ legend2Label }}</span>
       </div>
     </div>
 
@@ -28,10 +28,6 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="no-data" *ngIf="!isLoading && !hasData()">
-    <p>No hay logros disponibles</p>
   </div>
   
   <div class="loading" *ngIf="isLoading">

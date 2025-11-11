@@ -5,7 +5,7 @@ import { DashboardService } from '../../services/dashboard.service';
 import { ISkillSessionStats } from '../../interfaces';
 
 /**
- * Component to display skills progress with pie chart
+ * Componente para mostrar el progreso por habilidades con gráfico circular
  */
 @Component({
   selector: 'app-skills-progress',
@@ -16,40 +16,33 @@ import { ISkillSessionStats } from '../../interfaces';
 })
 export class SkillsProgressComponent implements OnInit {
 
-  //#region Properties
+  //#region Propiedades
   skillsData: ISkillSessionStats[] = [];
   selectedSkill: number | null = null;
   isLoading: boolean = true;
   //#endregion
 
   //#region Constructor
-  /**
-   * Creates an instance of SkillsProgressComponent
-   * @param dashboardService Service to fetch dashboard data
-   */
   constructor(private dashboardService: DashboardService) { }
   //#endregion
 
   //#region Lifecycle Hooks
-  /**
-   * Initializes the component and fetches skill session stats
-   */
   ngOnInit(): void {
     this.loadSkillSessionStats();
   }
   //#endregion
 
-  //#region Public Methods
+  //#region Métodos Públicos
   /**
-   * Handles skill selection change
+   * Maneja el cambio de habilidad seleccionada
    */
   onSkillChange(): void {
-    console.log('Selected skill changed:', this.selectedSkill);
+    console.log('Habilidad seleccionada cambiada:', this.selectedSkill);
   }
 
   /**
-   * Gets the completed percentage for selected skill
-   * @returns Percentage as number
+   * Obtiene el porcentaje completado para la habilidad seleccionada
+   * @returns Porcentaje como número
    */
   getCompletedPercentage(): number {
     if (this.selectedSkill === null) return 0;
@@ -63,8 +56,8 @@ export class SkillsProgressComponent implements OnInit {
   }
 
   /**
-   * Calculates stroke dasharray for pie chart
-   * @returns Stroke dasharray value
+   * Calcula stroke dasharray para el gráfico circular
+   * @returns Valor de stroke dasharray
    */
   getStrokeDasharray(): string {
     const circumference = 2 * Math.PI * 80;
@@ -72,8 +65,8 @@ export class SkillsProgressComponent implements OnInit {
   }
 
   /**
-   * Calculates stroke dashoffset for completed section
-   * @returns Stroke dashoffset value
+   * Calcula stroke dashoffset para la sección completada
+   * @returns Valor de stroke dashoffset
    */
   getCompletedCircumference(): number {
     const circumference = 2 * Math.PI * 80;
@@ -82,41 +75,62 @@ export class SkillsProgressComponent implements OnInit {
   }
 
   /**
-   * Checks if there is data to display
-   * @returns True if there is data
+   * Siempre devuelve true para mostrar el gráfico
+   * @returns True
    */
   hasData(): boolean {
     return this.skillsData.length > 0;
   }
   //#endregion
 
-  //#region Private Methods
+  //#region Métodos Privados
   /**
-   * Loads skill session statistics from the API
+   * Carga las estadísticas de sesiones por habilidad desde la API
    */
   private loadSkillSessionStats(): void {
-  this.isLoading = true;
-  this.dashboardService.getSkillSessionStats().subscribe({
-    next: (data: any) => {
-      console.log('✅ Datos de habilidades:', data);
-      
-      // Maneja si viene envuelto en { data: [...] }
-      let estadisticas = data && data.data ? data.data : (Array.isArray(data) ? data : []);
-      
-      this.skillsData = estadisticas;
-      if (this.skillsData.length > 0) {
+    this.isLoading = true;
+    this.dashboardService.getSkillSessionStats().subscribe({
+      next: (data: any) => {
+        console.log('✅ Datos de habilidades recibidos:', data);
+        
+        // Extraer los datos del response
+        let estadisticas: ISkillSessionStats[] = [];
+        
+        if (data && data.data && Array.isArray(data.data)) {
+          estadisticas = data.data;
+        } else if (Array.isArray(data)) {
+          estadisticas = data;
+        }
+        
+        // Si no hay datos, crear una habilidad por defecto
+        if (estadisticas.length === 0) {
+          estadisticas = [{
+            skillName: 'Habilidad #1',
+            completed: 0,
+            pending: 0
+          }];
+        }
+        
+        this.skillsData = estadisticas;
+        this.selectedSkill = 0; // Siempre selecciona la primera
+        
+        console.log('📊 Estadísticas procesadas:', this.skillsData);
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('❌ Error cargando estadísticas:', error);
+        console.error('Detalles del error:', error.error);
+        
+        // Crear una habilidad por defecto aunque haya error
+        this.skillsData = [{
+          skillName: 'Habilidad #1',
+          completed: 0,
+          pending: 0
+        }];
         this.selectedSkill = 0;
-      } else {
-        console.warn('⚠️ No hay estadísticas disponibles');
+        this.isLoading = false;
       }
-      this.isLoading = false;
-    },
-    error: (error) => {
-      console.error('❌ Error cargando estadísticas:', error);
-      this.skillsData = [];
-      this.isLoading = false;
-    }
-  });
-}
+    });
+  }
   //#endregion
 }
