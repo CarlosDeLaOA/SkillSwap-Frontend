@@ -1,62 +1,77 @@
 <div class="modal-header">
   <h5 class="modal-title">
-    <i class="bi bi-funnel me-2"></i>
+    <i class='bx bx-filter-alt me-2'></i>
     Filtrar sesiones
   </h5>
   <button type="button" class="btn-close btn-close-white" (click)="dismiss()"></button>
 </div>
 
 <div class="modal-body">
-  <!-- Filtro por Categoría -->
+  <!-- Filtro por Categoría (Knowledge Areas) -->
   <div class="filter-section">
     <h6 class="filter-title">
-      <i class="bi bi-tag me-2"></i>
-      Categorías
+      <i class='bx bx-category me-2'></i>
+      Áreas de Conocimiento
+      <span class="badge-count" *ngIf="getSelectedCategoriesCount() > 0">
+        {{ getSelectedCategoriesCount() }}
+      </span>
     </h6>
     <div class="filter-options">
-      <div class="form-check" *ngFor="let category of categories">
+      <div class="form-check" *ngFor="let area of knowledgeAreas">
         <input 
           class="form-check-input" 
           type="checkbox" 
-          [id]="'category-' + category"
-          [(ngModel)]="selectedCategories[category]"
+          [id]="'category-' + area.id"
+          [(ngModel)]="selectedCategoryIds[area.id]"
           (change)="onFilterChange()">
-        <label class="form-check-label" [for]="'category-' + category">
-          {{ category }}
+        <label class="form-check-label" [for]="'category-' + area.id">
+          <i class='bx bx-book-bookmark me-1' *ngIf="!area.iconUrl"></i>
+          {{ area.name }}
         </label>
       </div>
+    </div>
+    <div *ngIf="knowledgeAreas.length === 0" class="empty-message">
+      <i class='bx bx-info-circle me-1'></i>
+      No hay áreas de conocimiento disponibles
     </div>
   </div>
 
   <!-- Filtro por Idioma -->
   <div class="filter-section">
     <h6 class="filter-title">
-      <i class="bi bi-translate me-2"></i>
+      <i class='bx bx-world me-2'></i>
       Idiomas
+      <span class="badge-count" *ngIf="getSelectedLanguagesCount() > 0">
+        {{ getSelectedLanguagesCount() }}
+      </span>
     </h6>
     <div class="filter-options">
-      <div class="form-check" *ngFor="let language of languages">
+      <div class="form-check" *ngFor="let langCode of availableLanguages">
         <input 
           class="form-check-input" 
           type="checkbox" 
-          [id]="'language-' + language"
-          [(ngModel)]="selectedLanguages[language]"
+          [id]="'language-' + langCode"
+          [(ngModel)]="selectedLanguages[langCode]"
           (change)="onFilterChange()">
-        <label class="form-check-label" [for]="'language-' + language">
-          {{ language }}
+        <label class="form-check-label" [for]="'language-' + langCode">
+          {{ getLanguageName(langCode) }}
         </label>
       </div>
+    </div>
+    <div *ngIf="availableLanguages.length === 0" class="empty-message">
+      <i class='bx bx-info-circle me-1'></i>
+      No hay idiomas disponibles
     </div>
   </div>
 </div>
 
 <div class="modal-footer">
   <button type="button" class="btn btn-outline-light" (click)="clearFilters()">
-    <i class="bi bi-x-circle me-2"></i>
+    <i class='bx bx-x-circle me-2'></i>
     Limpiar
   </button>
   <button type="button" class="btn btn-primary" (click)="applyFilters()">
-    <i class="bi bi-check-circle me-2"></i>
+    <i class='bx bx-check-circle me-2'></i>
     Aplicar filtros
   </button>
 </div>
