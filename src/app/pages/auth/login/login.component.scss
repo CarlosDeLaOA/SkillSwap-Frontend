@@ -351,4 +351,57 @@ $font-bold: 700;
     font-size: 20px;
   }
 }
+
+//#region Password Toggle
+.form-group {
+  .password-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+
+    .form-control {
+      width: 100%;
+      padding-right: 80px !important; // ← Aumentado para dar espacio al check y al ojito
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 44px; // ← Movido más a la izquierda para dejar espacio al check
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      z-index: 10;
+      height: 32px;
+      width: 32px;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+      }
+
+      &:focus {
+        outline: none;
+      }
+
+      i {
+        font-size: 22px;
+        color: rgba(255, 255, 255, 0.6);
+        transition: color 0.3s ease;
+      }
+
+      &:hover i {
+        color: rgba(255, 255, 255, 1);
+      }
+    }
+  }
+}
+//#endregion
 //#endregion

@@ -21,6 +21,7 @@ export class LoginComponent implements OnInit {
 
   public passwordValidationError: string = '';
 
+  public showPassword: boolean = false;
 
   @ViewChild('email') emailModel!: NgModel;
 
@@ -127,8 +128,11 @@ export class LoginComponent implements OnInit {
     if (this.loginForm.password && this.passwordModel.touched) {
       this.validatePassword(this.loginForm.password);
     }
+    
   }
- 
+  public togglePasswordVisibility(): void {
+  this.showPassword = !this.showPassword;
+}
   public loginWithGoogle(): void {
     console.log('Iniciando login con Google...');
     this.googleAuthService.initiateGoogleLogin();
