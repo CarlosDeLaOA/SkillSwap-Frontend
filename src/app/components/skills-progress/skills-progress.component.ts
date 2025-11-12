@@ -1,11 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DashboardService } from '../../services/dashboard.service';
+import { ProfileService } from '../../services/profile.service';
 import { ISkillSessionStats } from '../../interfaces';
 
 /**
  * Componente para mostrar el progreso por habilidades con gráfico circular
+ * Siempre muestra un gráfico, incluso cuando no hay datos
  */
 @Component({
   selector: 'app-skills-progress',
@@ -20,15 +22,51 @@ export class SkillsProgressComponent implements OnInit {
   skillsData: ISkillSessionStats[] = [];
   selectedSkill: number | null = null;
   isLoading: boolean = true;
+  private dataLoaded: boolean = false;
   //#endregion
 
   //#region Constructor
-  constructor(private dashboardService: DashboardService) { }
+  constructor(
+    private dashboardService: DashboardService,
+    private profileService: ProfileService
+  ) {
+    // Escuchar cambios en el perfil
+    effect(() => {
+      const profile = this.profileService.person$();
+      
+      if (profile && profile.id && (profile.instructor !== undefined || profile.learner !== undefined)) {
+        console.log('🔄 Perfil actualizado en skills-progress, recargando datos...');
+        
+        // Resetear el flag cuando cambia el usuario
+        this.dataLoaded = false;
+        
+        // Limpiar datos anteriores
+        this.skillsData = [];
+        this.selectedSkill = null;
+        this.isLoading = true;
+        
+        // Cargar datos nuevos
+        this.loadSkillSessionStats();
+      }
+    });
+  }
   //#endregion
 
   //#region Lifecycle Hooks
   ngOnInit(): void {
-    this.loadSkillSessionStats();
+    const profile = this.profileService.person$();
+    
+    // Si no hay perfil cargado, esperar al effect
+    if (!profile || !profile.id) {
+      console.log('⏳ Esperando carga del perfil en skills-progress...');
+      return;
+    }
+    
+    // Si el perfil ya está cargado y no hemos cargado datos, cargarlos
+    if (!this.dataLoaded) {
+      console.log('✅ Perfil disponible, cargando datos de skills-progress...');
+      this.loadSkillSessionStats();
+    }
   }
   //#endregion
 
@@ -45,7 +83,9 @@ export class SkillsProgressComponent implements OnInit {
    * @returns Porcentaje como número
    */
   getCompletedPercentage(): number {
-    if (this.selectedSkill === null) return 0;
+    if (this.selectedSkill === null || this.skillsData.length === 0) {
+      return 0;
+    }
     
     const skill = this.skillsData[this.selectedSkill];
     const total = skill.completed + skill.pending;
@@ -79,31 +119,38 @@ export class SkillsProgressComponent implements OnInit {
    * @returns True
    */
   hasData(): boolean {
-    return this.skillsData.length > 0;
+    return true;
   }
   //#endregion
 
   //#region Métodos Privados
   /**
    * Carga las estadísticas de sesiones por habilidad desde la API
+   * Si no hay datos o hay error, crea una habilidad por defecto
    */
   private loadSkillSessionStats(): void {
     this.isLoading = true;
+    this.dataLoaded = true;
+    
     this.dashboardService.getSkillSessionStats().subscribe({
       next: (data: any) => {
         console.log('✅ Datos de habilidades recibidos:', data);
         
-        // Extraer los datos del response
         let estadisticas: ISkillSessionStats[] = [];
         
+        // Extraer datos del response
         if (data && data.data && Array.isArray(data.data)) {
           estadisticas = data.data;
         } else if (Array.isArray(data)) {
           estadisticas = data;
         }
         
-        // Si no hay datos, crear una habilidad por defecto
+        // Filtrar habilidades sin nombre o con nombre vacío
+        estadisticas = estadisticas.filter(e => e.skillName && e.skillName.trim() !== '');
+        
+        // Si no hay datos reales, crear habilidad por defecto
         if (estadisticas.length === 0) {
+          console.warn('⚠️ No hay datos de habilidades, creando habilidad por defecto');
           estadisticas = [{
             skillName: 'Habilidad #1',
             completed: 0,
@@ -112,7 +159,7 @@ export class SkillsProgressComponent implements OnInit {
         }
         
         this.skillsData = estadisticas;
-        this.selectedSkill = 0; // Siempre selecciona la primera
+        this.selectedSkill = 0;
         
         console.log('📊 Estadísticas procesadas:', this.skillsData);
         this.isLoading = false;
@@ -120,6 +167,7 @@ export class SkillsProgressComponent implements OnInit {
       error: (error) => {
         console.error('❌ Error cargando estadísticas:', error);
         console.error('Detalles del error:', error.error);
+        console.warn('⚠️ Creando habilidad por defecto debido a error');
         
         // Crear una habilidad por defecto aunque haya error
         this.skillsData = [{

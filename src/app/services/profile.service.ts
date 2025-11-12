@@ -55,6 +55,16 @@ export class ProfileService extends BaseService<IPerson> {
     });
   }
 
+  /**
+   * Limpia el perfil del usuario (útil para logout o cambio de usuario)
+   */
+  clearProfile() {
+    console.log('🧹 Limpiando perfil del usuario');
+    this.personSignal.set({
+      preferredLanguage: ''
+    });
+  }
+
   /** Verifica si el usuario es Instructor */
   isInstructor(): boolean {
     return this.personSignal().instructor !== null && this.personSignal().instructor !== undefined;
