@@ -85,146 +85,25 @@
         Ajusta tus habilidades a explorar para poder mostrarte contenido a tu medida.
       </p>
 
+      <!-- Grid dinámico con TODAS las knowledge areas -->
       <div class="skills-grid">
-        <!-- COLUMNA 1 -->
-        
-        <!-- 1. Programming -->
-        <div class="form-group">
-          <label>Programación</label>
-          <div class="select-with-tags">
-            @if (getSkillsForArea('Programming').length > 0) {
-              <div class="tags-inside-select">
-                @for (userSkill of getSkillsForArea('Programming'); track userSkill.id) {
-                  <span class="tag-pill">{{ userSkill.skill?.name }}</span>
-                }
-              </div>
-            } @else {
-              <span class="select-placeholder">Selecciona opciones</span>
-            }
-            <box-icon name='chevron-down' size="20px" color="#aae16b" class="select-arrow"></box-icon>
+        @for (area of getAllKnowledgeAreas(); track area.id) {
+          <div class="form-group">
+            <label>{{ getAreaDisplayName(area.name) }}</label>
+            <div class="select-with-tags">
+              @if (getSkillsForArea(area.name).length > 0) {
+                <div class="tags-inside-select">
+                  @for (userSkill of getSkillsForArea(area.name); track userSkill.id) {
+                    <span class="tag-pill">{{ userSkill.skill?.name }}</span>
+                  }
+                </div>
+              } @else {
+                <span class="select-placeholder">Selecciona opciones</span>
+              }
+              <box-icon name='chevron-down' size="20px" color="#aae16b" class="select-arrow"></box-icon>
+            </div>
           </div>
-        </div>
-
-        <!-- 2. Design -->
-        <div class="form-group">
-          <label>Diseño</label>
-          <div class="select-with-tags">
-            @if (getSkillsForArea('Design').length > 0) {
-              <div class="tags-inside-select">
-                @for (userSkill of getSkillsForArea('Design'); track userSkill.id) {
-                  <span class="tag-pill">{{ userSkill.skill?.name }}</span>
-                }
-              </div>
-            } @else {
-              <span class="select-placeholder">Selecciona opciones</span>
-            }
-            <box-icon name='chevron-down' size="20px" color="#aae16b" class="select-arrow"></box-icon>
-          </div>
-        </div>
-
-        <!-- 3. Languages -->
-        <div class="form-group">
-          <label>Idiomas</label>
-          <div class="select-with-tags">
-            @if (getSkillsForArea('Languages').length > 0) {
-              <div class="tags-inside-select">
-                @for (userSkill of getSkillsForArea('Languages'); track userSkill.id) {
-                  <span class="tag-pill">{{ userSkill.skill?.name }}</span>
-                }
-              </div>
-            } @else {
-              <span class="select-placeholder">Selecciona opciones</span>
-            }
-            <box-icon name='chevron-down' size="20px" color="#aae16b" class="select-arrow"></box-icon>
-          </div>
-        </div>
-
-        <!-- 4. Business -->
-        <div class="form-group">
-          <label>Negocios</label>
-          <div class="select-with-tags">
-            @if (getSkillsForArea('Business').length > 0) {
-              <div class="tags-inside-select">
-                @for (userSkill of getSkillsForArea('Business'); track userSkill.id) {
-                  <span class="tag-pill">{{ userSkill.skill?.name }}</span>
-                }
-              </div>
-            } @else {
-              <span class="select-placeholder">Selecciona opciones</span>
-            }
-            <box-icon name='chevron-down' size="20px" color="#aae16b" class="select-arrow"></box-icon>
-          </div>
-        </div>
-
-        <!-- COLUMNA 2 -->
-
-        <!-- 5. Arts -->
-        <div class="form-group">
-          <label>Arte</label>
-          <div class="select-with-tags">
-            @if (getSkillsForArea('Arts').length > 0) {
-              <div class="tags-inside-select">
-                @for (userSkill of getSkillsForArea('Arts'); track userSkill.id) {
-                  <span class="tag-pill">{{ userSkill.skill?.name }}</span>
-                }
-              </div>
-            } @else {
-              <span class="select-placeholder">Selecciona opciones</span>
-            }
-            <box-icon name='chevron-down' size="20px" color="#aae16b" class="select-arrow"></box-icon>
-          </div>
-        </div>
-
-        <!-- 6. Science -->
-        <div class="form-group">
-          <label>Ciencia</label>
-          <div class="select-with-tags">
-            @if (getSkillsForArea('Science').length > 0) {
-              <div class="tags-inside-select">
-                @for (userSkill of getSkillsForArea('Science'); track userSkill.id) {
-                  <span class="tag-pill">{{ userSkill.skill?.name }}</span>
-                }
-              </div>
-            } @else {
-              <span class="select-placeholder">Selecciona opciones</span>
-            }
-            <box-icon name='chevron-down' size="20px" color="#aae16b" class="select-arrow"></box-icon>
-          </div>
-        </div>
-
-        <!-- 7. Health & Fitness -->
-        <div class="form-group">
-          <label>Salud y Fitness</label>
-          <div class="select-with-tags">
-            @if (getSkillsForArea('Health & Fitness').length > 0) {
-              <div class="tags-inside-select">
-                @for (userSkill of getSkillsForArea('Health & Fitness'); track userSkill.id) {
-                  <span class="tag-pill">{{ userSkill.skill?.name }}</span>
-                }
-              </div>
-            } @else {
-              <span class="select-placeholder">Selecciona opciones</span>
-            }
-            <box-icon name='chevron-down' size="20px" color="#aae16b" class="select-arrow"></box-icon>
-          </div>
-        </div>
-
-        <!-- 8. Cooking -->
-        <div class="form-group">
-          <label>Cocina</label>
-          <div class="select-with-tags">
-            @if (getSkillsForArea('Cooking').length > 0) {
-              <div class="tags-inside-select">
-                @for (userSkill of getSkillsForArea('Cooking'); track userSkill.id) {
-                  <span class="tag-pill">{{ userSkill.skill?.name }}</span>
-                }
-              </div>
-            } @else {
-              <span class="select-placeholder">Selecciona opciones</span>
-            }
-            <box-icon name='chevron-down' size="20px" color="#aae16b" class="select-arrow"></box-icon>
-          </div>
-        </div>
+        }
       </div>
     </section>
   </main>
