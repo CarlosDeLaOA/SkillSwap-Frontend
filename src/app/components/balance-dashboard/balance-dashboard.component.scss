@@ -22,7 +22,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-width: 50%; /* Limita el ancho para que no se pegue a la imagen */
+  margin-left: 40px; /* Mueve el contenido más a la derecha */
 }
 
 .balance-label {
@@ -53,7 +53,7 @@
 
 .skillup-container {
   margin-top: 10px;
-  max-width: 50%;
+  margin-left: 40px; /* Mueve el botón más a la derecha */
 }
 
 .skillup-button {
@@ -81,7 +81,6 @@
   transform: translateY(0);
 }
 
-/* Ícono del botón SkillUp - MÁS GRANDE */
 .skillup-icon {
   width: 28px;
   height: 28px;
@@ -89,12 +88,12 @@
   filter: brightness(0) invert(1);
 }
 
-/* Contenedor de la ilustración de monedas - CENTRADO */
+/* Contenedor de la ilustración de monedas - MOVIDO A LA IZQUIERDA */
 .coins-illustration {
   position: absolute;
-  right: 50px;
+  right: 120px; /* Cambiado de 50px a 120px para moverlo más a la izquierda */
   top: 50%;
-  transform: translateY(-50%); /* Centra verticalmente */
+  transform: translateY(-50%);
   width: 320px;
   height: 240px;
   display: flex;
@@ -135,17 +134,19 @@
   .coins-illustration {
     width: 280px;
     height: 200px;
-    right: 30px;
+    right: 80px;
   }
 }
 
 @media (max-width: 768px) {
   .balance-header {
     max-width: 100%;
+    margin-left: 0;
   }
   
   .skillup-container {
     max-width: 100%;
+    margin-left: 0;
   }
   
   .coins-illustration {
