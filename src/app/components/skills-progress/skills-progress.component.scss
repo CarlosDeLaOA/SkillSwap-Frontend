@@ -52,8 +52,17 @@
   position: relative;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  padding: 0 20px;
+}
+
+.pie-chart-wrapper {
+  display: flex;
+  align-items: center;
   justify-content: center;
   flex: 1;
+  position: relative;
 }
 
 .pie-chart {
@@ -88,21 +97,23 @@
 
 .legend {
   display: flex;
+  flex-direction: column;
   justify-content: center;
-  gap: 25px;
-  margin-top: 10px;
+  gap: 20px;
+  padding-right: 30px;
 }
 
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .legend-color {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   border-radius: 2px;
+  flex-shrink: 0;
 }
 
 .legend-color.completed {
@@ -115,8 +126,9 @@
 
 .legend-label {
   color: #FFFFFF;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
+  text-align: left;
 }
 
 .no-data {
@@ -148,4 +160,16 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .chart-container {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .legend {
+    flex-direction: row;
+    padding-right: 0;
+  }
 }

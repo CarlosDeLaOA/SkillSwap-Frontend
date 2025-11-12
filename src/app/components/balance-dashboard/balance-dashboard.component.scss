@@ -13,7 +13,7 @@
 .content {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 25px;
   height: 100%;
   position: relative;
 }
@@ -21,13 +21,13 @@
 .balance-header {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-left: 40px; /* Mueve el contenido más a la derecha */
+  gap: 12px;
+  margin-left: 80px;
 }
 
 .balance-label {
   color: #FFFFFF;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 400;
   margin: 0;
 }
@@ -35,38 +35,38 @@
 .balance-amount {
   display: flex;
   align-items: baseline;
-  gap: 10px;
+  gap: 12px;
 }
 
 .amount {
   color: #AAE16B;
-  font-size: 48px;
+  font-size: 56px;
   font-weight: 700;
   line-height: 1;
 }
 
 .currency {
   color: #AAE16B;
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 500;
 }
 
 .skillup-container {
-  margin-top: 10px;
-  margin-left: 40px; /* Mueve el botón más a la derecha */
+  margin-top: 12px;
+  margin-left: 80px;
 }
 
 .skillup-button {
   background: linear-gradient(135deg, #504AB7 0%, #6B5DD4 100%);
   border: none;
   border-radius: 10px;
-  padding: 14px 28px;
+  padding: 16px 32px;
   color: #FFFFFF;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   width: fit-content;
@@ -82,20 +82,19 @@
 }
 
 .skillup-icon {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   object-fit: contain;
   filter: brightness(0) invert(1);
 }
 
-/* Contenedor de la ilustración de monedas - MOVIDO A LA IZQUIERDA */
 .coins-illustration {
   position: absolute;
-  right: 120px; /* Cambiado de 50px a 120px para moverlo más a la izquierda */
+  right: 80px;
   top: 50%;
   transform: translateY(-50%);
-  width: 320px;
-  height: 240px;
+  width: 350px;
+  height: 260px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -129,12 +128,19 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Ajustes responsivos */
 @media (max-width: 1200px) {
   .coins-illustration {
-    width: 280px;
-    height: 200px;
-    right: 80px;
+    width: 300px;
+    height: 220px;
+    right: 60px;
+  }
+  
+  .amount {
+    font-size: 48px;
+  }
+  
+  .currency {
+    font-size: 24px;
   }
 }
 
