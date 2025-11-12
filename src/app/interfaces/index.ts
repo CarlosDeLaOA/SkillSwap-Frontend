@@ -126,6 +126,7 @@ export interface IPerson {
   lastConnection?: string;
   instructor?: IInstructor;
   learner?: ILearner;
+  userSkills?: IUserSkill[];
 }
 
 /**

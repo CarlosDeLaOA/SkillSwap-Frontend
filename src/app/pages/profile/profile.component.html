@@ -85,110 +85,26 @@
         Ajusta tus habilidades a explorar para poder mostrarte contenido a tu medida.
       </p>
 
+      <!-- Grid dinámico con TODAS las knowledge areas -->
       <div class="skills-grid">
-        <!-- Tecnología -->
-        <div class="form-group">
-          <label>Tecnología</label>
-          <div class="select-wrapper">
-            <select>
-              <option value="" disabled selected>Selecciona opciones</option>
-              <option value="programming">Programación</option>
-              <option value="web-dev">Desarrollo Web</option>
-              <option value="mobile-dev">Desarrollo Móvil</option>
-              <option value="data-science">Ciencia de Datos</option>
-              <option value="ai-ml">Inteligencia Artificial</option>
-              <option value="cybersecurity">Ciberseguridad</option>
-              <option value="cloud">Computación en la Nube</option>
-              <option value="devops">DevOps</option>
-            </select>
+        @for (area of getAllKnowledgeAreas(); track area.id) {
+          <div class="form-group">
+            <label>{{ getAreaDisplayName(area.name) }}</label>
+            <div class="select-with-tags">
+              @if (getSkillsForArea(area.name).length > 0) {
+                <div class="tags-inside-select">
+                  @for (userSkill of getSkillsForArea(area.name); track userSkill.id) {
+                    <span class="tag-pill">{{ userSkill.skill?.name }}</span>
+                  }
+                </div>
+              } @else {
+                <span class="select-placeholder">Selecciona opciones</span>
+              }
+              <box-icon name='chevron-down' size="20px" color="#aae16b" class="select-arrow"></box-icon>
+            </div>
           </div>
-        </div>
-
-        <!-- Deportes -->
-        <div class="form-group">
-          <label>Deportes</label>
-          <div class="select-wrapper">
-            <select>
-              <option value="" disabled selected>Selecciona opciones</option>
-              <option value="soccer">Fútbol</option>
-              <option value="basketball">Baloncesto</option>
-              <option value="tennis">Tenis</option>
-              <option value="swimming">Natación</option>
-              <option value="running">Running</option>
-              <option value="yoga">Yoga</option>
-              <option value="gym">Gimnasio</option>
-              <option value="martial-arts">Artes Marciales</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Cocina -->
-        <div class="form-group">
-          <label>Cocina</label>
-          <div class="select-wrapper">
-            <select>
-              <option value="" disabled selected>Selecciona opciones</option>
-              <option value="italian">Cocina Italiana</option>
-              <option value="mexican">Cocina Mexicana</option>
-              <option value="asian">Cocina Asiática</option>
-              <option value="pastry">Repostería</option>
-              <option value="bakery">Panadería</option>
-              <option value="vegan">Cocina Vegana</option>
-              <option value="gourmet">Alta Cocina</option>
-              <option value="bbq">Barbacoa</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Arte -->
-        <div class="form-group">
-          <label>Arte</label>
-          <div class="select-wrapper">
-            <select>
-              <option value="" disabled selected>Selecciona opciones</option>
-              <option value="painting">Pintura</option>
-              <option value="drawing">Dibujo</option>
-              <option value="sculpture">Escultura</option>
-              <option value="photography">Fotografía</option>
-              <option value="digital-art">Arte Digital</option>
-              <option value="music">Música</option>
-              <option value="dance">Danza</option>
-              <option value="theater">Teatro</option>
-            </select>
-          </div>
-        </div>
-
-      <!-- Idioma preferido  -->
-<div class="form-group">
-  <label>Idioma preferido</label>
-  <div class="select-wrapper">
-    <select [value]="profileService.person$().preferredLanguage || ''" (change)="onLanguageChange($event)">
-      <option value="" disabled>Selecciona un idioma</option>
-      @for (lang of getLanguageOptions(); track lang.code) {
-        <option [value]="lang.code">{{ lang.name }}</option>
-      }
-    </select>
-  </div>
-</div>
-
-        <!-- Soft Skills -->
-        <div class="form-group">
-          <label>Soft Skills</label>
-          <div class="select-wrapper">
-            <select>
-              <option value="" disabled selected>Selecciona opciones</option>
-              <option value="leadership">Liderazgo</option>
-              <option value="communication">Comunicación</option>
-              <option value="teamwork">Trabajo en Equipo</option>
-              <option value="problem-solving">Resolución de Problemas</option>
-              <option value="creativity">Creatividad</option>
-              <option value="time-management">Gestión del Tiempo</option>
-              <option value="adaptability">Adaptabilidad</option>
-              <option value="critical-thinking">Pensamiento Crítico</option>
-            </select>
-          </div>
-        </div>
+        }
       </div>
     </section>
-  </main>
+  </main>
 </div>

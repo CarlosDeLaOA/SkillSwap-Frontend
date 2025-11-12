@@ -1,11 +1,15 @@
 import { Component, inject, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ProfileService } from '../../services/profile.service';
+import { KnowledgeAreaService } from '../../services/knowledge-area.service';
 import { CommonModule } from '@angular/common';
+import { IUserSkill, IKnowledgeArea } from '../../interfaces';
 
 /**
  * Componente de perfil de usuario para SkillSwap
  * Muestra información del usuario autenticado (Person, Instructor o Learner)
  * 
+ * @author SkillSwap Team
+ * @version 2.0.0
  */
 @Component({
   selector: 'app-profile',
@@ -18,12 +22,36 @@ import { CommonModule } from '@angular/common';
 export class ProfileComponent implements OnInit {
   /** Servicio de perfil inyectado */
   public profileService = inject(ProfileService);
+  
+  /** Servicio de knowledge areas inyectado */
+  private knowledgeAreaService = inject(KnowledgeAreaService);
+
+  /** Array con todas las knowledge areas cargadas */
+  public knowledgeAreas: IKnowledgeArea[] = [];
 
   /**
-   * Inicializa el componente y carga el perfil del usuario
+   * Inicializa el componente y carga el perfil del usuario y las áreas de conocimiento
    */
   ngOnInit(): void {
     this.profileService.getUserProfile();
+    this.loadKnowledgeAreas();
+  }
+
+  /**
+   * Carga todas las áreas de conocimiento desde el backend
+   */
+  private loadKnowledgeAreas(): void {
+    this.knowledgeAreaService.getAllKnowledgeAreas().subscribe({
+      next: (response) => {
+        // El backend devuelve { data: [...], message: "..." }
+        this.knowledgeAreas = response.data || response;
+        console.log('✅ Knowledge Areas cargadas:', this.knowledgeAreas.length);
+        console.log('📋 Áreas:', this.knowledgeAreas);
+      },
+      error: (error) => {
+        console.error('❌ Error cargando Knowledge Areas:', error);
+      }
+    });
   }
 
   /**
@@ -75,75 +103,69 @@ export class ProfileComponent implements OnInit {
   }
 
   /**
-   * Obtiene el idioma preferido del usuario
-   * @returns Idioma preferido o 'No especificado' si es null/undefined
+   * Obtiene todas las áreas de conocimiento disponibles
+   * @returns Array con todas las knowledge areas
    */
-  getPreferredLanguage(): string {
-    return this.profileService.person$().preferredLanguage || 'No especificado';
+  getAllKnowledgeAreas(): IKnowledgeArea[] {
+    return this.knowledgeAreas;
   }
 
   /**
- * Obtiene la lista de idiomas disponibles
- * @returns Array de objetos con código y nombre del idioma
- */
-/**
- * Obtiene la lista de idiomas disponibles
- * @returns Array de objetos con código y nombre del idioma
- */
-getLanguageOptions() {
-  return [
-    { code: 'es', name: 'Español' },
-    { code: 'en', name: 'Inglés' },
-    { code: 'fr', name: 'Francés' },
-    { code: 'de', name: 'Alemán' },
-    { code: 'it', name: 'Italiano' },
-    { code: 'pt', name: 'Portugués' },
-    { code: 'ru', name: 'Ruso' },
-    { code: 'zh', name: 'Chino' },
-    { code: 'ja', name: 'Japonés' },
-    { code: 'ko', name: 'Coreano' },
-    { code: 'ar', name: 'Árabe' },
-    { code: 'hi', name: 'Hindi' },
-    { code: 'nl', name: 'Holandés' },
-    { code: 'sv', name: 'Sueco' },
-    { code: 'pl', name: 'Polaco' },
-    { code: 'tr', name: 'Turco' },
-    { code: 'gr', name: 'Griego' },
-    { code: 'he', name: 'Hebreo' },
-    { code: 'no', name: 'Noruego' },
-    { code: 'da', name: 'Danés' },
-    { code: 'fi', name: 'Finlandés' },
-    { code: 'cs', name: 'Checo' },
-    { code: 'ro', name: 'Rumano' },
-    { code: 'hu', name: 'Húngaro' },
-    { code: 'th', name: 'Tailandés' },
-    { code: 'vi', name: 'Vietnamita' },
-    { code: 'id', name: 'Indonesio' },
-    { code: 'ms', name: 'Malayo' },
-    { code: 'uk', name: 'Ucraniano' },
-    { code: 'bg', name: 'Búlgaro' }
-  ];
-}
+   * Obtiene las skills del usuario para un área específica
+   * @param areaName Nombre del área de conocimiento
+   * @returns Array de skills del usuario en esa área
+   */
+  getSkillsForArea(areaName: string): IUserSkill[] {
+    const userSkills = this.profileService.person$().userSkills || [];
+    return userSkills.filter(
+      userSkill => 
+        userSkill.active && 
+        userSkill.skill?.knowledgeArea?.name === areaName
+    );
+  }
 
-/**
- * Obtiene el nombre completo del idioma preferido
- * @returns Nombre del idioma o 'No especificado'
- */
-getPreferredLanguageName(): string {
-  const code = this.profileService.person$().preferredLanguage;
-  if (!code) return 'No especificado';
-  
-  const language = this.getLanguageOptions().find(lang => lang.code === code);
-  return language ? language.name : code;
-}
+  /**
+   * Traduce el nombre del área de conocimiento al español
+   * @param areaName Nombre del área en inglés
+   * @returns Nombre traducido al español
+   */
+  getAreaDisplayName(areaName: string): string {
+    const translations: { [key: string]: string } = {
+      'Programming': 'Programación',
+      'Design': 'Diseño',
+      'Languages': 'Idiomas',
+      'Business': 'Negocios',
+      'Arts': 'Arte',
+      'Science': 'Ciencia',
+      'Health & Fitness': 'Salud y Fitness',
+      'Cooking': 'Cocina',
+      'Mathematics': 'Matemáticas',
+      'Music': 'Música',
+      'Sports': 'Deportes',
+      'Writing': 'Escritura',
+      'Photography': 'Fotografía',
+      'Marketing': 'Marketing',
+      'Finance': 'Finanzas',
+      'Law': 'Derecho',
+      'Engineering': 'Ingeniería',
+      'Medicine': 'Medicina',
+      'Psychology': 'Psicología',
+      'Education': 'Educación',
+      'Technology': 'Tecnología',
+      'Environment': 'Medio Ambiente',
+      'History': 'Historia',
+      'Literature': 'Literatura'
+    };
+    
+    return translations[areaName] || areaName;
+  }
 
-/**
- * Maneja el cambio de idioma preferido
- */
-onLanguageChange(event: Event): void {
-  const select = event.target as HTMLSelectElement;
-  const newLanguage = select.value;
-  console.log('Nuevo idioma seleccionado:', newLanguage);
-  // Aquí puedes llamar a un servicio para guardar el cambio en el backend
-}
+  /**
+   * Verifica si el usuario tiene habilidades asignadas
+   * @returns true si tiene al menos una habilidad
+   */
+  hasUserSkills(): boolean {
+    const userSkills = this.profileService.person$().userSkills || [];
+    return userSkills.some(skill => skill.active);
+  }
 }
