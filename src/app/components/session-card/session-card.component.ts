@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ILearningSession } from '../../interfaces';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-session-card',
@@ -26,9 +27,11 @@ export class SessionCardComponent {
   };
   //</region>
 
-  //<region desc="Event Handlers">
+  constructor(private router: Router) {}
+
   onRegister() {
-    this.register.emit(this.session.id);
+    // Navegar a los detalles de la sesión
+    this.router.navigate(['/app/sessions', this.session.id]);
   }
   //</region>
 

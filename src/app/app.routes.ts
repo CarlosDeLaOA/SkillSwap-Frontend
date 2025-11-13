@@ -16,6 +16,7 @@ import { SessionListComponent} from './pages/session-list/session-list.component
 import { LandingComponent } from './pages/landing/landing.component';
 import { SkillOnboardingComponent } from './pages/skill-onboarding/skill-onboarding.component';
 import { VerifyEmailComponent } from './pages/verify-email/verify-email.component';import { LandingskillswapComponent } from './pages/landingskillswap/landingskillswap.component';
+import { SessionDetailComponent } from './pages/session-detail/session-detail.component';
 
 
 export const routes: Routes = [
@@ -103,6 +104,10 @@ export const routes: Routes = [
           showInSidebar: true
         }
       },
+      {
+      path: 'sessions/:id',  // ← Ruta para ver detalles
+      component: SessionDetailComponent
+    },
     ],
   },
   { path: '**', redirectTo: 'login' }
