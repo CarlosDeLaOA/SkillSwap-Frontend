@@ -9,7 +9,9 @@
     </div>
 
     <div class="chart-container" *ngIf="selectedSkill !== null">
-      <div class="pie-chart-wrapper">
+      <div class="pie-chart-wrapper" 
+           (mouseenter)="onChartMouseEnter()" 
+           (mouseleave)="onChartMouseLeave()">
         <svg class="pie-chart" viewBox="0 0 200 200">
           <circle
             class="pie-segment completed"
@@ -31,6 +33,33 @@
         
         <div class="percentage-label">
           {{ getCompletedPercentage() }}%
+        </div>
+
+        <!-- Tooltip -->
+        <div class="tooltip" *ngIf="showTooltip">
+          <div class="tooltip-content">
+            <div class="tooltip-row completed-row">
+              <span class="tooltip-label">
+                <span class="tooltip-dot completed-dot"></span>
+                Completado:
+              </span>
+              <span class="tooltip-value">
+                {{ tooltipData.completed }} sesiones ({{ tooltipData.completedPercentage }}%)
+              </span>
+            </div>
+            <div class="tooltip-row pending-row">
+              <span class="tooltip-label">
+                <span class="tooltip-dot pending-dot"></span>
+                Pendiente:
+              </span>
+              <span class="tooltip-value">
+                {{ tooltipData.pending }} sesiones ({{ tooltipData.pendingPercentage }}%)
+              </span>
+            </div>
+            <div class="tooltip-total">
+              <strong>Total: {{ tooltipData.completed + tooltipData.pending }} sesiones</strong>
+            </div>
+          </div>
         </div>
       </div>
 

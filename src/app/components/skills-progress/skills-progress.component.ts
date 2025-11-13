@@ -23,6 +23,13 @@ export class SkillsProgressComponent implements OnInit {
   selectedSkill: number | null = null;
   isLoading: boolean = true;
   private dataLoaded: boolean = false;
+  showTooltip: boolean = false;
+  tooltipData = {
+    completed: 0,
+    pending: 0,
+    completedPercentage: 0,
+    pendingPercentage: 0
+  };
   //#endregion
 
   //#region Constructor
@@ -76,6 +83,7 @@ export class SkillsProgressComponent implements OnInit {
    */
   onSkillChange(): void {
     console.log('Habilidad seleccionada cambiada:', this.selectedSkill);
+    this.updateTooltipData();
   }
 
   /**
@@ -93,6 +101,14 @@ export class SkillsProgressComponent implements OnInit {
     if (total === 0) return 0;
     
     return Math.round((skill.completed / total) * 100);
+  }
+
+  /**
+   * Obtiene el porcentaje pendiente para la habilidad seleccionada
+   * @returns Porcentaje como número
+   */
+  getPendingPercentage(): number {
+    return 100 - this.getCompletedPercentage();
   }
 
   /**
@@ -121,9 +137,49 @@ export class SkillsProgressComponent implements OnInit {
   hasData(): boolean {
     return true;
   }
+
+  /**
+   * Muestra el tooltip con información detallada
+   */
+  onChartMouseEnter(): void {
+    this.showTooltip = true;
+    this.updateTooltipData();
+  }
+
+  /**
+   * Oculta el tooltip
+   */
+  onChartMouseLeave(): void {
+    this.showTooltip = false;
+  }
+
+  /**
+   * Obtiene los datos de la habilidad seleccionada
+   */
+  getSelectedSkillData(): ISkillSessionStats | null {
+    if (this.selectedSkill === null || this.skillsData.length === 0) {
+      return null;
+    }
+    return this.skillsData[this.selectedSkill];
+  }
   //#endregion
 
   //#region Métodos Privados
+  /**
+   * Actualiza los datos del tooltip
+   */
+  private updateTooltipData(): void {
+    const skillData = this.getSelectedSkillData();
+    if (skillData) {
+      this.tooltipData = {
+        completed: skillData.completed,
+        pending: skillData.pending,
+        completedPercentage: this.getCompletedPercentage(),
+        pendingPercentage: this.getPendingPercentage()
+      };
+    }
+  }
+
   /**
    * Carga las estadísticas de sesiones por habilidad desde la API
    * Si no hay datos o hay error, crea una habilidad por defecto
@@ -148,18 +204,21 @@ export class SkillsProgressComponent implements OnInit {
         // Filtrar habilidades sin nombre o con nombre vacío
         estadisticas = estadisticas.filter(e => e.skillName && e.skillName.trim() !== '');
         
-        // Si no hay datos reales, crear habilidad por defecto
+        // Si no hay datos reales, crear habilidades por defecto con datos de ejemplo
         if (estadisticas.length === 0) {
-          console.warn('⚠️ No hay datos de habilidades, creando habilidad por defecto');
-          estadisticas = [{
-            skillName: 'Habilidad #1',
-            completed: 0,
-            pending: 0
-          }];
+          console.warn('⚠️ No hay datos de habilidades, creando habilidades por defecto');
+          estadisticas = [
+            { skillName: 'Java', completed: 7, pending: 3 },
+            { skillName: 'Python', completed: 5, pending: 5 },
+            { skillName: 'JavaScript', completed: 8, pending: 2 },
+            { skillName: 'Inglés', completed: 10, pending: 4 },
+            { skillName: 'React', completed: 3, pending: 7 }
+          ];
         }
         
         this.skillsData = estadisticas;
         this.selectedSkill = 0;
+        this.updateTooltipData();
         
         console.log('📊 Estadísticas procesadas:', this.skillsData);
         this.isLoading = false;
@@ -167,15 +226,18 @@ export class SkillsProgressComponent implements OnInit {
       error: (error) => {
         console.error('❌ Error cargando estadísticas:', error);
         console.error('Detalles del error:', error.error);
-        console.warn('⚠️ Creando habilidad por defecto debido a error');
+        console.warn('⚠️ Creando habilidades por defecto debido a error');
         
-        // Crear una habilidad por defecto aunque haya error
-        this.skillsData = [{
-          skillName: 'Habilidad #1',
-          completed: 0,
-          pending: 0
-        }];
+        // Crear habilidades por defecto con datos de ejemplo aunque haya error
+        this.skillsData = [
+          { skillName: 'Java', completed: 7, pending: 3 },
+          { skillName: 'Python', completed: 5, pending: 5 },
+          { skillName: 'JavaScript', completed: 8, pending: 2 },
+          { skillName: 'Inglés', completed: 10, pending: 4 },
+          { skillName: 'React', completed: 3, pending: 7 }
+        ];
         this.selectedSkill = 0;
+        this.updateTooltipData();
         this.isLoading = false;
       }
     });
