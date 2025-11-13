@@ -4,10 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FilterModalComponent } from '../../components/filter-modal/filter-modal.component';
 import { SessionCardComponent } from '../../components/session-card/session-card.component';
+import { SessionDetailModalComponent } from '../../components/session-detail-modal/session-detail-modal.component';
 import { LearningSessionService } from '../../services/learning-session.service';
 import { KnowledgeAreaService } from '../../services/knowledge-area.service';
 import { ILearningSession, IKnowledgeArea, IResponse } from '../../interfaces';
 
+/**
+ * Componente para listar y filtrar sesiones de aprendizaje disponibles
+ */
 @Component({
   selector: 'app-session-list',
   standalone: true,
@@ -21,20 +25,19 @@ import { ILearningSession, IKnowledgeArea, IResponse } from '../../interfaces';
 })
 export class SessionListComponent implements OnInit {
   
-  //<editor-fold desc="Properties">
+  //#region Properties
   searchTerm: string = '';
   sessions: ILearningSession[] = [];
   filteredSessions: ILearningSession[] = [];
   paginatedSessions: ILearningSession[] = [];
   knowledgeAreas: IKnowledgeArea[] = [];
-  availableLanguages: string[] = []; // Idiomas dinámicos extraídos de las sesiones
+  availableLanguages: string[] = [];
   
   activeFilters = {
     categoryIds: [] as number[],
     languages: [] as string[]
   };
   
-  // Propiedades de paginación
   currentPage: number = 1;
   itemsPerPage: number = 6;
   totalPages: number = 0;
@@ -42,36 +45,36 @@ export class SessionListComponent implements OnInit {
   isLoading: boolean = false;
   errorMessage: string = '';
   
-  // Exponer Math para usarlo en el template
   Math = Math;
-  //</editor-fold>
+  //#endregion
 
-  //<editor-fold desc="Constructor">
+  //#region Constructor
   constructor(
     private modalService: NgbModal,
     private learningSessionService: LearningSessionService,
     private knowledgeAreaService: KnowledgeAreaService
   ) {}
-  //</editor-fold>
+  //#endregion
 
-  //<editor-fold desc="Lifecycle Hooks">
-  ngOnInit() {
+  //#region Lifecycle Hooks
+  ngOnInit(): void {
     this.loadKnowledgeAreas();
     this.loadSessions();
   }
-  //</editor-fold>
+  //#endregion
 
-  //<editor-fold desc="Data Loading Methods">
-  loadKnowledgeAreas() {
+  //#region Data Loading Methods
+  /**
+   * Carga todas las áreas de conocimiento disponibles
+   */
+  loadKnowledgeAreas(): void {
     this.knowledgeAreaService.getAllKnowledgeAreas().subscribe({
       next: (response: any) => {
         console.log('Knowledge Areas Response:', response);
         
-        // Verificar si la respuesta tiene la estructura de GlobalResponseHandler
         if (response && response.data) {
           this.knowledgeAreas = Array.isArray(response.data) ? response.data : [];
         } else if (Array.isArray(response)) {
-          // Si es un array directo
           this.knowledgeAreas = response;
         } else {
           console.error('Unexpected knowledge areas response format:', response);
@@ -87,7 +90,10 @@ export class SessionListComponent implements OnInit {
     });
   }
 
-  loadSessions() {
+  /**
+   * Carga todas las sesiones disponibles
+   */
+  loadSessions(): void {
     this.isLoading = true;
     this.errorMessage = '';
     
@@ -95,20 +101,16 @@ export class SessionListComponent implements OnInit {
       next: (response: any) => {
         console.log('Sessions Response:', response);
         
-        // Verificar si la respuesta tiene la estructura de GlobalResponseHandler
         if (response && response.data) {
           this.sessions = Array.isArray(response.data) ? response.data : [];
         } else if (Array.isArray(response)) {
-          // Si es un array directo
           this.sessions = response;
         } else {
           console.error('Unexpected sessions response format:', response);
           this.sessions = [];
         }
         
-        // Extraer idiomas únicos de las sesiones
         this.extractAvailableLanguages();
-        
         this.filteredSessions = [...this.sessions];
         this.updatePagination();
         this.isLoading = false;
@@ -131,7 +133,7 @@ export class SessionListComponent implements OnInit {
   /**
    * Extrae los idiomas únicos disponibles de las sesiones cargadas
    */
-  extractAvailableLanguages() {
+  extractAvailableLanguages(): void {
     const languagesSet = new Set<string>();
     
     this.sessions.forEach(session => {
@@ -142,15 +144,21 @@ export class SessionListComponent implements OnInit {
     
     this.availableLanguages = Array.from(languagesSet).sort();
   }
-  //</editor-fold>
+  //#endregion
 
-  //<editor-fold desc="Search and Filter Methods">
-  onSearch() {
-    this.currentPage = 1; // Reset a la primera página al buscar
+  //#region Search and Filter Methods
+  /**
+   * Maneja el evento de búsqueda por texto
+   */
+  onSearch(): void {
+    this.currentPage = 1;
     this.applyFilters();
   }
 
-  openFilterModal() {
+  /**
+   * Abre el modal de filtros
+   */
+  openFilterModal(): void {
     const modalRef = this.modalService.open(FilterModalComponent, {
       size: 'md',
       centered: true,
@@ -159,13 +167,13 @@ export class SessionListComponent implements OnInit {
     
     modalRef.componentInstance.currentFilters = { ...this.activeFilters };
     modalRef.componentInstance.knowledgeAreas = this.knowledgeAreas;
-    modalRef.componentInstance.availableLanguages = this.availableLanguages; // Pasar idiomas dinámicos
+    modalRef.componentInstance.availableLanguages = this.availableLanguages;
     
     modalRef.result.then(
       (filters) => {
         console.log('Filters received from modal:', filters);
         this.activeFilters = filters;
-        this.currentPage = 1; // Reset a la primera página al filtrar
+        this.currentPage = 1;
         this.applyFilters();
       },
       () => {
@@ -174,7 +182,10 @@ export class SessionListComponent implements OnInit {
     );
   }
 
-  applyFilters() {
+  /**
+   * Aplica los filtros de búsqueda y categoría/idioma
+   */
+  applyFilters(): void {
     if (!Array.isArray(this.sessions)) {
       console.error('Sessions is not an array:', this.sessions);
       this.filteredSessions = [];
@@ -183,19 +194,16 @@ export class SessionListComponent implements OnInit {
     }
 
     this.filteredSessions = this.sessions.filter(session => {
-      // Filtro de búsqueda por texto
       const matchesSearch = !this.searchTerm || 
         session.title?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         session.description?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         session.skill?.name?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         session.skill?.knowledgeArea?.name?.toLowerCase().includes(this.searchTerm.toLowerCase());
       
-      // Filtro por categoría (Knowledge Area ID)
       const matchesCategory = this.activeFilters.categoryIds.length === 0 ||
         (session.skill?.knowledgeArea?.id && 
          this.activeFilters.categoryIds.includes(session.skill.knowledgeArea.id));
       
-      // Filtro por idioma
       const matchesLanguage = this.activeFilters.languages.length === 0 ||
         this.activeFilters.languages.includes(session.language);
       
@@ -205,13 +213,15 @@ export class SessionListComponent implements OnInit {
     console.log('Filtered sessions:', this.filteredSessions.length);
     this.updatePagination();
   }
-  //</editor-fold>
+  //#endregion
 
-  //<editor-fold desc="Pagination Methods">
-  updatePagination() {
+  //#region Pagination Methods
+  /**
+   * Actualiza la paginación basada en las sesiones filtradas
+   */
+  updatePagination(): void {
     this.totalPages = Math.ceil(this.filteredSessions.length / this.itemsPerPage);
     
-    // Asegurar que currentPage esté en rango válido
     if (this.currentPage > this.totalPages && this.totalPages > 0) {
       this.currentPage = this.totalPages;
     }
@@ -222,45 +232,58 @@ export class SessionListComponent implements OnInit {
     this.updatePaginatedSessions();
   }
 
-  updatePaginatedSessions() {
+  /**
+   * Actualiza las sesiones a mostrar en la página actual
+   */
+  updatePaginatedSessions(): void {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
     this.paginatedSessions = this.filteredSessions.slice(startIndex, endIndex);
   }
 
-  goToPage(page: number) {
+  /**
+   * Navega a una página específica
+   * @param page Número de página
+   */
+  goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
       this.updatePaginatedSessions();
-      
-      // Scroll suave hacia arriba
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
-  nextPage() {
+  /**
+   * Navega a la página siguiente
+   */
+  nextPage(): void {
     if (this.currentPage < this.totalPages) {
       this.goToPage(this.currentPage + 1);
     }
   }
 
-  previousPage() {
+  /**
+   * Navega a la página anterior
+   */
+  previousPage(): void {
     if (this.currentPage > 1) {
       this.goToPage(this.currentPage - 1);
     }
   }
 
+  /**
+   * Genera el array de números de página a mostrar
+   * @returns Array de números de página
+   */
   getPageNumbers(): number[] {
     const pages: number[] = [];
     const maxPagesToShow = 5;
     
     if (this.totalPages <= maxPagesToShow) {
-      // Mostrar todas las páginas si son pocas
       for (let i = 1; i <= this.totalPages; i++) {
         pages.push(i);
       }
     } else {
-      // Mostrar páginas alrededor de la página actual
       let startPage = Math.max(1, this.currentPage - 2);
       let endPage = Math.min(this.totalPages, this.currentPage + 2);
       
@@ -277,12 +300,41 @@ export class SessionListComponent implements OnInit {
     
     return pages;
   }
-  //</editor-fold>
+  //#endregion
 
-  //<editor-fold desc="Event Handlers">
-  onRegister(sessionId: number) {
+  //#region Event Handlers
+  /**
+   * Maneja el evento de registro a una sesión
+   * @param sessionId ID de la sesión
+   */
+  onRegister(sessionId: number): void {
     console.log('Registrarse en sesión:', sessionId);
     // TODO: Implementar lógica de registro (crear booking)
   }
-  //</editor-fold>
+
+  /**
+   * Abre el modal de detalles de una sesión
+   * @param session Sesión a mostrar
+   */
+  onViewDetails(session: ILearningSession): void {
+    const modalRef = this.modalService.open(SessionDetailModalComponent, {
+      size: 'lg',
+      centered: true,
+      backdrop: 'static',
+      modalDialogClass: 'session-detail-modal'
+    });
+    
+    modalRef.componentInstance.session = session;
+    
+    modalRef.result.then(
+      (sessionId: number) => {
+        console.log('Registrarse desde modal en sesión:', sessionId);
+        this.onRegister(sessionId);
+      },
+      () => {
+        // Modal dismissed
+      }
+    );
+  }
+  //#endregion
 }
