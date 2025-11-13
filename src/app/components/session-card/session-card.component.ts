@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ILearningSession } from '../../interfaces';
+import { Router } from '@angular/router';
 
 /**
  * Componente de tarjeta para mostrar información resumida de una sesión de aprendizaje
@@ -31,11 +32,11 @@ export class SessionCardComponent {
   //#endregion
 
   //#region Event Handlers
-  /**
-   * Emite evento de registro para la sesión
-   */
-  onRegister(): void {
-    this.register.emit(this.session.id);
+  constructor(private router: Router) {}
+
+  onRegister() {
+    // Navegar a los detalles de la sesión
+    this.router.navigate(['/app/sessions', this.session.id]);
   }
 
   /**
