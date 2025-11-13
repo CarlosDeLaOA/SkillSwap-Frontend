@@ -1,84 +1,100 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { BaseService } from './base-service';
-import { IPerson } from '../interfaces';
+import { HttpClient } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { IPerson, IUserSkill } from '../interfaces';
+import { Observable } from 'rxjs';
 
 /**
  * Servicio para gestionar el perfil de usuario en SkillSwap
- * Obtiene información del usuario autenticado desde el backend
+ * 
+ * @author SkillSwap Team
+ * @version 4.0.0
  */
 @Injectable({
   providedIn: 'root'
 })
-export class ProfileService extends BaseService<IPerson> {
-  /** Endpoint del backend para obtener perfil */
-  protected override source: string = 'persons/me';
+export class ProfileService {
+  private apiUrl = 'http://localhost:8080/persons';
+  private http = inject(HttpClient);
+  private snackBar = inject(MatSnackBar);
   
-  private personSignal = signal<IPerson>({
+  // ⚠️ CRÍTICO: Signal público para poder hacer .set() desde el componente
+  public personSignal = signal<IPerson>({
     preferredLanguage: '' 
   });
-  
-  private snackBar = inject(MatSnackBar);
 
-  /** Getter para acceder al signal del usuario */
+  /** Getter para mantener compatibilidad */
   get person$() {
     return this.personSignal;
   }
 
-  /** Obtiene la información del perfil del usuario autenticado */
-  getUserProfile() {
-    this.findAll().subscribe({
+  getUserProfile(): void {
+    console.log('📡 [ProfileService] Obteniendo perfil desde:', `${this.apiUrl}/me`);
+    
+    this.http.get<any>(`${this.apiUrl}/me`).subscribe({
       next: (response: any) => {
-        if (response.data) {
-          this.personSignal.set(response.data);
-          console.log('Perfil cargado:', response.data);
-          console.log('Idioma preferido:', response.data.preferredLanguage); 
-        } else {
-          this.personSignal.set(response);
-          console.log('Perfil cargado:', response);
-          console.log('Idioma preferido:', response.preferredLanguage); 
-        }
+        const personData = response.data || response;
+        this.personSignal.set(personData);
+        
+        console.log('✅ [ProfileService] Perfil cargado:', personData);
+        console.log('✅ [ProfileService] UserSkills:', personData.userSkills?.length || 0);
       },
       error: (error: any) => {
-        console.error('Error obteniendo perfil:', error);
+        console.error('❌ [ProfileService] Error:', error);
         this.snackBar.open(
-          `Error al cargar el perfil: ${error.error?.message || error.message || 'Error desconocido'}`,
+          `Error al cargar el perfil: ${error.error?.message || error.message}`,
           'Cerrar', 
-          {
-            horizontalPosition: 'right', 
-            verticalPosition: 'top',
-            duration: 5000,
-            panelClass: ['error-snackbar']
-          }
+          { horizontalPosition: 'right', verticalPosition: 'top', duration: 5000 }
         );
       }
     });
   }
 
-  /** Verifica si el usuario es Instructor */
+  updateLanguage(language: string): Observable<any> {
+    console.log('🌐 [ProfileService] Actualizando idioma a:', language);
+    return this.http.put(`${this.apiUrl}/me/language`, { language });
+  }
+/**
+ * Elimina la foto de perfil del usuario
+ * @returns Observable con la respuesta del servidor
+ */
+deleteProfilePhoto(): Observable<any> {
+  console.log('🗑️ [ProfileService] Eliminando foto de perfil');
+  return this.http.delete(`${this.apiUrl}/me/profile-photo`);
+}
+  /**
+   * Actualiza la foto de perfil del usuario
+   * @param file Archivo de imagen a subir
+   * @returns Observable con la respuesta del servidor
+   */
+  updateProfilePhoto(file: File): Observable<any> {
+    console.log('📸 [ProfileService] Subiendo foto de perfil:', file.name);
+    
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.http.put(`${this.apiUrl}/me/profile-photo`, formData);
+  }
+
   isInstructor(): boolean {
-    return this.personSignal().instructor !== null && this.personSignal().instructor !== undefined;
+    return this.personSignal().instructor !== null && 
+           this.personSignal().instructor !== undefined;
   }
 
-  /** Verifica si el usuario es Learner */
   isLearner(): boolean {
-    return this.personSignal().learner !== null && this.personSignal().learner !== undefined;
+    return this.personSignal().learner !== null && 
+           this.personSignal().learner !== undefined;
   }
 
-  /** Obtiene el rol del usuario como string */
   getUserRole(): string {
-    if (this.isInstructor() && this.isLearner()) {
-      return 'SkillSwapper'; // Si es ambos
-    } else if (this.isInstructor()) {
-      return 'SkillSwapper'; // Solo instructor
-    } else if (this.isLearner()) {
-      return 'SkillSeeker'; // Solo learner
-    }
+    if (this.isInstructor() && this.isLearner()) return 'SkillSwapper';
+    if (this.isInstructor()) return 'SkillSwapper';
+    if (this.isLearner()) return 'SkillSeeker';
     return 'Usuario';
   }
 
-  /** Obtiene el idioma preferido del usuario */
   getPreferredLanguage(): string {
     return this.personSignal().preferredLanguage || 'No especificado';
   }
 }
+

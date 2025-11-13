@@ -256,6 +256,7 @@ export interface IKnowledgeArea {
   description?: string;
   iconUrl?: string;
   active: boolean;
+  skills?: ISkill[];  
 }
 
 export interface ISessionFilters {

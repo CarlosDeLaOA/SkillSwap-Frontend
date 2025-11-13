@@ -16,11 +16,12 @@ import { GoogleAuthService } from '../../../services/google-auth.service';
 })
 export class LoginComponent implements OnInit {
 
-  public loginError!: string;
+  public loginError: string = '';
 
 
   public passwordValidationError: string = '';
 
+  public showPassword: boolean = false;
 
   @ViewChild('email') emailModel!: NgModel;
 
@@ -58,11 +59,11 @@ export class LoginComponent implements OnInit {
       
       
       if (user && user.email) {
-        console.log('🔵 Usuario ya autenticado, redirigiendo...');
+        console.log('Usuario ya autenticado, redirigiendo...');
         this.router.navigate(['/app/dashboard']);
       } else {
         
-        console.warn('⚠️ Token existe pero usuario inválido, limpiando...');
+        console.warn('Token existe pero usuario inválido, limpiando...');
         this.authService.clearAuth();
       }
     }
@@ -127,10 +128,13 @@ export class LoginComponent implements OnInit {
     if (this.loginForm.password && this.passwordModel.touched) {
       this.validatePassword(this.loginForm.password);
     }
+    
   }
- 
+  public togglePasswordVisibility(): void {
+  this.showPassword = !this.showPassword;
+}
   public loginWithGoogle(): void {
-    console.log('🔵 Iniciando login con Google...');
+    console.log('Iniciando login con Google...');
     this.googleAuthService.initiateGoogleLogin();
   }
   
@@ -142,43 +146,41 @@ export class LoginComponent implements OnInit {
    * @param event 
    */
   public handleLogin(event: Event): void {
-    event.preventDefault();
+  event.preventDefault();
 
-    this.loginError = '';
-    this.passwordValidationError = '';
+  this.loginError = '';
+  this.passwordValidationError = '';
 
-    if (!this.emailModel.valid) {
-      this.emailModel.control.markAsTouched();
-    }
-
-    if (!this.passwordModel.valid) {
-      this.passwordModel.control.markAsTouched();
-    }
-
-    const isPasswordValid = this.validatePassword(this.loginForm.password);
-
-    if (this.emailModel.valid && this.passwordModel.valid && isPasswordValid) {
-      this.authService.login(this.loginForm).subscribe({
-        next: () => {
-          console.log(' Login tradicional exitoso');
-          this.router.navigateByUrl('/app/dashboard');
-        },
-        error: (err: any) => {
-          console.error(' Login error:', err);
-          
-          if (err.error && err.error.message) {
-            this.loginError = err.error.message;
-          } else if (err.error && err.error.description) {
-            this.loginError = err.error.description;
-          } else if (err.status === 401) {
-            this.loginError = 'Email o contraseña incorrectos';
-          } else if (err.status === 0) {
-            this.loginError = 'No se pudo conectar con el servidor';
-          } else {
-            this.loginError = 'Error al iniciar sesión. Intenta de nuevo.';
-          }
-        }
-      });
-    }
+  if (!this.emailModel.valid) {
+    this.emailModel.control.markAsTouched();
   }
+
+  if (!this.passwordModel.valid) {
+    this.passwordModel.control.markAsTouched();
+  }
+
+  const isPasswordValid = this.validatePassword(this.loginForm.password);
+
+  if (this.emailModel.valid && this.passwordModel.valid && isPasswordValid) {
+    this.authService.login(this.loginForm).subscribe({
+      next: () => {
+        console.log('Login  exitoso');
+        this.router.navigateByUrl('/app/dashboard');
+      },
+      error: (err: any) => {
+        console.error('Login error:', err);
+        
+        if (err.error && err.error.message) {
+          this.loginError = err.error.message;
+        } else if (err.status === 401) {
+          this.loginError = 'Email o contraseña incorrectos';
+        } else if (err.status === 0) {
+          this.loginError = 'No se pudo conectar con el servidor';
+        } else {
+          this.loginError = 'Error al iniciar sesión. Intenta de nuevo.';
+        }
+      }
+    });
+  }
+}
 }

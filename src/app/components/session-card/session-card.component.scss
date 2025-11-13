@@ -33,6 +33,15 @@
   font-weight: 700;
   color: #ffffff;
   margin: 0;
+  
+  &.clickable {
+    cursor: pointer;
+    transition: color 0.3s ease;
+    
+    &:hover {
+      color: #AAE16B;
+    }
+  }
 }
 
 .session-category {

@@ -1,78 +1,429 @@
 import { Component, inject, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ProfileService } from '../../services/profile.service';
 import { KnowledgeAreaService } from '../../services/knowledge-area.service';
-import { CommonModule } from '@angular/common';
-import { IUserSkill, IKnowledgeArea } from '../../interfaces';
+import { UserSkillService } from '../../services/user-skill.service';
+import { IUserSkill, IKnowledgeArea, ISkill } from '../../interfaces';
 
 /**
  * Componente de perfil de usuario para SkillSwap
- * Muestra información del usuario autenticado (Person, Instructor o Learner)
+ * Permite ver y editar información del usuario autenticado
  * 
  * @author SkillSwap Team
- * @version 2.0.0
+ * @version 4.0.0
  */
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  templateUrl: './profile.component.html',
+  templateUrl: './profile.component.html', 
   styleUrl: './profile.component.scss'
 })
 export class ProfileComponent implements OnInit {
-  /** Servicio de perfil inyectado */
   public profileService = inject(ProfileService);
-  
-  /** Servicio de knowledge areas inyectado */
-  private knowledgeAreaService = inject(KnowledgeAreaService);
+  public knowledgeAreaService = inject(KnowledgeAreaService);
+  public userSkillService = inject(UserSkillService);
 
-  /** Array con todas las knowledge areas cargadas */
   public knowledgeAreas: IKnowledgeArea[] = [];
+  public isEditingPersonalInfo: boolean = false;
+  public isEditingSkills: boolean = false;
+  public selectedLanguage: string = '';
+  public skillsToAdd: number[] = [];
+  public skillsToRemove: number[] = [];
+  public showSkillDropdown: boolean = false;
+  public selectedArea: IKnowledgeArea | null = null;
 
-  /**
-   * Inicializa el componente y carga el perfil del usuario y las áreas de conocimiento
-   */
+  // Sistema de notificaciones
+  public showNotification: boolean = false;
+  public notificationType: 'success' | 'warning' | 'error' | 'info' = 'info';
+  public notificationTitle: string = '';
+  public notificationMessage: string = '';
+  private notificationTimeout: any;
+
+  // ========== FOTO DE PERFIL ==========
+  public isUploadingPhoto: boolean = false;
+  public selectedFile: File | null = null;
+
   ngOnInit(): void {
     this.profileService.getUserProfile();
     this.loadKnowledgeAreas();
+    
+    setTimeout(() => {
+      this.selectedLanguage = this.profileService.person$().preferredLanguage || 'es';
+    }, 1000);
   }
 
-  /**
-   * Carga todas las áreas de conocimiento desde el backend
-   */
   private loadKnowledgeAreas(): void {
     this.knowledgeAreaService.getAllKnowledgeAreas().subscribe({
       next: (response) => {
-        // El backend devuelve { data: [...], message: "..." }
         this.knowledgeAreas = response.data || response;
-        console.log('✅ Knowledge Areas cargadas:', this.knowledgeAreas.length);
-        console.log('📋 Áreas:', this.knowledgeAreas);
       },
       error: (error) => {
-        console.error('❌ Error cargando Knowledge Areas:', error);
+        console.error('Error cargando Knowledge Areas:', error);
+        this.showToast('error', 'Error', 'No se pudieron cargar las áreas de conocimiento');
+      }
+    });
+  }
+
+  // ========== SISTEMA DE NOTIFICACIONES ==========
+
+  /**
+   * Muestra una notificación tipo toast
+   */
+  private showToast(type: 'success' | 'warning' | 'error' | 'info', title: string, message: string): void {
+    this.notificationType = type;
+    this.notificationTitle = title;
+    this.notificationMessage = message;
+    this.showNotification = true;
+
+    // Auto-cerrar después de 4 segundos
+    if (this.notificationTimeout) {
+      clearTimeout(this.notificationTimeout);
+    }
+    this.notificationTimeout = setTimeout(() => {
+      this.closeNotification();
+    }, 4000);
+  }
+
+  /**
+   * Cierra la notificación manualmente
+   */
+  public closeNotification(): void {
+    this.showNotification = false;
+    if (this.notificationTimeout) {
+      clearTimeout(this.notificationTimeout);
+    }
+  }
+
+  // ========== FOTO DE PERFIL ==========
+
+  /**
+   * Maneja la selección de archivo desde el input
+   */
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      
+      // Validar tipo de archivo
+      if (!file.type.startsWith('image/')) {
+        this.showToast('error', 'Archivo inválido', 'Solo se permiten archivos de imagen');
+        return;
+      }
+      
+      // Validar tamaño (5MB máximo)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        this.showToast('error', 'Archivo muy grande', 'El tamaño máximo es 5MB');
+        return;
+      }
+      
+      this.selectedFile = file;
+      this.uploadProfilePhoto();
+    }
+  }
+
+  /**
+   * Sube la foto de perfil al servidor
+   */
+  private uploadProfilePhoto(): void {
+    if (!this.selectedFile) return;
+    
+    this.isUploadingPhoto = true;
+    
+    this.profileService.updateProfilePhoto(this.selectedFile).subscribe({
+      next: (response) => {
+        this.showToast('success', 'Foto actualizada', 'Tu foto de perfil se ha actualizado correctamente');
+        this.profileService.getUserProfile(); // Recargar perfil
+        this.selectedFile = null;
+        this.isUploadingPhoto = false;
+      },
+      error: (error) => {
+        console.error('Error subiendo foto:', error);
+        let errorMessage = 'No se pudo actualizar la foto de perfil';
+        
+        if (error.error?.message) {
+          errorMessage = error.error.message;
+        }
+        
+        this.showToast('error', 'Error', errorMessage);
+        this.selectedFile = null;
+        this.isUploadingPhoto = false;
       }
     });
   }
 
   /**
-   * Formatea una fecha ISO a formato legible
-   * @param date Fecha en formato ISO
-   * @returns Fecha formateada o 'N/A'
+   * Abre el selector de archivos
    */
-  formatDate(date: string | undefined): string {
-    if (!date) return 'N/A';
-    return new Date(date).toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
+  triggerFileInput(): void {
+    const fileInput = document.getElementById('profilePhotoInput') as HTMLInputElement;
+    fileInput?.click();
   }
 
   /**
-   * Obtiene las iniciales del nombre completo
-   * @param fullName Nombre completo
-   * @returns Iniciales (máximo 2 letras)
+   * Obtiene la URL de la foto de perfil o usa iniciales
    */
+  getProfilePhotoUrl(): string | null {
+    return this.profileService.person$().profilePhotoUrl || null;
+  }
+
+  // ========== INFORMACIÓN PERSONAL ==========
+
+  enablePersonalInfoEdit(): void {
+    this.isEditingPersonalInfo = true;
+  }
+
+  savePersonalInfo(): void {
+    const currentLanguage = this.profileService.person$().preferredLanguage;
+    
+    if (this.selectedLanguage !== currentLanguage) {
+      this.userSkillService.updateLanguage(this.selectedLanguage).subscribe({
+        next: () => {
+          const languageName = this.selectedLanguage === 'es' ? 'Español' : 'English';
+          this.showToast('success', 'Idioma actualizado', `Tu idioma preferido ahora es ${languageName}`);
+          this.profileService.getUserProfile();
+          this.isEditingPersonalInfo = false;
+        },
+        error: (error) => {
+          console.error('Error actualizando idioma:', error);
+          this.showToast('error', 'Error', 'No se pudo actualizar el idioma');
+        }
+      });
+    } else {
+      this.showToast('info', 'Sin cambios', 'No hay cambios que guardar');
+      this.isEditingPersonalInfo = false;
+    }
+  }
+
+  // ========== SKILLS ==========
+
+  enableSkillsEdit(): void {
+    this.isEditingSkills = true;
+    this.skillsToAdd = [];
+    this.skillsToRemove = [];
+  }
+
+  cancelSkillsEdit(): void {
+    this.isEditingSkills = false;
+    this.skillsToAdd = [];
+    this.skillsToRemove = [];
+    this.showSkillDropdown = false;
+    this.selectedArea = null;
+    this.profileService.getUserProfile();
+    this.showToast('info', 'Cambios cancelados', 'Se han descartado todos los cambios');
+  }
+
+  saveSkills(): void {
+    // Validar que quedará al menos 1 skill
+    const currentActiveSkills = this.getActiveUserSkills().length;
+    const totalAfterChanges = currentActiveSkills + this.skillsToAdd.length - this.skillsToRemove.length;
+    
+    if (totalAfterChanges < 1) {
+      this.showToast('warning', 'Acción no permitida', 'Debes mantener al menos una habilidad activa');
+      return;
+    }
+    
+    // Verificar que haya cambios
+    if (this.skillsToAdd.length === 0 && this.skillsToRemove.length === 0) {
+      this.showToast('info', 'Sin cambios', 'No hay cambios que guardar');
+      this.isEditingSkills = false;
+      return;
+    }
+    
+    // Procesar cambios
+    if (this.skillsToRemove.length > 0) {
+      this.processSkillRemovals();
+    } else if (this.skillsToAdd.length > 0) {
+      this.processSkillAdditions();
+    }
+  }
+
+  private processSkillAdditions(): void {
+    this.userSkillService.addUserSkills(this.skillsToAdd).subscribe({
+      next: () => {
+        this.finishSkillsEdit(0);
+      },
+      error: (error) => {
+        console.error('Error agregando skills:', error);
+        this.showToast('error', 'Error', 'No se pudieron agregar las habilidades');
+        this.finishSkillsEdit(1);
+      }
+    });
+  }
+
+  private processSkillRemovals(): void {
+    let completed = 0;
+    let errors = 0;
+    
+    this.skillsToRemove.forEach(userSkillId => {
+      this.userSkillService.removeUserSkill(userSkillId).subscribe({
+        next: () => {
+          completed++;
+          if (completed === this.skillsToRemove.length) {
+            if (this.skillsToAdd.length > 0) {
+              this.processSkillAdditions();
+            } else {
+              this.finishSkillsEdit(errors);
+            }
+          }
+        },
+        error: (error) => {
+          console.error('Error eliminando skill:', userSkillId, error);
+          errors++;
+          completed++;
+          if (completed === this.skillsToRemove.length) {
+            if (this.skillsToAdd.length > 0) {
+              this.processSkillAdditions();
+            } else {
+              this.finishSkillsEdit(errors);
+            }
+          }
+        }
+      });
+    });
+  }
+
+  private finishSkillsEdit(errors: number): void {
+    this.profileService.getUserProfile();
+    this.isEditingSkills = false;
+    this.skillsToAdd = [];
+    this.skillsToRemove = [];
+    this.showSkillDropdown = false;
+    this.selectedArea = null;
+    
+    if (errors > 0) {
+      this.showToast('warning', 'Cambios guardados con errores', `Se completó la operación pero ocurrieron ${errors} error(es)`);
+    } else {
+      this.showToast('success', 'Cambios guardados', 'Tus habilidades se han actualizado correctamente');
+    }
+  }
+
+  openSkillDropdown(area: IKnowledgeArea): void {
+    if (this.selectedArea?.id === area.id) {
+      this.showSkillDropdown = !this.showSkillDropdown;
+    } else {
+      this.selectedArea = area;
+      this.showSkillDropdown = true;
+    }
+  }
+
+  addSkillToArea(skill: ISkill): void {
+    if (!this.skillsToAdd.includes(skill.id)) {
+      this.skillsToAdd.push(skill.id);
+      
+      const finalSkill: ISkill = {
+        ...skill,
+        knowledgeArea: skill.knowledgeArea || this.selectedArea!
+      };
+      
+      const tempUserSkill: IUserSkill = {
+        id: Date.now(),
+        skill: finalSkill,
+        active: true,
+        selectedDate: new Date().toISOString(),
+        person: this.profileService.person$()
+      };
+      
+      const currentPerson = this.profileService.person$();
+      this.profileService.personSignal.set({
+        ...currentPerson,
+        userSkills: [...(currentPerson.userSkills || []), tempUserSkill]
+      });
+    }
+    
+    this.showSkillDropdown = false;
+    this.selectedArea = null;
+  }
+
+  removeSkill(userSkill: IUserSkill): void {
+    const isTemporarySkill = userSkill.id > 1000000000000;
+    
+    if (isTemporarySkill) {
+      // Skill temporal - remover directamente
+      const skillIdToRemove = userSkill.skill?.id;
+      if (skillIdToRemove) {
+        const index = this.skillsToAdd.indexOf(skillIdToRemove);
+        if (index > -1) {
+          this.skillsToAdd.splice(index, 1);
+        }
+      }
+    } else {
+      // Skill real - validar que no sea la última EN TOTAL (contando todas las categorías)
+      
+      // Contar TODAS las skills activas (reales + temporales) en TODAS las categorías
+      const allActiveSkills = this.getActiveUserSkills();
+      const totalCurrentSkills = allActiveSkills.length;
+      
+      // Calcular cuántas quedarían DESPUÉS de eliminar esta
+      const alreadyMarkedForRemoval = this.skillsToRemove.length;
+      const toBeAdded = this.skillsToAdd.length;
+      
+      // Total = actuales - ya marcadas - esta + nuevas a agregar
+      const totalAfterRemoval = totalCurrentSkills - alreadyMarkedForRemoval - 1 + toBeAdded;
+      
+      // Debe quedar AL MENOS 1 skill EN TOTAL (en todas las categorías)
+      if (totalAfterRemoval < 1) {
+        let message = 'Debes mantener al menos una habilidad activa en total';
+        
+        if (alreadyMarkedForRemoval > 0) {
+          const plural = alreadyMarkedForRemoval === 1 ? 'habilidad marcada' : 'habilidades marcadas';
+          message = `Ya tienes ${alreadyMarkedForRemoval} ${plural} para eliminar. Debes mantener al menos una habilidad activa.`;
+        }
+        
+        this.showToast('warning', 'Acción no permitida', message);
+        return;
+      }
+
+      if (!this.skillsToRemove.includes(userSkill.id)) {
+        this.skillsToRemove.push(userSkill.id);
+      }
+    }
+    
+    // Actualizar visualmente
+    const currentPerson = this.profileService.person$();
+    this.profileService.personSignal.set({
+      ...currentPerson,
+      userSkills: (currentPerson.userSkills || []).filter(us => us.id !== userSkill.id)
+    });
+  }
+
+  getAvailableSkillsForArea(areaName: string): ISkill[] {
+    const area = this.knowledgeAreas.find(a => a.name === areaName);
+    if (!area || !area.skills) return [];
+    
+    const userSkillIds = this.getSkillsForArea(areaName).map(us => us.skill?.id);
+    return area.skills.filter(skill => skill.active && !userSkillIds.includes(skill.id));
+  }
+
+  /**
+   * Obtiene todas las skills activas del usuario
+   * (Incluye temporales, excluye las marcadas para eliminar)
+   */
+  getActiveUserSkills(): IUserSkill[] {
+    const userSkills = this.profileService.person$().userSkills || [];
+    return userSkills.filter(us => us.active && !this.skillsToRemove.includes(us.id));
+    // ← Excluye las skills ya marcadas para eliminar
+  }
+
+  // ========== MÉTODOS TRACKBY ==========
+
+  trackByAreaId(index: number, area: IKnowledgeArea): number {
+    return area.id;
+  }
+
+  trackBySkillId(index: number, userSkill: IUserSkill): number {
+    return userSkill.id;
+  }
+
+  trackBySkillOptionId(index: number, skill: ISkill): number {
+    return skill.id;
+  }
+
+  // ========== MÉTODOS AUXILIARES ==========
+
   getInitials(fullName: string | undefined): string {
     if (!fullName) return 'U';
     const names = fullName.split(' ');
@@ -80,21 +431,12 @@ export class ProfileComponent implements OnInit {
     return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
   }
 
-  /**
-   * Obtiene el primer nombre del usuario
-   * @returns Primer nombre o cadena vacía
-   */
   getFirstName(): string {
     const fullName = this.profileService.person$().fullName;
     if (!fullName) return '';
-    const parts = fullName.split(' ');
-    return parts[0] || '';
+    return fullName.split(' ')[0] || '';
   }
 
-  /**
-   * Obtiene los apellidos del usuario
-   * @returns Apellidos o cadena vacía
-   */
   getLastNames(): string {
     const fullName = this.profileService.person$().fullName;
     if (!fullName) return '';
@@ -102,33 +444,17 @@ export class ProfileComponent implements OnInit {
     return parts.slice(1).join(' ') || '';
   }
 
-  /**
-   * Obtiene todas las áreas de conocimiento disponibles
-   * @returns Array con todas las knowledge areas
-   */
   getAllKnowledgeAreas(): IKnowledgeArea[] {
     return this.knowledgeAreas;
   }
 
-  /**
-   * Obtiene las skills del usuario para un área específica
-   * @param areaName Nombre del área de conocimiento
-   * @returns Array de skills del usuario en esa área
-   */
   getSkillsForArea(areaName: string): IUserSkill[] {
     const userSkills = this.profileService.person$().userSkills || [];
     return userSkills.filter(
-      userSkill => 
-        userSkill.active && 
-        userSkill.skill?.knowledgeArea?.name === areaName
+      userSkill => userSkill.active && userSkill.skill?.knowledgeArea?.name === areaName
     );
   }
 
-  /**
-   * Traduce el nombre del área de conocimiento al español
-   * @param areaName Nombre del área en inglés
-   * @returns Nombre traducido al español
-   */
   getAreaDisplayName(areaName: string): string {
     const translations: { [key: string]: string } = {
       'Programming': 'Programación',
@@ -154,18 +480,10 @@ export class ProfileComponent implements OnInit {
       'Technology': 'Tecnología',
       'Environment': 'Medio Ambiente',
       'History': 'Historia',
-      'Literature': 'Literatura'
+      'Literature': 'Literatura',
+      'Power Skills': 'Power Skills'
     };
     
     return translations[areaName] || areaName;
-  }
-
-  /**
-   * Verifica si el usuario tiene habilidades asignadas
-   * @returns true si tiene al menos una habilidad
-   */
-  hasUserSkills(): boolean {
-    const userSkills = this.profileService.person$().userSkills || [];
-    return userSkills.some(skill => skill.active);
   }
 }

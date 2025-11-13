@@ -1,7 +1,9 @@
 <div class="session-card">
   <div class="session-content">
     <div class="session-header">
-      <h3 class="session-title">{{ session.title }}</h3>
+      <h3 class="session-title clickable" (click)="onViewDetails()">
+        {{ session.title }}
+      </h3>
       <span class="session-category badge" *ngIf="session.skill?.knowledgeArea?.name">
         <i class='bx bx-category-alt me-1'></i>
         {{ session.skill.knowledgeArea.name }}
