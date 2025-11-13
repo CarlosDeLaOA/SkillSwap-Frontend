@@ -12,6 +12,11 @@ import { IRoleType } from './interfaces';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { AuthCallbackComponent } from './pages/auth/auth-callback.component/auth-callback.component';
 import { ForgotPasswordComponent } from './pages/auth/forgotpassword/forgot-password.component';
+import { SessionListComponent} from './pages/session-list/session-list.component';  
+import { LandingComponent } from './pages/landing/landing.component';
+import { SkillOnboardingComponent } from './pages/skill-onboarding/skill-onboarding.component';
+import { VerifyEmailComponent } from './pages/verify-email/verify-email.component';import { LandingskillswapComponent } from './pages/landingskillswap/landingskillswap.component';
+
 
 export const routes: Routes = [
   {
@@ -28,7 +33,6 @@ export const routes: Routes = [
     path: 'auth/callback',
     component: AuthCallbackComponent
   },
-
   {
     path: 'forgot-password',
     component: ForgotPasswordComponent,
@@ -39,19 +43,29 @@ export const routes: Routes = [
     component: RegisterComponent,
     canActivate: [GuestGuard],
   },
-
-  
-
-
+  {
+    path: 'onboarding/skills',
+    component: SkillOnboardingComponent
+    // SIN canActivate - permite acceso sin autenticación
+  },
+  {
+    path: 'verify-email',
+    component: VerifyEmailComponent
+   
+  },
   {
     path: 'access-denied',
     component: AccessDeniedComponent,
   },
   {
     path: '',
-    redirectTo: 'login',
-    pathMatch: 'full',
+    component: LandingComponent,
   },
+{
+  path: 'skillswap',
+  component: LandingskillswapComponent,
+},
+
   {
     path: 'app',
     component: AppLayoutComponent,
@@ -80,9 +94,16 @@ export const routes: Routes = [
           showInSidebar: false
         }
       },
-      
+      {
+        path: 'sessions',
+        component: SessionListComponent,
+        data: {
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+          name: 'Sesiones',
+          showInSidebar: true
+        }
+      },
     ],
   },
-  // Fallback
   { path: '**', redirectTo: 'login' }
 ];

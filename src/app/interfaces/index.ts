@@ -126,6 +126,7 @@ export interface IPerson {
   lastConnection?: string;
   instructor?: IInstructor;
   learner?: ILearner;
+  userSkills?: IUserSkill[];
 }
 
 /**
@@ -208,6 +209,7 @@ export interface IFeedback {
   sessionTitle: string;
 }
 
+<<<<<<< HEAD
 export interface IAccountBalance {
   skillCoins: number;
 }
@@ -227,4 +229,88 @@ export interface IMonthlyAttendance {
   month: string;
   presentes: number;
   registrados: number;
+=======
+export interface ILearningSession {
+  id: number;
+  title: string;
+  description: string;
+  scheduledDatetime: string;
+  durationMinutes: number;
+  type: string;
+  maxCapacity: number;
+  isPremium: boolean;
+  skillcoinsCost: number;
+  language: string;
+  status: string;
+  videoCallLink?: string;
+  creationDate: string;
+  
+  instructor: {
+    id: number;
+    person: {
+      id: number;
+      fullName: string;
+      profilePhotoUrl?: string;
+      email: string;
+    };
+  };
+  
+  skill: {
+    id: number;
+    name: string;
+    knowledgeArea: {
+      id: number;
+      name: string;
+      iconUrl?: string;
+    };
+  };
+  
+  bookings: any[];
+  
+  currentBookings?: number;
+  availableSpots?: number;
+}
+
+export interface IKnowledgeArea {
+  id: number;
+  name: string;
+  description?: string;
+  iconUrl?: string;
+  active: boolean;
+  skills?: ISkill[];  
+}
+
+export interface ISessionFilters {
+  categoryId?: number;
+  language?: string;
+}
+
+/**
+ * Interfaz para Skill (Habilidad)
+ */
+export interface ISkill {
+  id: number;
+  name: string;
+  description?: string;
+  active: boolean;
+  knowledgeArea?: IKnowledgeArea;
+}
+
+/**
+ * Interfaz para UserSkill (Habilidad del Usuario)
+ */
+export interface IUserSkill {
+  id: number;
+  person: IPerson;
+  skill: ISkill;
+  selectedDate: string;
+  active: boolean;
+}
+
+/**
+ * Request para guardar habilidades del usuario
+ */
+export interface ISaveUserSkillsRequest {
+  skillIds: number[];
+>>>>>>> main
 }

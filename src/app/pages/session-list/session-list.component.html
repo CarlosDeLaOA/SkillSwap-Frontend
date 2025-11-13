@@ -1,0 +1,118 @@
+<div class="sessions-page">
+  <!-- Header con imagen de fondo -->
+  <div class="sessions-header">
+    <h1 class="header-title">
+      <span class="title-span">Explora</span> 
+      todas las 
+      <span class="title-span">sesiones</span>
+    </h1>
+    <p class="header-subtitle">que están disponibles para ti</p>
+    
+    <!-- Barra de búsqueda y filtro -->
+    <div class="search-container">
+      <div class="search-wrapper">
+        <input 
+          type="text" 
+          class="form-control search-input" 
+          placeholder="Buscar sesión..."
+          [(ngModel)]="searchTerm"
+          (input)="onSearch()">
+        <i class='bx bx-search search-icon'></i>
+      </div>
+      <button class="btn btn-filter" (click)="openFilterModal()">
+        <i class='bx bx-filter-alt'></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="loading-text">Cargando sesiones...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage && !isLoading" class="error-container">
+    <div class="alert alert-danger" role="alert">
+      <i class='bx bx-error-circle me-2'></i>
+      {{ errorMessage }}
+    </div>
+  </div>
+
+  <!-- Lista de sesiones -->
+  <div *ngIf="!isLoading && !errorMessage" class="sessions-container">
+    <div class="sessions-list">
+      <!-- Cuando hay sesiones -->
+      <ng-container *ngIf="paginatedSessions && paginatedSessions.length > 0">
+        <app-session-card 
+          *ngFor="let session of paginatedSessions"
+          [session]="session"
+          (register)="onRegister($event)"
+          (viewDetails)="onViewDetails($event)">
+        </app-session-card>
+      </ng-container>
+
+      <!-- Cuando no hay sesiones -->
+      <div *ngIf="!paginatedSessions || paginatedSessions.length === 0" class="no-sessions">
+        <i class='bx bx-calendar-x'></i>
+        <h3>No hay sesiones disponibles</h3>
+        <p>No se encontraron sesiones que coincidan con tus criterios de búsqueda.</p>
+      </div>
+    </div>
+
+    <!-- Paginación -->
+    <div *ngIf="paginatedSessions && paginatedSessions.length > 0 && totalPages > 1" class="pagination-container">
+      <nav aria-label="Paginación de sesiones">
+        <ul class="pagination">
+          <!-- Botón Anterior -->
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <button class="page-link" (click)="previousPage()" [disabled]="currentPage === 1">
+              <i class='bx bx-chevron-left'></i>
+              <span class="d-none d-sm-inline ms-1">Anterior</span>
+            </button>
+          </li>
+
+          <!-- Primera página -->
+          <li class="page-item" *ngIf="getPageNumbers()[0] > 1">
+            <button class="page-link" (click)="goToPage(1)">1</button>
+          </li>
+          <li class="page-item disabled" *ngIf="getPageNumbers()[0] > 2">
+            <span class="page-link">...</span>
+          </li>
+
+          <!-- Páginas numeradas -->
+          <li class="page-item" 
+              *ngFor="let page of getPageNumbers()" 
+              [class.active]="page === currentPage">
+            <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+          </li>
+
+          <!-- Última página -->
+          <li class="page-item disabled" *ngIf="getPageNumbers()[getPageNumbers().length - 1] < totalPages - 1">
+            <span class="page-link">...</span>
+          </li>
+          <li class="page-item" *ngIf="getPageNumbers()[getPageNumbers().length - 1] < totalPages">
+            <button class="page-link" (click)="goToPage(totalPages)">{{ totalPages }}</button>
+          </li>
+
+          <!-- Botón Siguiente -->
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <button class="page-link" (click)="nextPage()" [disabled]="currentPage === totalPages">
+              <span class="d-none d-sm-inline me-1">Siguiente</span>
+              <i class='bx bx-chevron-right'></i>
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Información de paginación -->
+      <div class="pagination-info">
+        Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }} - 
+        {{ Math.min(currentPage * itemsPerPage, filteredSessions.length) }} 
+        de {{ filteredSessions.length }} sesiones
+      </div>
+    </div>
+  </div>
+</div>

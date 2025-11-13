@@ -164,7 +164,7 @@ export class RegisterComponent {
 
         this.registerService.saveTemporaryData(registerData);
         this.isLoading = false;
-        this.router.navigate(['/onboarding']);
+        this.router.navigate(['/onboarding/skills']);
       },
       error: () => {
         this.isLoading = false;

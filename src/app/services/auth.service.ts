@@ -120,11 +120,16 @@ export class AuthService {
    */
   public login(credentials: { email: string; password: string }): Observable<ILoginResponse> {
     return this.http.post<ILoginResponse>('auth/login', credentials).pipe(
-      tap((response: any) => {
-        this.accessToken = response.token;
-        this.expiresIn = response.expiresIn;
-        this.setUser(response.authUser); 
-        this.save();
+      tap({
+        next: (response: any) => {
+          this.accessToken = response.token;
+          this.expiresIn = response.expiresIn;
+          this.setUser(response.authUser); 
+          this.save();
+        },
+        error: (error) => {
+          console.error('Error en AuthService:', error);
+        }
       })
     );
   }
