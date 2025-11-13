@@ -1,23 +1,22 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ILearningSession } from '../../interfaces';
 
 /**
- * Componente de tarjeta para mostrar información resumida de una sesión de aprendizaje
+ * Componente modal para mostrar los detalles completos de una sesión de aprendizaje
  */
 @Component({
-  selector: 'app-session-card',
+  selector: 'app-session-detail-modal',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './session-card.component.html',
-  styleUrls: ['./session-card.component.scss']
+  templateUrl: './session-detail-modal.component.html',
+  styleUrls: ['./session-detail-modal.component.scss']
 })
-export class SessionCardComponent {
-  
-  //#region Input/Output Properties
+export class SessionDetailModalComponent {
+
+  //#region Input Properties
   @Input() session!: ILearningSession;
-  @Output() register = new EventEmitter<number>();
-  @Output() viewDetails = new EventEmitter<ILearningSession>();
   //#endregion
 
   //#region Constants
@@ -28,21 +27,25 @@ export class SessionCardComponent {
     'de': 'Alemán',
     'pt': 'Portugués'
   };
+
+  statusLabels: { [key: string]: string } = {
+    'SCHEDULED': 'Programada',
+    'ACTIVE': 'Activa',
+    'COMPLETED': 'Completada',
+    'CANCELLED': 'Cancelada'
+  };
   //#endregion
 
-  //#region Event Handlers
-  /**
-   * Emite evento de registro para la sesión
-   */
-  onRegister(): void {
-    this.register.emit(this.session.id);
-  }
+  //#region Constructor
+  constructor(public activeModal: NgbActiveModal) {}
+  //#endregion
 
+  //#region Modal Actions
   /**
-   * Emite evento para ver detalles de la sesión
+   * Cierra el modal
    */
-  onViewDetails(): void {
-    this.viewDetails.emit(this.session);
+  close(): void {
+    this.activeModal.dismiss();
   }
   //#endregion
 
@@ -84,11 +87,28 @@ export class SessionCardComponent {
   }
 
   /**
+   * Obtiene la etiqueta del estado de la sesión
+   * @param status Estado de la sesión
+   * @returns Etiqueta del estado
+   */
+  getStatusLabel(status: string): string {
+    return this.statusLabels[status] || status;
+  }
+
+  /**
    * Calcula los cupos disponibles
    * @returns Número de cupos disponibles
    */
   getAvailableSpots(): number {
     return this.session.maxCapacity - (this.session.bookings?.length || 0);
+  }
+
+  /**
+   * Determina si hay cupos disponibles
+   * @returns true si hay cupos disponibles
+   */
+  hasSpotsAvailable(): boolean {
+    return this.getAvailableSpots() > 0;
   }
   //#endregion
 }
