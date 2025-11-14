@@ -366,12 +366,18 @@ export class ProfileComponent implements OnInit {
   }
 
   getAvailableSkillsForArea(areaName: string): ISkill[] {
-    const area = this.knowledgeAreas.find(a => a.name === areaName);
-    if (!area || !area.skills) return [];
-    
-    const userSkillIds = this.getSkillsForArea(areaName).map(us => us.skill?.id);
-    return area.skills.filter(skill => skill.active && !userSkillIds.includes(skill.id));
-  }
+  const area = this.knowledgeAreas.find(a => a.name === areaName);
+  if (!area || !area.skills) return [];
+  
+  const userSkillIds = this.getSkillsForArea(areaName).map(us => us.skill?.id);
+  const availableSkills = area.skills.filter(skill => skill.active && !userSkillIds.includes(skill.id));
+  
+  return availableSkills.sort((a, b) => {
+    const nameA = a.name.toLowerCase();
+    const nameB = b.name.toLowerCase();
+    return nameA.localeCompare(nameB, 'es');
+  });
+}
 
   /**
    * Obtiene todas las skills activas del usuario
@@ -421,11 +427,17 @@ export class ProfileComponent implements OnInit {
   }
 
   getSkillsForArea(areaName: string): IUserSkill[] {
-    const userSkills = this.profileService.person$().userSkills || [];
-    return userSkills.filter(
-      userSkill => userSkill.active && userSkill.skill?.knowledgeArea?.name === areaName
-    );
-  }
+  const userSkills = this.profileService.person$().userSkills || [];
+  const filteredSkills = userSkills.filter(
+    userSkill => userSkill.active && userSkill.skill?.knowledgeArea?.name === areaName
+  );
+  
+  return filteredSkills.sort((a, b) => {
+    const nameA = a.skill?.name.toLowerCase() || '';
+    const nameB = b.skill?.name.toLowerCase() || '';
+    return nameA.localeCompare(nameB, 'es');
+  });
+}
 
   getAreaDisplayName(areaName: string): string {
     const translations: { [key: string]: string } = {
