@@ -16,10 +16,8 @@ interface Testimonial {
 })
 export class LandingskillswapComponent implements OnInit {
   
-  // Estado del scroll para el navbar
   isScrolled = false;
 
-  // Testimonios
   testimonials: Testimonial[] = [
     {
       name: 'Julio Gómez',
@@ -38,7 +36,6 @@ export class LandingskillswapComponent implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit(): void {
-    // Smooth scroll para los enlaces del menú
     this.setupSmoothScroll();
   }
 
@@ -55,7 +52,6 @@ export class LandingskillswapComponent implements OnInit {
    * Configura el smooth scroll para los enlaces internos
    */
   private setupSmoothScroll(): void {
-    // Esperar a que el DOM esté listo
     setTimeout(() => {
       const links = document.querySelectorAll('a[href^="#"]');
       

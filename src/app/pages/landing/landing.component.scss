@@ -1,10 +1,9 @@
-// VARIABLES 
+
 $primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 $cyan-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
 $pink-gradient: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
 $hero-bg-gradient: linear-gradient(180deg, #a6e6fa 0%, #d4a5f5 50%, #fa9deb 100%);
 
-// BASE
 
 * {
   margin: 0;
@@ -20,8 +19,6 @@ $hero-bg-gradient: linear-gradient(180deg, #a6e6fa 0%, #d4a5f5 50%, #fa9deb 100%
   border: none; 
   box-shadow: none; 
 }
-
-// NAVBAR
 
 .landing-nav {
   position: fixed;
@@ -76,8 +73,6 @@ $hero-bg-gradient: linear-gradient(180deg, #a6e6fa 0%, #d4a5f5 50%, #fa9deb 100%
       }
     }
   }
-
-  // SCROLL
   &.scrolled {
     .logo {
       color: #ffffff;
@@ -96,15 +91,12 @@ $hero-bg-gradient: linear-gradient(180deg, #a6e6fa 0%, #d4a5f5 50%, #fa9deb 100%
     }
   }
 }
-// CONTENEDOR GENERAL
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 2rem;
 }
-
-// HEADER
 
 .hero {
   position: relative;
@@ -236,8 +228,6 @@ $hero-bg-gradient: linear-gradient(180deg, #a6e6fa 0%, #d4a5f5 50%, #fa9deb 100%
   }
 }
 
-// SECCIONES GENERALES
-
 .section {
   padding: 6rem 0;
   position: relative;
@@ -264,7 +254,6 @@ $hero-bg-gradient: linear-gradient(180deg, #a6e6fa 0%, #d4a5f5 50%, #fa9deb 100%
   color: #fff;
 }
 
-// QUIÉNES SOMOS
 .about-intro-center {
   font-size: 1.3rem;
   font-weight: 600;
@@ -319,8 +308,6 @@ $hero-bg-gradient: linear-gradient(180deg, #a6e6fa 0%, #d4a5f5 50%, #fa9deb 100%
     }
   }
 }
-
-// MISIÓN Y VISIÓN
 
 .mv-grid {
   display: grid;
@@ -397,8 +384,6 @@ $hero-bg-gradient: linear-gradient(180deg, #a6e6fa 0%, #d4a5f5 50%, #fa9deb 100%
   line-height: 1.7;
   color: rgba(255, 255, 255, 0.7);
 }
-
-// PROYECTO 
 
 .project-card {
   background: rgba(50, 50, 70, 0.4);
@@ -483,9 +468,6 @@ $hero-bg-gradient: linear-gradient(180deg, #a6e6fa 0%, #d4a5f5 50%, #fa9deb 100%
     transform: translateY(0);
   }
 }
-
-// FOOTER
-
 .landing-footer {
   position: relative;
   width: 100%;
@@ -526,8 +508,6 @@ $hero-bg-gradient: linear-gradient(180deg, #a6e6fa 0%, #d4a5f5 50%, #fa9deb 100%
   color: #2a2a3a; 
 }
 
-
-// SCROLL 
 html {
   scroll-behavior: smooth;
 }

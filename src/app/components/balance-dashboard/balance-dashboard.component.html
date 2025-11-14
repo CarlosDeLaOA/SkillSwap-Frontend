@@ -1,3 +1,26 @@
 <div class="balance-dashboard">
-    <!--JOSE-->
+  <div class="content" *ngIf="!isLoading">
+    <div class="balance-header">
+      <h3 class="balance-label">Saldo de la cuenta:</h3>
+      <div class="balance-amount">
+        <span class="amount">{{ accountBalance }}</span>
+        <span class="currency">SkillCoins</span>
+      </div>
+    </div>
+    
+    <div class="skillup-container">
+      <button class="skillup-button" (click)="onSkillUpClick()">
+        <img src="assets/img/dashboard/GraficaBalance.png" alt="SkillUp Icon" class="skillup-icon">
+        <span>SkillUp</span>
+      </button>
+    </div>
+
+    <div class="coins-illustration">
+      <img src="assets/img/dashboard/SkillsCoinsimage.png" alt="Coins" class="coins-image">
+    </div>
+  </div>
+  
+  <div class="loading" *ngIf="isLoading">
+    <div class="spinner"></div>
+  </div>
 </div>

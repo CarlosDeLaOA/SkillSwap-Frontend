@@ -80,22 +80,6 @@
         <div class="card-header">
           <h3 class="section-title">Información personal</h3>
           
-          <button 
-            *ngIf="!isEditingPersonalInfo" 
-            (click)="enablePersonalInfoEdit()"
-            class="btn-edit"
-          >
-            Editar
-          </button>
-          
-          <button 
-            *ngIf="isEditingPersonalInfo" 
-            (click)="savePersonalInfo()"
-            class="btn-save"
-          >
-            <box-icon name='check' color='white' size='18px'></box-icon>
-            Guardar
-          </button>
         </div>
 
         <div class="form-grid">
@@ -127,18 +111,6 @@
               placeholder="Correo electrónico"
               readonly
             />
-          </div>
-
-          <div class="form-group">
-            <label>Idioma preferido</label>
-            <select 
-              [(ngModel)]="selectedLanguage" 
-              [disabled]="!isEditingPersonalInfo"
-              class="language-select"
-            >
-              <option value="es">Español</option>
-              <option value="en">English</option>
-            </select>
           </div>
         </div>
       </section>

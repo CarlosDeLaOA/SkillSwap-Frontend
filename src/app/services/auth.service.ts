@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { IAuthority, ILoginResponse, IRoleType, IUser } from '../interfaces';
 import { Observable, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { ProfileService } from './profile.service';
 
 @Injectable({
   providedIn: 'root',
@@ -12,6 +13,7 @@ export class AuthService {
   private expiresIn!: number;
   private user: IUser | null = null; 
   private http: HttpClient = inject(HttpClient);
+  private profileService: ProfileService = inject(ProfileService);
   
   constructor() {
     this.load();
@@ -35,7 +37,7 @@ export class AuthService {
       try {
         this.user = JSON.parse(user);
       } catch (error) {
-        console.error('❌ Error parsing user from localStorage:', error);
+        console.error('Error parsing user from localStorage:', error);
         this.user = null;
       }
     }
@@ -56,12 +58,10 @@ export class AuthService {
   public setUser(user: any): void {
     console.log('🔵 Setting user:', user);
     
-   
     if (!user) {
-      console.error(' Attempting to set undefined/null user');
+      console.error('⚠️ Attempting to set undefined/null user');
       return;
     }
-    
     
     this.user = {
       email: user.email || '',
@@ -69,7 +69,7 @@ export class AuthService {
     };
     
     localStorage.setItem('auth_user', JSON.stringify(this.user));
-    console.log(' User set successfully:', this.user);
+    console.log('✅ User set successfully:', this.user);
   }
 
   /**
@@ -143,25 +143,40 @@ export class AuthService {
     return this.http.post<ILoginResponse>('auth/signup', user);
   }
 
- 
+  /**
+   * Cierra la sesión del usuario
+   * Limpia tokens, datos de usuario y perfil cargado
+   */
   public logout(): void {
+    console.log('🚪 Cerrando sesión...');
+    
+    // Limpiar datos de autenticación
     this.accessToken = '';
-    this.user = null; 
+    this.user = null;
+    
+    // Limpiar localStorage
     localStorage.removeItem('access_token');
     localStorage.removeItem('expiresIn');
     localStorage.removeItem('auth_user');
+    
+    // IMPORTANTE: Limpiar el perfil del ProfileService
+    this.profileService.clearProfile();
+    
+    console.log('✅ Sesión cerrada correctamente');
   }
 
-  
+  /**
+   * Alias para logout
+   */
   public clearAuth(): void {
     this.logout();
   }
  
   /**
-   * 
-   * @param code 
-   * @param redirectUri 
-   * @returns
+   * Login con Google OAuth
+   * @param code Código de autorización
+   * @param redirectUri URI de redirección
+   * @returns Observable con la respuesta de login
    */
   public loginWithGoogle(code: string, redirectUri: string): Observable<any> {
     return this.http.post<any>('/auth/google', { code, redirectUri }).pipe(
@@ -181,12 +196,11 @@ export class AuthService {
   }
 
   /**
-   * 
-   * @param role 
-   * @returns 
+   * Verifica si el usuario tiene un rol específico
+   * @param role Rol a verificar
+   * @returns true si el usuario tiene el rol, false en caso contrario
    */
   public hasRole(role: string): boolean {
-
     if (!this.user || !Array.isArray(this.user.authorities)) {
       return false;
     }
@@ -194,11 +208,10 @@ export class AuthService {
   }
 
   /**
-   * 
-   * @returns 
+   * Verifica si el usuario es super admin
+   * @returns true si es super admin, false en caso contrario
    */
   public isSuperAdmin(): boolean {
-    
     if (!this.user || !Array.isArray(this.user.authorities)) {
       return false;
     }
@@ -206,12 +219,11 @@ export class AuthService {
   }
 
   /**
-   * 
-   * @param roles 
-   * @returns 
+   * Verifica si el usuario tiene alguno de los roles especificados
+   * @param roles Array de roles a verificar
+   * @returns true si el usuario tiene al menos uno de los roles
    */
   public hasAnyRole(roles: any[]): boolean {
-    
     if (!this.user || !Array.isArray(this.user.authorities)) {
       return false;
     }
@@ -219,9 +231,9 @@ export class AuthService {
   }
 
   /**
-   * 
-   * @param routes 
-   * @returns 
+   * Obtiene las rutas permitidas para el usuario actual
+   * @param routes Array de rutas
+   * @returns Array de rutas permitidas
    */
   public getPermittedRoutes(routes: any[]): any[] {
     let permittedRoutes: any[] = [];
@@ -236,11 +248,10 @@ export class AuthService {
   }
 
   /**
-   * 
-   * @returns 
+   * Obtiene las autoridades del usuario actual
+   * @returns Array de autoridades
    */
   public getUserAuthorities(): IAuthority[] {
- 
     if (!this.user || !Array.isArray(this.user.authorities)) {
       return [];
     }
@@ -248,14 +259,13 @@ export class AuthService {
   }
 
   /**
-   * 
-   * @param routeAuthorities
-   * @returns 
+   * Verifica si las acciones están disponibles para el usuario
+   * @param routeAuthorities Autoridades requeridas
+   * @returns true si las acciones están disponibles
    */
   public areActionsAvailable(routeAuthorities: string[]): boolean {
     const userAuthorities = this.getUserAuthorities();
     
-   
     if (!userAuthorities || userAuthorities.length === 0) {
       return false;
     }
@@ -277,5 +287,4 @@ export class AuthService {
 
     return allowedUser && isAdmin;
   }
- 
 }

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GoogleAuthService } from '../../../services/google-auth.service';
 import { AuthService } from '../../../services/auth.service';
+import { ProfileService } from '../../../services/profile.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -13,8 +14,7 @@ import { CommonModule } from '@angular/common';
       <div class="callback-content">
         <div *ngIf="loading" class="loading-state">
           <div class="spinner"></div>
-          <p>Autenticando con Google...</p>
-          <!-- ✅ ELIMINADO: debugInfo ya no se muestra -->
+          <p>{{ loadingMessage }}</p>
         </div>
         
         <div *ngIf="error" class="error-state">
@@ -132,6 +132,7 @@ import { CommonModule } from '@angular/common';
 export class AuthCallbackComponent implements OnInit {
   
   public loading: boolean = true;
+  public loadingMessage: string = 'Procesando autenticación...';
   public error: string = '';
   public errorDetail: string = '';
   
@@ -139,7 +140,8 @@ export class AuthCallbackComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private googleAuthService: GoogleAuthService,
-    private authService: AuthService
+    private authService: AuthService,
+    private profileService: ProfileService
   ) { }
   
   ngOnInit(): void {
@@ -147,7 +149,7 @@ export class AuthCallbackComponent implements OnInit {
       const code = params['code'];
       const error = params['error'];
 
-      console.log('🔵 Callback params:', { code: code?.substring(0, 20) + '...', error });
+      console.log('🔵 [Callback] Recibido:', { code: code?.substring(0, 20) + '...', error });
 
       if (error) {
         this.handleError('Autenticación cancelada o rechazada', error);
@@ -158,66 +160,102 @@ export class AuthCallbackComponent implements OnInit {
         this.handleError('No se recibió el código de autorización');
         return;
       }
-      this.processGoogleCallback(code);
-    });
-  }
-  
-  private processGoogleCallback(code: string): void {
-    console.log('🔵 Procesando código de Google...');
-    
-    this.googleAuthService.authenticateWithGoogle(code).subscribe({
-      next: (response) => {
-        console.log(' Respuesta exitosa del backend:', response);
-        
-        if (response.token) {
-          this.authService.setToken(response.token);
-        } else {
-          console.error(' No se recibió token en la respuesta');
-          this.handleError('No se recibió token de autenticación');
-          return;
-        }
-        
-        const userData = response.authUser || response.profile || response.user;
-        if (userData) {
-         
-          const normalizedUser = {
-            email: userData.email || '',
-            authorities: Array.isArray(userData.authorities) ? userData.authorities : []
-          };
-          this.authService.setUser(normalizedUser);
-          console.log(' Usuario establecido:', normalizedUser);
-        } else {
-          console.warn(' No se recibió información del usuario');
-        }
 
       
-        if (response.requiresOnboarding) {
-          this.router.navigate(['/onboarding']);
-        } else {
-          this.router.navigate(['/app/dashboard']);
-        }
-      },
-      error: (err) => {
-        console.error(' Error en autenticación:', err);
-        
-        let errorMessage = 'Error al autenticar con Google';
-        let errorDetails = '';
-        
-        if (err.status === 0) {
-          errorMessage = 'No se pudo conectar con el servidor';
-          errorDetails = 'Verifica que el backend esté corriendo en http://localhost:8080';
-        } else if (err.error?.error) {
-          errorMessage = err.error.error;
-          errorDetails = err.error.message || '';
-        } else if (err.error?.message) {
-          errorMessage = err.error.message;
-        } else if (err.message) {
-          errorDetails = err.message;
-        }
-        
-        this.handleError(errorMessage, errorDetails);
-      }
+      this.checkUserStatus(code);
     });
+  }
+
+  
+  private checkUserStatus(code: string): void {
+  this.loadingMessage = 'Verificando tu cuenta...';
+
+  this.googleAuthService.checkGoogleUser(code).subscribe({
+    next: (response) => {
+      console.log('🔵 [Callback] Estado del usuario:', response);
+
+      if (response.needsRoleSelection) {
+      
+        console.log('➡️ Redirigiendo a selección de rol...');
+        
+        const googleUserData = {
+          email: response.email || response.userInfo?.email,
+          name: response.name || response.userInfo?.name,
+          picture: response.picture || response.userInfo?.picture,
+          googleId: response.googleId || response.userInfo?.id,
+          accessToken: response.accessToken 
+        };
+        
+        sessionStorage.setItem('pendingGoogleAuth', JSON.stringify(googleUserData));
+        
+        this.loading = false;
+        this.router.navigate(['/auth/role-selection'], { 
+          replaceUrl: true 
+        });
+        return;
+      }
+
+
+      console.log(' Usuario existente con roles - Autenticando...');
+      this.authenticateExistingUser(response);
+    },
+    error: (err) => {
+      console.error(' Error verificando usuario:', err);
+      this.handleError(
+        'Error al verificar la cuenta',
+        err.error?.message || err.message
+      );
+    }
+  });
+}
+
+  
+  private authenticateExistingUser(response: any): void {
+    this.loadingMessage = 'Iniciando sesión...';
+
+    try {
+      if (response.token) {
+        this.authService.setToken(response.token);
+      } else {
+        throw new Error('No se recibió token en la respuesta');
+      }
+
+     
+      if (response.profile) {
+        const normalizedUser = {
+          email: response.profile.email || '',
+          authorities: []
+        };
+        this.authService.setUser(normalizedUser);
+      }
+
+      this.profileService.getUserProfile();
+
+      const hasLearner = response.hasLearner === true;
+      const hasInstructor = response.hasInstructor === true;
+
+      console.log(' Roles del usuario:', { hasLearner, hasInstructor });
+
+      if (hasInstructor && hasLearner) {
+        this.router.navigate(['/app/dashboard'], { replaceUrl: true });
+      } else if (hasInstructor) {
+       
+        this.router.navigate(['/app/dashboard'], { replaceUrl: true });
+      } else if (hasLearner) {
+      
+        this.router.navigate(['/app/dashboard'], { replaceUrl: true });
+      } else {
+      
+        this.router.navigate(['/app/dashboard'], { replaceUrl: true });
+      }
+
+    } catch (error: any) {
+      console.error(' Error en autenticación:', error);
+      this.handleError(
+        'Error al iniciar sesión',
+        error.message
+      );
+    }
   }
 
   private handleError(message: string, detail?: string): void {

@@ -17,9 +17,8 @@ import { IKnowledgeArea } from '../../interfaces';
 export class FilterModalComponent implements OnInit {
   @Input() currentFilters: any;
   @Input() knowledgeAreas: IKnowledgeArea[] = [];
-  @Input() availableLanguages: string[] = []; // Idiomas dinámicos de las sesiones
+  @Input() availableLanguages: string[] = [];
 
-  // Mapeo de códigos de idioma a nombres legibles
   languageNames: { [key: string]: string } = {
     'es': 'Español',
     'en': 'Inglés',
@@ -46,13 +45,11 @@ export class FilterModalComponent implements OnInit {
       availableLanguages: this.availableLanguages
     });
 
-    // Inicializar categorías seleccionadas
     this.knowledgeAreas.forEach(area => {
       this.selectedCategoryIds[area.id] = 
         this.currentFilters?.categoryIds?.includes(area.id) || false;
     });
     
-    // Inicializar idiomas seleccionados (usando los idiomas dinámicos)
     this.availableLanguages.forEach(langCode => {
       this.selectedLanguages[langCode] = 
         this.currentFilters?.languages?.includes(langCode) || false;
@@ -60,7 +57,6 @@ export class FilterModalComponent implements OnInit {
   }
 
   onFilterChange() {
-    // Opcional: lógica adicional cuando cambian los filtros
     console.log('Filter changed', {
       categories: this.selectedCategoryIds,
       languages: this.selectedLanguages
@@ -71,7 +67,7 @@ export class FilterModalComponent implements OnInit {
     const filters = {
       categoryIds: Object.keys(this.selectedCategoryIds)
         .filter(key => this.selectedCategoryIds[+key])
-        .map(key => +key), // Convertir a números
+        .map(key => +key),
       languages: Object.keys(this.selectedLanguages)
         .filter(key => this.selectedLanguages[key])
     };
@@ -81,12 +77,10 @@ export class FilterModalComponent implements OnInit {
   }
 
   clearFilters() {
-    // Limpiar todas las categorías
     this.knowledgeAreas.forEach(area => {
       this.selectedCategoryIds[area.id] = false;
     });
     
-    // Limpiar todos los idiomas (usando los idiomas dinámicos)
     this.availableLanguages.forEach(langCode => {
       this.selectedLanguages[langCode] = false;
     });
@@ -98,7 +92,6 @@ export class FilterModalComponent implements OnInit {
     this.activeModal.dismiss();
   }
 
-  // Métodos auxiliares para el template
   getSelectedCategoriesCount(): number {
     return Object.values(this.selectedCategoryIds).filter(v => v).length;
   }

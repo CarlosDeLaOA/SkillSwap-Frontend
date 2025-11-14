@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { IPerson, IUserSkill } from '../interfaces';
+import { IPerson } from '../interfaces';
 import { Observable } from 'rxjs';
 
 /**
@@ -18,7 +18,6 @@ export class ProfileService {
   private http = inject(HttpClient);
   private snackBar = inject(MatSnackBar);
   
-  // ⚠️ CRÍTICO: Signal público para poder hacer .set() desde el componente
   public personSignal = signal<IPerson>({
     preferredLanguage: '' 
   });
@@ -29,18 +28,18 @@ export class ProfileService {
   }
 
   getUserProfile(): void {
-    console.log('📡 [ProfileService] Obteniendo perfil desde:', `${this.apiUrl}/me`);
+    console.log('[ProfileService] Obteniendo perfil desde:', `${this.apiUrl}/me`);
     
     this.http.get<any>(`${this.apiUrl}/me`).subscribe({
       next: (response: any) => {
         const personData = response.data || response;
         this.personSignal.set(personData);
         
-        console.log('✅ [ProfileService] Perfil cargado:', personData);
-        console.log('✅ [ProfileService] UserSkills:', personData.userSkills?.length || 0);
+        console.log('[ProfileService] Perfil cargado:', personData);
+        console.log('[ProfileService] UserSkills:', personData.userSkills?.length || 0);
       },
       error: (error: any) => {
-        console.error('❌ [ProfileService] Error:', error);
+        console.error('[ProfileService] Error:', error);
         this.snackBar.open(
           `Error al cargar el perfil: ${error.error?.message || error.message}`,
           'Cerrar', 
@@ -50,8 +49,21 @@ export class ProfileService {
     });
   }
 
+  /**
+   * Limpia el perfil del usuario (útil para logout o cambio de usuario)
+   */
+  clearProfile() {
+    console.log('🧹 Limpiando perfil del usuario');
+    this.personSignal.set({
+      preferredLanguage: ''
+    });
+  }
+
+  /**
+   * Actualiza el idioma preferido del usuario
+   */
   updateLanguage(language: string): Observable<any> {
-    console.log('🌐 [ProfileService] Actualizando idioma a:', language);
+    console.log('[ProfileService] Actualizando idioma a:', language);
     return this.http.put(`${this.apiUrl}/me/language`, { language });
   }
 /**
@@ -59,7 +71,7 @@ export class ProfileService {
  * @returns Observable con la respuesta del servidor
  */
 deleteProfilePhoto(): Observable<any> {
-  console.log('🗑️ [ProfileService] Eliminando foto de perfil');
+  console.log('[ProfileService] Eliminando foto de perfil');
   return this.http.delete(`${this.apiUrl}/me/profile-photo`);
 }
   /**
@@ -68,7 +80,7 @@ deleteProfilePhoto(): Observable<any> {
    * @returns Observable con la respuesta del servidor
    */
   updateProfilePhoto(file: File): Observable<any> {
-    console.log('📸 [ProfileService] Subiendo foto de perfil:', file.name);
+    console.log('[ProfileService] Subiendo foto de perfil:', file.name);
     
     const formData = new FormData();
     formData.append('file', file);
@@ -76,16 +88,19 @@ deleteProfilePhoto(): Observable<any> {
     return this.http.put(`${this.apiUrl}/me/profile-photo`, formData);
   }
 
+  /** Verifica si el usuario es Instructor */
   isInstructor(): boolean {
     return this.personSignal().instructor !== null && 
            this.personSignal().instructor !== undefined;
   }
 
+  /** Verifica si el usuario es Learner */
   isLearner(): boolean {
     return this.personSignal().learner !== null && 
            this.personSignal().learner !== undefined;
   }
 
+  /** Obtiene el rol del usuario */
   getUserRole(): string {
     if (this.isInstructor() && this.isLearner()) return 'SkillSwapper';
     if (this.isInstructor()) return 'SkillSwapper';
@@ -93,8 +108,8 @@ deleteProfilePhoto(): Observable<any> {
     return 'Usuario';
   }
 
+  /** Obtiene el idioma preferido del usuario */
   getPreferredLanguage(): string {
     return this.personSignal().preferredLanguage || 'No especificado';
   }
 }
-
