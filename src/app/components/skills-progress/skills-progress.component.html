@@ -10,11 +10,13 @@
 
     <div class="chart-container" *ngIf="selectedSkill !== null">
      
-      <div class="hover-area" 
-           (mouseenter)="showTooltipInfo()" 
-           (mouseleave)="hideTooltipInfo()">
+
+      <div class="hover-area">
         
-        <div class="pie-chart-wrapper">
+      
+        <div class="pie-chart-wrapper"
+             (mouseenter)="showTooltipInfo()" 
+             (mouseleave)="hideTooltipInfo()">
           <svg class="pie-chart" viewBox="0 0 200 200">
             <circle
               class="pie-segment completed"
@@ -39,8 +41,11 @@
           </div>
         </div>
 
-        
-        <div class="tooltip" *ngIf="showTooltip">
+    
+        <div class="tooltip" 
+             *ngIf="showTooltip"
+             (mouseenter)="showTooltipInfo()"
+             (mouseleave)="hideTooltipInfo()">
           <div class="tooltip-content">
             <div class="tooltip-row completed-row">
               <span class="tooltip-label">

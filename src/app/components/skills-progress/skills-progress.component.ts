@@ -19,6 +19,7 @@ export class SkillsProgressComponent implements OnInit {
   isLoading: boolean = true;
   private dataLoaded: boolean = false;
   showTooltip: boolean = false;
+  private hideTooltipTimeout: any = null; 
   tooltipData = {
     completed: 0,
     pending: 0,
@@ -34,7 +35,7 @@ export class SkillsProgressComponent implements OnInit {
       const profile = this.profileService.person$();
       
       if (profile && profile.id && (profile.instructor !== undefined || profile.learner !== undefined)) {
-        console.log('🔄 Perfil actualizado en skills-progress, recargando datos...');
+        console.log(' Perfil actualizado en skills-progress, recargando datos...');
         
         this.dataLoaded = false;
         this.skillsData = [];
@@ -50,12 +51,12 @@ export class SkillsProgressComponent implements OnInit {
     const profile = this.profileService.person$();
     
     if (!profile || !profile.id) {
-      console.log('⏳ Esperando carga del perfil en skills-progress...');
+      console.log(' Esperando carga del perfil en skills-progress...');
       return;
     }
     
     if (!this.dataLoaded) {
-      console.log('✅ Perfil disponible, cargando datos de skills-progress...');
+      console.log(' Perfil disponible, cargando datos de skills-progress...');
       this.loadSkillSessionStats();
     }
   }
@@ -97,13 +98,24 @@ export class SkillsProgressComponent implements OnInit {
     return true;
   }
 
+
   showTooltipInfo(): void {
+
+    if (this.hideTooltipTimeout) {
+      clearTimeout(this.hideTooltipTimeout);
+      this.hideTooltipTimeout = null;
+    }
+    
     this.showTooltip = true;
     this.updateTooltipData();
   }
 
   hideTooltipInfo(): void {
-    this.showTooltip = false;
+
+    this.hideTooltipTimeout = setTimeout(() => {
+      this.showTooltip = false;
+      this.hideTooltipTimeout = null;
+    }, 6000); 
   }
 
   getSelectedSkillData(): ISkillSessionStats | null {
@@ -153,7 +165,7 @@ export class SkillsProgressComponent implements OnInit {
     
     this.dashboardService.getSkillSessionStats().subscribe({
       next: (data: any) => {
-        console.log('✅ Datos de habilidades recibidos:', data);
+        console.log(' Datos de habilidades recibidos:', data);
         
         let estadisticas: ISkillSessionStats[] = [];
         
@@ -166,7 +178,7 @@ export class SkillsProgressComponent implements OnInit {
         estadisticas = estadisticas.filter(e => e.skillName && e.skillName.trim() !== '');
         
         if (estadisticas.length === 0) {
-          console.warn('⚠️ No hay datos de habilidades, creando habilidades por defecto');
+          console.warn(' No hay datos de habilidades, creando habilidades por defecto');
           estadisticas = [
             { skillName: 'Java', completed: 7, pending: 3 },
             { skillName: 'Python', completed: 5, pending: 5 },
@@ -180,7 +192,7 @@ export class SkillsProgressComponent implements OnInit {
         this.selectedSkill = 0;
         this.updateTooltipData();
         
-        console.log('Estadísticas procesadas:', this.skillsData);
+        console.log('📊 Estadísticas procesadas:', this.skillsData);
         this.isLoading = false;
       },
       error: (error) => {
