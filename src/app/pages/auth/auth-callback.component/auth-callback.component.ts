@@ -13,8 +13,7 @@ import { CommonModule } from '@angular/common';
       <div class="callback-content">
         <div *ngIf="loading" class="loading-state">
           <div class="spinner"></div>
-          <p>Autenticando con Google...</p>
-          <!-- ✅ ELIMINADO: debugInfo ya no se muestra -->
+          <p>{{ loadingMessage }}</p>
         </div>
         
         <div *ngIf="error" class="error-state">
@@ -132,6 +131,7 @@ import { CommonModule } from '@angular/common';
 export class AuthCallbackComponent implements OnInit {
   
   public loading: boolean = true;
+  public loadingMessage: string = 'Procesando autenticación...';
   public error: string = '';
   public errorDetail: string = '';
   
@@ -158,73 +158,83 @@ export class AuthCallbackComponent implements OnInit {
         this.handleError('No se recibió el código de autorización');
         return;
       }
-      this.processGoogleCallback(code);
+
+
+this.loading = false;
+this.router.navigate(['/auth/role-selection'], { queryParams: { code } });
+
     });
   }
   
-  private processGoogleCallback(code: string): void {
-    console.log('🔵 Procesando código de Google...');
+  /**
+   * Verifica si el usuario ya existe en el sistema
+   * Si existe -> autentica directamente
+   * Si NO existe -> redirige al popup de selección de rol
+   */
+  private checkUserExistence(code: string): void {
+    this.loadingMessage = 'Verificando cuenta...';
     
-    this.googleAuthService.authenticateWithGoogle(code).subscribe({
+    // Primero intentamos obtener el token y ver si el usuario existe
+    this.googleAuthService.checkExistingGoogleUser(code).subscribe({
       next: (response) => {
-        console.log(' Respuesta exitosa del backend:', response);
-        
-        if (response.token) {
-          this.authService.setToken(response.token);
-        } else {
-          console.error(' No se recibió token en la respuesta');
-          this.handleError('No se recibió token de autenticación');
-          return;
-        }
-        
-        const userData = response.authUser || response.profile || response.user;
-        if (userData) {
-         
-          const normalizedUser = {
-            email: userData.email || '',
-            authorities: Array.isArray(userData.authorities) ? userData.authorities : []
-          };
-          this.authService.setUser(normalizedUser);
-          console.log(' Usuario establecido:', normalizedUser);
-        } else {
-          console.warn(' No se recibió información del usuario');
-        }
-
-      
-        if (response.requiresOnboarding) {
-          this.router.navigate(['/onboarding']);
-        } else {
-          this.router.navigate(['/app/dashboard']);
-        }
+        console.log('✅ Usuario existente encontrado');
+        // Usuario existe, autenticar directamente
+        this.authenticateExistingUser(response);
       },
       error: (err) => {
-        console.error(' Error en autenticación:', err);
-        
-        let errorMessage = 'Error al autenticar con Google';
-        let errorDetails = '';
-        
-        if (err.status === 0) {
-          errorMessage = 'No se pudo conectar con el servidor';
-          errorDetails = 'Verifica que el backend esté corriendo en http://localhost:8080';
-        } else if (err.error?.error) {
-          errorMessage = err.error.error;
-          errorDetails = err.error.message || '';
-        } else if (err.error?.message) {
-          errorMessage = err.error.message;
-        } else if (err.message) {
-          errorDetails = err.message;
+        if (err.status === 404) {
+          // Usuario NO existe, redirigir al popup de selección de rol
+          console.log('🔵 Usuario nuevo, redirigiendo a selección de rol...');
+          this.router.navigate(['/auth/role-selection'], { 
+            queryParams: { code: code } 
+          });
+        } else {
+          console.error('❌ Error verificando usuario:', err);
+          this.handleError('Error al verificar la cuenta', err.message);
         }
-        
-        this.handleError(errorMessage, errorDetails);
       }
     });
+  }
+
+  /**
+   * Autentica un usuario existente
+   */
+  private authenticateExistingUser(response: any): void {
+    this.loadingMessage = 'Iniciando sesión...';
+    
+    if (response.token) {
+      this.authService.setToken(response.token);
+    } else {
+      console.error('❌ No se recibió token en la respuesta');
+      this.handleError('No se recibió token de autenticación');
+      return;
+    }
+    
+    const userData = response.authUser || response.profile || response.user;
+    if (userData) {
+      const normalizedUser = {
+        email: userData.email || '',
+        authorities: Array.isArray(userData.authorities) ? userData.authorities : []
+      };
+      this.authService.setUser(normalizedUser);
+      console.log('✅ Usuario establecido:', normalizedUser);
+    } else {
+      console.warn('⚠️ No se recibió información del usuario');
+    }
+
+    // Redirigir según si requiere onboarding o no
+    if (response.requiresOnboarding) {
+      this.router.navigate(['/onboarding']);
+    } else {
+      this.router.navigate(['/app/dashboard']);
+    }
   }
 
   private handleError(message: string, detail?: string): void {
     this.loading = false;
     this.error = message;
     this.errorDetail = detail || '';
-    console.error(' Error:', message, detail);
+    console.error('❌ Error:', message, detail);
   }
 
   public redirectToLogin(): void {

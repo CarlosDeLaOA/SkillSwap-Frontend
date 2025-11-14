@@ -51,8 +51,6 @@ export interface IRole {
   updatedAt: string;
 }
 
-
-
 export interface ISearch {
   page?: number;
   size?: number;
@@ -110,6 +108,28 @@ export interface IEmailCheckResponse {
 // ========================================
 
 /**
+ * Interfaz para Skill (Habilidad)
+ */
+export interface ISkill {
+  id: number;
+  name: string;
+  description?: string;
+  active: boolean;
+  knowledgeArea?: IKnowledgeArea;
+}
+
+/**
+ * Interfaz para UserSkill (Habilidad del Usuario)
+ */
+export interface IUserSkill {
+  id: number;
+  person: IPerson;
+  skill: ISkill;
+  selectedDate: string;
+  active: boolean;
+}
+
+/**
  * Entidad Person del sistema SkillSwap
  */
 export interface IPerson {
@@ -163,6 +183,7 @@ export interface ILoginResponseSkillSwap {
   expiresIn: number;
   authPerson: IPerson;
 }
+
 /** 
  * Respuesta del endpoint de horas de aprendizaje
  */
@@ -208,6 +229,36 @@ export interface IFeedback {
   learnerName: string;
   sessionTitle: string;
 }
+
+// ========================================
+// INTERFACES DE DASHBOARD
+// ========================================
+
+export interface IAccountBalance {
+  skillCoins: number;
+}
+
+export interface IMonthlyAchievement {
+  month: string;
+  credentials: number;
+  certificates: number;
+}
+
+export interface ISkillSessionStats {
+  skillName: string;
+  completed: number;
+  pending: number;
+}
+
+export interface IMonthlyAttendance {
+  month: string;
+  presentes: number;
+  registrados: number;
+}
+
+// ========================================
+// INTERFACES DE LEARNING SESSIONS
+// ========================================
 
 export interface ILearningSession {
   id: number;
@@ -262,28 +313,6 @@ export interface IKnowledgeArea {
 export interface ISessionFilters {
   categoryId?: number;
   language?: string;
-}
-
-/**
- * Interfaz para Skill (Habilidad)
- */
-export interface ISkill {
-  id: number;
-  name: string;
-  description?: string;
-  active: boolean;
-  knowledgeArea?: IKnowledgeArea;
-}
-
-/**
- * Interfaz para UserSkill (Habilidad del Usuario)
- */
-export interface IUserSkill {
-  id: number;
-  person: IPerson;
-  skill: ISkill;
-  selectedDate: string;
-  active: boolean;
 }
 
 /**

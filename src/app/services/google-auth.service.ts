@@ -8,57 +8,99 @@ import { environment } from '../../environments/environment';
 })
 export class GoogleAuthService {
   
+  private apiUrl = environment.apiUrl;
+  private googleClientId = environment.googleClientId;
+  private redirectUri = environment.googleRedirectUri;
+
   constructor(private http: HttpClient) {}
 
   /**
-   * Obtiene la URL de autorización de Google
-   * @returns URL completa para redirigir al usuario
+   * Inicia el flujo de login con Google OAuth
+   * Redirige al callback que luego decidirá si mostrar el popup o no
    */
-  getGoogleAuthUrl(): string {
-    const clientId = environment.googleClientId;
-    const redirectUri = environment.googleRedirectUri;
-    const scope = 'email profile openid';
-    const responseType = 'code';
-    const accessType = 'offline';
-    const prompt = 'consent';
+  public initiateGoogleLogin(): void {
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+      `client_id=${this.googleClientId}&` +
+      `redirect_uri=${this.redirectUri}&` +
+      `response_type=code&` +
+      `scope=openid%20profile%20email&` +
+      `access_type=offline&` +
+      `prompt=consent`;
 
-    const params = new URLSearchParams({
-      client_id: clientId,
-      redirect_uri: redirectUri,
-      response_type: responseType,
-      scope: scope,
-      access_type: accessType,
-      prompt: prompt
-    });
-
-    return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
-  }
-
-  
-  initiateGoogleLogin(): void {
-    const authUrl = this.getGoogleAuthUrl();
-    console.log('🔵 Redirigiendo a Google OAuth:', authUrl);
+    console.log('🔵 Iniciando autenticación con Google...');
+    console.log('🔵 Redirect URI:', this.redirectUri);
+    
+    // Redirigir a Google OAuth
     window.location.href = authUrl;
   }
 
   /**
-   * Autentica con Google usando el código de autorización
+   * NUEVO: Verifica si el usuario ya existe en el sistema
    * @param code Código de autorización de Google
-   * @returns Observable con la respuesta del backend
    */
-  authenticateWithGoogle(code: string): Observable<any> {
-    const redirectUri = environment.googleRedirectUri;
+  public checkExistingGoogleUser(code: string): Observable<any> {
+    console.log('🔵 Verificando si el usuario ya existe...');
     
-    console.log('🔵 Enviando petición a backend:', {
-      endpoint: 'auth/google',
-      code: code.substring(0, 20) + '...',
-      redirectUri
+    return this.http.post(`${this.apiUrl}/auth/google/check`, {
+      code: code,
+      redirectUri: this.redirectUri
     });
+  }
+
+  /**
+   * NUEVO: Autentica al usuario con Google y el rol seleccionado
+   * @param code Código de autorización de Google
+   * @param role Rol seleccionado por el usuario
+   */
+  public authenticateWithGoogleAndRole(code: string, role: 'LEARNER' | 'INSTRUCTOR'): Observable<any> {
+    console.log('🔵 Autenticando con Google y rol:', role);
     
+    return this.http.post(`${this.apiUrl}/auth/google`, {
+      code: code,
+      redirectUri: this.redirectUri,
+      role: role
+    });
+  }
+
+  /**
+   * Método original - Autentica sin especificar rol (para usuarios existentes)
+   * Se mantiene para compatibilidad con el flujo de usuarios existentes
+   */
+  public authenticateWithGoogle(code: string): Observable<any> {
+    console.log('🔵 Autenticando usuario existente con Google...');
     
-    return this.http.post<any>('auth/google', { 
-      code, 
-      redirectUri 
+    return this.http.post(`${this.apiUrl}/auth/google`, {
+      code: code,
+      redirectUri: this.redirectUri
+    });
+  }
+
+  /**
+   * Obtiene la URL de autorización de Google
+   */
+  public getGoogleAuthUrl(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/auth/google/url`);
+  }
+
+  /**
+   * Verifica el estado de la sesión de Google
+   */
+  public checkGoogleAuthStatus(token: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/auth/google/status`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+  }
+
+  /**
+   * Cierra la sesión de Google
+   */
+  public googleLogout(token: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/auth/google/logout`, {}, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     });
   }
 }
