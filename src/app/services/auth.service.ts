@@ -37,7 +37,7 @@ export class AuthService {
       try {
         this.user = JSON.parse(user);
       } catch (error) {
-        console.error('❌ Error parsing user from localStorage:', error);
+        console.error('Error parsing user from localStorage:', error);
         this.user = null;
       }
     }

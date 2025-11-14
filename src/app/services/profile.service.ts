@@ -18,7 +18,6 @@ export class ProfileService {
   private http = inject(HttpClient);
   private snackBar = inject(MatSnackBar);
   
-  // ⚠️ CRÍTICO: Signal público para poder hacer .set() desde el componente
   public personSignal = signal<IPerson>({
     preferredLanguage: '' 
   });
@@ -29,18 +28,18 @@ export class ProfileService {
   }
 
   getUserProfile(): void {
-    console.log('📡 [ProfileService] Obteniendo perfil desde:', `${this.apiUrl}/me`);
+    console.log('[ProfileService] Obteniendo perfil desde:', `${this.apiUrl}/me`);
     
     this.http.get<any>(`${this.apiUrl}/me`).subscribe({
       next: (response: any) => {
         const personData = response.data || response;
         this.personSignal.set(personData);
         
-        console.log('✅ [ProfileService] Perfil cargado:', personData);
-        console.log('✅ [ProfileService] UserSkills:', personData.userSkills?.length || 0);
+        console.log('[ProfileService] Perfil cargado:', personData);
+        console.log('[ProfileService] UserSkills:', personData.userSkills?.length || 0);
       },
       error: (error: any) => {
-        console.error('❌ [ProfileService] Error:', error);
+        console.error('[ProfileService] Error:', error);
         this.snackBar.open(
           `Error al cargar el perfil: ${error.error?.message || error.message}`,
           'Cerrar', 
@@ -64,26 +63,24 @@ export class ProfileService {
    * Actualiza el idioma preferido del usuario
    */
   updateLanguage(language: string): Observable<any> {
-    console.log('🌐 [ProfileService] Actualizando idioma a:', language);
+    console.log('[ProfileService] Actualizando idioma a:', language);
     return this.http.put(`${this.apiUrl}/me/language`, { language });
   }
-
-  /**
-   * Elimina la foto de perfil del usuario
-   * @returns Observable con la respuesta del servidor
-   */
-  deleteProfilePhoto(): Observable<any> {
-    console.log('🗑️ [ProfileService] Eliminando foto de perfil');
-    return this.http.delete(`${this.apiUrl}/me/profile-photo`);
-  }
-
+/**
+ * Elimina la foto de perfil del usuario
+ * @returns Observable con la respuesta del servidor
+ */
+deleteProfilePhoto(): Observable<any> {
+  console.log('[ProfileService] Eliminando foto de perfil');
+  return this.http.delete(`${this.apiUrl}/me/profile-photo`);
+}
   /**
    * Actualiza la foto de perfil del usuario
    * @param file Archivo de imagen a subir
    * @returns Observable con la respuesta del servidor
    */
   updateProfilePhoto(file: File): Observable<any> {
-    console.log('📸 [ProfileService] Subiendo foto de perfil:', file.name);
+    console.log('[ProfileService] Subiendo foto de perfil:', file.name);
     
     const formData = new FormData();
     formData.append('file', file);

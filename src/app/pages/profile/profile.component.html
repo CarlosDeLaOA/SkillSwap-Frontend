@@ -20,13 +20,10 @@
   </div>
 
   <main class="profile-main">
-    <!-- Primera fila: Avatar e Información Personal -->
     <div class="profile-grid-top">
-      <!-- COLUMNA IZQUIERDA: Avatar -->
       <aside class="avatar-card">
         <div class="profile-photo-section">
           <div class="photo-container">
-            <!-- Si hay foto, mostrarla -->
             <img 
               *ngIf="getProfilePhotoUrl()" 
               [src]="getProfilePhotoUrl()!" 
@@ -34,7 +31,6 @@
               class="profile-photo"
             />
             
-            <!-- Si no hay foto, mostrar iniciales -->
             <div 
               *ngIf="!getProfilePhotoUrl()" 
               class="avatar-initials"
@@ -42,12 +38,10 @@
               {{ getInitials(profileService.person$().fullName) }}
             </div>
             
-            <!-- Indicador de carga -->
             <div *ngIf="isUploadingPhoto" class="upload-overlay">
               <div class="spinner"></div>
             </div>
             
-            <!-- Botón para cambiar foto -->
             <button 
               type="button"
               class="change-photo-btn"
@@ -62,7 +56,6 @@
             </button>
           </div>
           
-          <!-- Input oculto para seleccionar archivo -->
           <input 
             type="file" 
             id="profilePhotoInput"
@@ -75,7 +68,6 @@
         <h3 class="user-role">{{ profileService.getUserRole() }}</h3>
       </aside>
 
-      <!-- COLUMNA DERECHA: Información Personal -->
       <section class="info-card">
         <div class="card-header">
           <h3 class="section-title">Información personal</h3>
@@ -144,7 +136,6 @@
       </section>
     </div>
 
-    <!-- Segunda fila: Habilidades a explorar -->
     <section class="info-card skills-card">
       <div class="card-header">
         <h3 class="section-title">Habilidades a explorar</h3>
@@ -162,12 +153,10 @@
         Ajusta tus habilidades a explorar para poder mostrarte contenido a tu medida.
       </p>
 
-      <!-- Grid dinámico con TODAS las knowledge areas -->
       <div class="skills-grid">
         <div class="form-group" *ngFor="let area of getAllKnowledgeAreas(); trackBy: trackByAreaId">
           <label>{{ getAreaDisplayName(area.name) }}</label>
           
-          <!-- MODO VISTA -->
           <div class="select-with-tags" *ngIf="!isEditingSkills">
             <div class="tags-container" *ngIf="getSkillsForArea(area.name).length > 0">
               <span 
@@ -183,7 +172,6 @@
             <box-icon name='chevron-down' size="20px" color="#aae16b" class="select-arrow"></box-icon>
           </div>
 
-          <!-- MODO EDICIÓN -->
           <div class="select-with-tags-editable" *ngIf="isEditingSkills">
             <div class="tags-container-editable">
               <span 
@@ -209,7 +197,6 @@
               </button>
             </div>
 
-            <!-- Dropdown de skills disponibles -->
             <div 
               *ngIf="selectedArea?.id === area.id && showSkillDropdown"
               class="skills-dropdown"
@@ -232,7 +219,6 @@
         </div>
       </div>
 
-      <!-- Botones de guardar/cancelar -->
       <div *ngIf="isEditingSkills" class="actions-footer">
         <button (click)="cancelSkillsEdit()" class="btn-cancel">
           Cancelar

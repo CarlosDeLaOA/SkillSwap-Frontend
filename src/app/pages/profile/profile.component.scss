@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;600;700&display=swap');
 
-// Paleta de colores SkillSwap
 $primary: #504ab7;
 $secondary: #aae16b;
 $neutral: #3e3e43;
@@ -8,13 +7,11 @@ $dark: #141414;
 $white: #ffffff;
 $border-color: rgba(170, 225, 107, 0.5);
 
-// Colores de notificaciones
 $success: #4CAF50;
 $warning: #FFC107;
 $error: #F44336;
 $info: #2196F3;
 
-// Tipografía
 $font-family: 'Epilogue', sans-serif;
 
 .profile-wrapper {
@@ -28,7 +25,6 @@ $font-family: 'Epilogue', sans-serif;
   position: relative;
 }
 
-// ===== SISTEMA DE NOTIFICACIONES TOAST =====
 .toast-notification {
   position: fixed;
   top: -100px;
@@ -138,7 +134,6 @@ $font-family: 'Epilogue', sans-serif;
   gap: 16px;
 }
 
-// ===== PRIMERA FILA: Avatar + Info Personal =====
 .profile-grid-top {
   display: grid;
   grid-template-columns: 320px 1fr;
@@ -150,7 +145,6 @@ $font-family: 'Epilogue', sans-serif;
   }
 }
 
-// ===== AVATAR CARD =====
 .avatar-card {
   background-color: rgba(0, 0, 0, 0.4);
   border: 2px solid $border-color;
@@ -174,7 +168,6 @@ $font-family: 'Epilogue', sans-serif;
   }
 }
 
-// ===== FOTO DE PERFIL =====
 .profile-photo-section {
   display: flex;
   justify-content: center;
@@ -282,7 +275,6 @@ $font-family: 'Epilogue', sans-serif;
   }
 }
 
-// ===== INFO CARDS =====
 .info-card {
   background-color: rgba(0, 0, 0, 0.4);
   border: 2px solid $border-color;
@@ -312,7 +304,6 @@ $font-family: 'Epilogue', sans-serif;
   margin: 0;
 }
 
-// ===== BOTONES =====
 .btn-edit,
 .btn-save,
 .btn-edit-skills,
@@ -451,7 +442,6 @@ $font-family: 'Epilogue', sans-serif;
   }
 }
 
-// ===== SELECT CON TAGS =====
 .select-with-tags {
   width: 100%;
   min-height: 46px;
@@ -499,7 +489,6 @@ $font-family: 'Epilogue', sans-serif;
   }
 }
 
-// ===== MODO EDICIÓN DE SKILLS =====
 .select-with-tags-editable {
   width: 100%;
   min-height: 46px;
@@ -622,7 +611,6 @@ $font-family: 'Epilogue', sans-serif;
   }
 }
 
-// ===== FOOTER DE ACCIONES =====
 .actions-footer {
   display: flex;
   gap: 12px;
@@ -671,7 +659,6 @@ $font-family: 'Epilogue', sans-serif;
   }
 }
 
-// ===== ANIMACIONES =====
 @keyframes fadeIn {
   from {
     opacity: 0;

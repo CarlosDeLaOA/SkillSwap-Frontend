@@ -1,10 +1,8 @@
-// ===== VARIABLES =====
 $primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
 $green-color: #a3e635;
 $purple-text: #6366f1;
 $hero-gradient: linear-gradient(180deg, #6366f1 0%, #8b5cf6 5%, #a3e635 90%);
 
-// ===== BASE =====
 * {
   margin: 0;
   padding: 0;
@@ -18,7 +16,6 @@ $hero-gradient: linear-gradient(180deg, #6366f1 0%, #8b5cf6 5%, #a3e635 90%);
   overflow-x: hidden;
 }
 
-// ===== NAVBAR =====
 .landing-nav {
   position: fixed;
   top: 0;
@@ -168,8 +165,6 @@ $hero-gradient: linear-gradient(180deg, #6366f1 0%, #8b5cf6 5%, #a3e635 90%);
     }
   }
 }
-
-// ===== CONTAINER =====
 .container {
   max-width: 1400px;
   margin: 0 auto;
@@ -188,7 +183,6 @@ $hero-gradient: linear-gradient(180deg, #6366f1 0%, #8b5cf6 5%, #a3e635 90%);
   }
 }
 
-// ===== HERO SECTION =====
 .hero {
   position: relative;
   min-height: 100vh;
@@ -327,7 +321,6 @@ $hero-gradient: linear-gradient(180deg, #6366f1 0%, #8b5cf6 5%, #a3e635 90%);
   }
 }
 
-// ===== SECTIONS =====
 .section {
   padding: 5rem 0;
   position: relative;
@@ -381,7 +374,6 @@ $hero-gradient: linear-gradient(180deg, #6366f1 0%, #8b5cf6 5%, #a3e635 90%);
   }
 }
 
-// ===== WHY SECTION =====
 .why-section {
   background: #0a0a0a;
 }
@@ -487,8 +479,6 @@ $hero-gradient: linear-gradient(180deg, #6366f1 0%, #8b5cf6 5%, #a3e635 90%);
     }
   }
 }
-
-// ===== BECOME SECTION =====
 .become-section {
   background: #0a0a0a;
 }
@@ -676,7 +666,6 @@ $hero-gradient: linear-gradient(180deg, #6366f1 0%, #8b5cf6 5%, #a3e635 90%);
   }
 }
 
-// ===== JOIN SECTION =====
 .join-section {
   background: #0a0a0a;
   text-align: center;
@@ -734,7 +723,6 @@ $hero-gradient: linear-gradient(180deg, #6366f1 0%, #8b5cf6 5%, #a3e635 90%);
   }
 }
 
-// ===== TESTIMONIALS SECTION =====
 .testimonials-section {
   background: #0a0a0a;
 }
@@ -848,7 +836,6 @@ $hero-gradient: linear-gradient(180deg, #6366f1 0%, #8b5cf6 5%, #a3e635 90%);
   }
 }
 
-// ===== FOOTER =====
 .landing-footer {
   position: relative;
   width: 100%;
@@ -911,12 +898,10 @@ $hero-gradient: linear-gradient(180deg, #6366f1 0%, #8b5cf6 5%, #a3e635 90%);
   }
 }
 
-// ===== SCROLL BEHAVIOR =====
 html {
   scroll-behavior: smooth;
 }
 
-// ===== UTILITIES =====
 .highlight {
   color: $green-color;
   font-weight: 600;

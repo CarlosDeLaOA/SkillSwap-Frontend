@@ -103,10 +103,6 @@ export interface IEmailCheckResponse {
 
 //#endregion
 
-// ========================================
-// INTERFACES DE SKILLSWAP
-// ========================================
-
 /**
  * Interfaz para Skill (Habilidad)
  */

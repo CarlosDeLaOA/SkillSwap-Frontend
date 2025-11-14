@@ -195,7 +195,6 @@
   }
 }
 
-// Estilos de Paginación
 .pagination-container {
   display: flex;
   flex-direction: column;
@@ -273,7 +272,6 @@
   text-align: center;
 }
 
-// Responsive
 @media (max-width: 768px) {
   .header-title {
     font-size: 1.8rem;

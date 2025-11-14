@@ -195,7 +195,7 @@ export class SkillOnboardingComponent implements OnInit, OnDestroy {
 
     registerObservable.pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {
-        console.log('✅ Registro completado:', response);
+        console.log('Registro completado:', response);
         this.registerService.clearTemporaryData();
         
         this.router.navigate(['/login'], { 
@@ -207,7 +207,7 @@ export class SkillOnboardingComponent implements OnInit, OnDestroy {
         });
       },
       error: (error) => {
-        console.error('❌ Error en registro:', error);
+        console.error('Error en registro:', error);
         this.errorMessage = error.error?.message || 'Error al completar el registro';
         this.isLoading = false;
       }

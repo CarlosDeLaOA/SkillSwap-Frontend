@@ -183,7 +183,6 @@
   }
 }
 
-// Estilos para el modal (debe estar en styles.scss o en el componente global)
 ::ng-deep {
   .modal-content {
     background-color: #39434b;
@@ -192,7 +191,6 @@
   }
 }
 
-// Responsive
 @media (max-width: 576px) {
   .filter-options {
     grid-template-columns: 1fr;
