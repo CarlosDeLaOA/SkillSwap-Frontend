@@ -57,11 +57,20 @@
   padding: 0 20px;
 }
 
+/* CRÍTICO: Área de hover expandida que incluye gráfico + espacio + tooltip */
+.hover-area {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  /* Padding a la derecha para cubrir el espacio hasta el tooltip */
+  padding-right: 300px;
+}
+
 .pie-chart-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: 1;
   position: relative;
   cursor: pointer;
 }
@@ -73,7 +82,7 @@
   transition: transform 0.3s ease;
 }
 
-.pie-chart-wrapper:hover .pie-chart {
+.hover-area:hover .pie-chart {
   transform: rotate(-90deg) scale(1.05);
 }
 
@@ -83,7 +92,7 @@
   transition: stroke-dashoffset 0.5s ease, stroke-width 0.3s ease;
 }
 
-.pie-chart-wrapper:hover .pie-segment {
+.hover-area:hover .pie-segment {
   stroke-width: 45;
 }
 
@@ -107,15 +116,16 @@
   transition: font-size 0.3s ease;
 }
 
-.pie-chart-wrapper:hover .percentage-label {
+.hover-area:hover .percentage-label {
   font-size: 36px;
 }
 
-/* Tooltip Styles */
+/* Tooltip - ahora está dentro del área de hover */
 .tooltip {
   position: absolute;
-  top: -10px;
-  right: -280px;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
   background: linear-gradient(135deg, #2A3238 0%, #39434B 100%);
   border: 2px solid #504AB7;
   border-radius: 12px;
@@ -129,11 +139,11 @@
 @keyframes tooltipFadeIn {
   from {
     opacity: 0;
-    transform: translateX(-10px);
+    transform: translateY(-50%) translateX(10px);
   }
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(-50%) translateX(0);
   }
 }
 
@@ -291,14 +301,23 @@
 
 /* Responsive Design */
 @media (max-width: 1200px) {
+  .hover-area {
+    padding-right: 250px;
+  }
+  
   .tooltip {
-    right: -240px;
     min-width: 220px;
   }
 }
 
 @media (max-width: 768px) {
   .chart-container {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .hover-area {
+    padding-right: 0;
     flex-direction: column;
     gap: 20px;
   }
@@ -310,11 +329,11 @@
   }
 
   .tooltip {
-    position: fixed;
-    top: 50%;
-    left: 50%;
+    position: relative;
+    top: auto;
     right: auto;
-    transform: translate(-50%, -50%);
+    transform: none;
+    margin-top: 20px;
   }
 
   .tooltip::before {

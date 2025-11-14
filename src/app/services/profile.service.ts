@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { IPerson, IUserSkill } from '../interfaces';
+import { IPerson } from '../interfaces';
 import { Observable } from 'rxjs';
 
 /**
@@ -50,7 +50,6 @@ export class ProfileService {
     });
   }
 
-<<<<<<< HEAD
   /**
    * Limpia el perfil del usuario (útil para logout o cambio de usuario)
    */
@@ -61,20 +60,23 @@ export class ProfileService {
     });
   }
 
-  /** Verifica si el usuario es Instructor */
-=======
+  /**
+   * Actualiza el idioma preferido del usuario
+   */
   updateLanguage(language: string): Observable<any> {
     console.log('🌐 [ProfileService] Actualizando idioma a:', language);
     return this.http.put(`${this.apiUrl}/me/language`, { language });
   }
-/**
- * Elimina la foto de perfil del usuario
- * @returns Observable con la respuesta del servidor
- */
-deleteProfilePhoto(): Observable<any> {
-  console.log('🗑️ [ProfileService] Eliminando foto de perfil');
-  return this.http.delete(`${this.apiUrl}/me/profile-photo`);
-}
+
+  /**
+   * Elimina la foto de perfil del usuario
+   * @returns Observable con la respuesta del servidor
+   */
+  deleteProfilePhoto(): Observable<any> {
+    console.log('🗑️ [ProfileService] Eliminando foto de perfil');
+    return this.http.delete(`${this.apiUrl}/me/profile-photo`);
+  }
+
   /**
    * Actualiza la foto de perfil del usuario
    * @param file Archivo de imagen a subir
@@ -89,17 +91,19 @@ deleteProfilePhoto(): Observable<any> {
     return this.http.put(`${this.apiUrl}/me/profile-photo`, formData);
   }
 
->>>>>>> main
+  /** Verifica si el usuario es Instructor */
   isInstructor(): boolean {
     return this.personSignal().instructor !== null && 
            this.personSignal().instructor !== undefined;
   }
 
+  /** Verifica si el usuario es Learner */
   isLearner(): boolean {
     return this.personSignal().learner !== null && 
            this.personSignal().learner !== undefined;
   }
 
+  /** Obtiene el rol del usuario */
   getUserRole(): string {
     if (this.isInstructor() && this.isLearner()) return 'SkillSwapper';
     if (this.isInstructor()) return 'SkillSwapper';
@@ -107,12 +111,8 @@ deleteProfilePhoto(): Observable<any> {
     return 'Usuario';
   }
 
+  /** Obtiene el idioma preferido del usuario */
   getPreferredLanguage(): string {
     return this.personSignal().preferredLanguage || 'No especificado';
   }
-<<<<<<< HEAD
 }
-=======
-}
-
->>>>>>> main

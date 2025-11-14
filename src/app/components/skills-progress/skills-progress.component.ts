@@ -139,17 +139,17 @@ export class SkillsProgressComponent implements OnInit {
   }
 
   /**
-   * Muestra el tooltip con información detallada
+   * Muestra el tooltip - se llama desde el área de hover expandida
    */
-  onChartMouseEnter(): void {
+  showTooltipInfo(): void {
     this.showTooltip = true;
     this.updateTooltipData();
   }
 
   /**
-   * Oculta el tooltip
+   * Oculta el tooltip - se llama al salir del área de hover expandida
    */
-  onChartMouseLeave(): void {
+  hideTooltipInfo(): void {
     this.showTooltip = false;
   }
 

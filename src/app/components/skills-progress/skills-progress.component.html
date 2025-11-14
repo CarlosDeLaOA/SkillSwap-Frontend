@@ -9,33 +9,37 @@
     </div>
 
     <div class="chart-container" *ngIf="selectedSkill !== null">
-      <div class="pie-chart-wrapper" 
-           (mouseenter)="onChartMouseEnter()" 
-           (mouseleave)="onChartMouseLeave()">
-        <svg class="pie-chart" viewBox="0 0 200 200">
-          <circle
-            class="pie-segment completed"
-            cx="100"
-            cy="100"
-            r="80"
-            [attr.stroke-dasharray]="getStrokeDasharray()"
-            [attr.stroke-dashoffset]="0"
-          ></circle>
-          <circle
-            class="pie-segment pending"
-            cx="100"
-            cy="100"
-            r="80"
-            [attr.stroke-dasharray]="getStrokeDasharray()"
-            [attr.stroke-dashoffset]="getCompletedCircumference()"
-          ></circle>
-        </svg>
+      <!-- Área expandida que incluye gráfico + tooltip -->
+      <div class="hover-area" 
+           (mouseenter)="showTooltipInfo()" 
+           (mouseleave)="hideTooltipInfo()">
         
-        <div class="percentage-label">
-          {{ getCompletedPercentage() }}%
+        <div class="pie-chart-wrapper">
+          <svg class="pie-chart" viewBox="0 0 200 200">
+            <circle
+              class="pie-segment completed"
+              cx="100"
+              cy="100"
+              r="80"
+              [attr.stroke-dasharray]="getStrokeDasharray()"
+              [attr.stroke-dashoffset]="0"
+            ></circle>
+            <circle
+              class="pie-segment pending"
+              cx="100"
+              cy="100"
+              r="80"
+              [attr.stroke-dasharray]="getStrokeDasharray()"
+              [attr.stroke-dashoffset]="getCompletedCircumference()"
+            ></circle>
+          </svg>
+          
+          <div class="percentage-label">
+            {{ getCompletedPercentage() }}%
+          </div>
         </div>
 
-        <!-- Tooltip -->
+        <!-- Tooltip dentro del área de hover -->
         <div class="tooltip" *ngIf="showTooltip">
           <div class="tooltip-content">
             <div class="tooltip-row completed-row">
