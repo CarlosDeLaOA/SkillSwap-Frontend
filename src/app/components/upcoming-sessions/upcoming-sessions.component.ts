@@ -70,7 +70,6 @@ export class UpcomingSessionsComponent implements OnInit {
    */
   onEdit(session: IUpcomingSession): void {
     console.log('Editing session:', session);
-    // TODO: Implement edit functionality
   }
 
   /**
@@ -79,7 +78,6 @@ export class UpcomingSessionsComponent implements OnInit {
    */
   onCancel(session: IUpcomingSession): void {
     console.log('Canceling session:', session);
-    // TODO: Implement cancel functionality
   }
 
   /**

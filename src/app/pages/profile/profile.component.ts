@@ -35,14 +35,12 @@ export class ProfileComponent implements OnInit {
   public showSkillDropdown: boolean = false;
   public selectedArea: IKnowledgeArea | null = null;
 
-  // Sistema de notificaciones
   public showNotification: boolean = false;
   public notificationType: 'success' | 'warning' | 'error' | 'info' = 'info';
   public notificationTitle: string = '';
   public notificationMessage: string = '';
   private notificationTimeout: any;
 
-  // ========== FOTO DE PERFIL ==========
   public isUploadingPhoto: boolean = false;
   public selectedFile: File | null = null;
 
@@ -67,8 +65,6 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  // ========== SISTEMA DE NOTIFICACIONES ==========
-
   /**
    * Muestra una notificación tipo toast
    */
@@ -78,7 +74,6 @@ export class ProfileComponent implements OnInit {
     this.notificationMessage = message;
     this.showNotification = true;
 
-    // Auto-cerrar después de 4 segundos
     if (this.notificationTimeout) {
       clearTimeout(this.notificationTimeout);
     }
@@ -97,7 +92,6 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-  // ========== FOTO DE PERFIL ==========
 
   /**
    * Maneja la selección de archivo desde el input
@@ -107,13 +101,11 @@ export class ProfileComponent implements OnInit {
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
       
-      // Validar tipo de archivo
       if (!file.type.startsWith('image/')) {
         this.showToast('error', 'Archivo inválido', 'Solo se permiten archivos de imagen');
         return;
       }
       
-      // Validar tamaño (5MB máximo)
       const maxSize = 5 * 1024 * 1024; // 5MB
       if (file.size > maxSize) {
         this.showToast('error', 'Archivo muy grande', 'El tamaño máximo es 5MB');
@@ -170,8 +162,6 @@ export class ProfileComponent implements OnInit {
     return this.profileService.person$().profilePhotoUrl || null;
   }
 
-  // ========== INFORMACIÓN PERSONAL ==========
-
   enablePersonalInfoEdit(): void {
     this.isEditingPersonalInfo = true;
   }
@@ -197,9 +187,6 @@ export class ProfileComponent implements OnInit {
       this.isEditingPersonalInfo = false;
     }
   }
-
-  // ========== SKILLS ==========
-
   enableSkillsEdit(): void {
     this.isEditingSkills = true;
     this.skillsToAdd = [];
@@ -217,7 +204,6 @@ export class ProfileComponent implements OnInit {
   }
 
   saveSkills(): void {
-    // Validar que quedará al menos 1 skill
     const currentActiveSkills = this.getActiveUserSkills().length;
     const totalAfterChanges = currentActiveSkills + this.skillsToAdd.length - this.skillsToRemove.length;
     
@@ -225,15 +211,12 @@ export class ProfileComponent implements OnInit {
       this.showToast('warning', 'Acción no permitida', 'Debes mantener al menos una habilidad activa');
       return;
     }
-    
-    // Verificar que haya cambios
     if (this.skillsToAdd.length === 0 && this.skillsToRemove.length === 0) {
       this.showToast('info', 'Sin cambios', 'No hay cambios que guardar');
       this.isEditingSkills = false;
       return;
     }
     
-    // Procesar cambios
     if (this.skillsToRemove.length > 0) {
       this.processSkillRemovals();
     } else if (this.skillsToAdd.length > 0) {
@@ -342,7 +325,6 @@ export class ProfileComponent implements OnInit {
     const isTemporarySkill = userSkill.id > 1000000000000;
     
     if (isTemporarySkill) {
-      // Skill temporal - remover directamente
       const skillIdToRemove = userSkill.skill?.id;
       if (skillIdToRemove) {
         const index = this.skillsToAdd.indexOf(skillIdToRemove);
@@ -351,20 +333,14 @@ export class ProfileComponent implements OnInit {
         }
       }
     } else {
-      // Skill real - validar que no sea la última EN TOTAL (contando todas las categorías)
-      
-      // Contar TODAS las skills activas (reales + temporales) en TODAS las categorías
       const allActiveSkills = this.getActiveUserSkills();
       const totalCurrentSkills = allActiveSkills.length;
       
-      // Calcular cuántas quedarían DESPUÉS de eliminar esta
       const alreadyMarkedForRemoval = this.skillsToRemove.length;
       const toBeAdded = this.skillsToAdd.length;
       
-      // Total = actuales - ya marcadas - esta + nuevas a agregar
       const totalAfterRemoval = totalCurrentSkills - alreadyMarkedForRemoval - 1 + toBeAdded;
       
-      // Debe quedar AL MENOS 1 skill EN TOTAL (en todas las categorías)
       if (totalAfterRemoval < 1) {
         let message = 'Debes mantener al menos una habilidad activa en total';
         
@@ -382,7 +358,6 @@ export class ProfileComponent implements OnInit {
       }
     }
     
-    // Actualizar visualmente
     const currentPerson = this.profileService.person$();
     this.profileService.personSignal.set({
       ...currentPerson,
@@ -405,10 +380,8 @@ export class ProfileComponent implements OnInit {
   getActiveUserSkills(): IUserSkill[] {
     const userSkills = this.profileService.person$().userSkills || [];
     return userSkills.filter(us => us.active && !this.skillsToRemove.includes(us.id));
-    // ← Excluye las skills ya marcadas para eliminar
-  }
 
-  // ========== MÉTODOS TRACKBY ==========
+  }
 
   trackByAreaId(index: number, area: IKnowledgeArea): number {
     return area.id;
@@ -422,7 +395,6 @@ export class ProfileComponent implements OnInit {
     return skill.id;
   }
 
-  // ========== MÉTODOS AUXILIARES ==========
 
   getInitials(fullName: string | undefined): string {
     if (!fullName) return 'U';

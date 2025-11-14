@@ -1,4 +1,3 @@
-// forgot-password.component.ts
 import { Component, signal, computed, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
