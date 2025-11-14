@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GoogleAuthService } from '../../../services/google-auth.service';
 import { AuthService } from '../../../services/auth.service';
+import { ProfileService } from '../../../services/profile.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -139,7 +140,8 @@ export class AuthCallbackComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private googleAuthService: GoogleAuthService,
-    private authService: AuthService
+    private authService: AuthService,
+    private profileService: ProfileService
   ) { }
   
   ngOnInit(): void {
@@ -147,7 +149,7 @@ export class AuthCallbackComponent implements OnInit {
       const code = params['code'];
       const error = params['error'];
 
-      console.log('🔵 Callback params:', { code: code?.substring(0, 20) + '...', error });
+      console.log('🔵 [Callback] Recibido:', { code: code?.substring(0, 20) + '...', error });
 
       if (error) {
         this.handleError('Autenticación cancelada o rechazada', error);
@@ -159,74 +161,100 @@ export class AuthCallbackComponent implements OnInit {
         return;
       }
 
-
-this.loading = false;
-this.router.navigate(['/auth/role-selection'], { queryParams: { code } });
-
+      
+      this.checkUserStatus(code);
     });
   }
+
   
-  /**
-   * Verifica si el usuario ya existe en el sistema
-   * Si existe -> autentica directamente
-   * Si NO existe -> redirige al popup de selección de rol
-   */
-  private checkUserExistence(code: string): void {
-    this.loadingMessage = 'Verificando cuenta...';
-    
-    // Primero intentamos obtener el token y ver si el usuario existe
-    this.googleAuthService.checkExistingGoogleUser(code).subscribe({
-      next: (response) => {
-        console.log('✅ Usuario existente encontrado');
-        // Usuario existe, autenticar directamente
-        this.authenticateExistingUser(response);
-      },
-      error: (err) => {
-        if (err.status === 404) {
-          // Usuario NO existe, redirigir al popup de selección de rol
-          console.log('🔵 Usuario nuevo, redirigiendo a selección de rol...');
-          this.router.navigate(['/auth/role-selection'], { 
-            queryParams: { code: code } 
-          });
-        } else {
-          console.error('❌ Error verificando usuario:', err);
-          this.handleError('Error al verificar la cuenta', err.message);
-        }
-      }
-    });
-  }
+  private checkUserStatus(code: string): void {
+  this.loadingMessage = 'Verificando tu cuenta...';
 
-  /**
-   * Autentica un usuario existente
-   */
+  this.googleAuthService.checkGoogleUser(code).subscribe({
+    next: (response) => {
+      console.log('🔵 [Callback] Estado del usuario:', response);
+
+      if (response.needsRoleSelection) {
+      
+        console.log('➡️ Redirigiendo a selección de rol...');
+        
+        const googleUserData = {
+          email: response.email || response.userInfo?.email,
+          name: response.name || response.userInfo?.name,
+          picture: response.picture || response.userInfo?.picture,
+          googleId: response.googleId || response.userInfo?.id,
+          accessToken: response.accessToken 
+        };
+        
+        sessionStorage.setItem('pendingGoogleAuth', JSON.stringify(googleUserData));
+        
+        this.loading = false;
+        this.router.navigate(['/auth/role-selection'], { 
+          replaceUrl: true 
+        });
+        return;
+      }
+
+
+      console.log(' Usuario existente con roles - Autenticando...');
+      this.authenticateExistingUser(response);
+    },
+    error: (err) => {
+      console.error(' Error verificando usuario:', err);
+      this.handleError(
+        'Error al verificar la cuenta',
+        err.error?.message || err.message
+      );
+    }
+  });
+}
+
+  
   private authenticateExistingUser(response: any): void {
     this.loadingMessage = 'Iniciando sesión...';
-    
-    if (response.token) {
-      this.authService.setToken(response.token);
-    } else {
-      console.error('❌ No se recibió token en la respuesta');
-      this.handleError('No se recibió token de autenticación');
-      return;
-    }
-    
-    const userData = response.authUser || response.profile || response.user;
-    if (userData) {
-      const normalizedUser = {
-        email: userData.email || '',
-        authorities: Array.isArray(userData.authorities) ? userData.authorities : []
-      };
-      this.authService.setUser(normalizedUser);
-      console.log('✅ Usuario establecido:', normalizedUser);
-    } else {
-      console.warn('⚠️ No se recibió información del usuario');
-    }
 
-    // Redirigir según si requiere onboarding o no
-    if (response.requiresOnboarding) {
-      this.router.navigate(['/onboarding']);
-    } else {
-      this.router.navigate(['/app/dashboard']);
+    try {
+      if (response.token) {
+        this.authService.setToken(response.token);
+      } else {
+        throw new Error('No se recibió token en la respuesta');
+      }
+
+     
+      if (response.profile) {
+        const normalizedUser = {
+          email: response.profile.email || '',
+          authorities: []
+        };
+        this.authService.setUser(normalizedUser);
+      }
+
+      this.profileService.getUserProfile();
+
+      const hasLearner = response.hasLearner === true;
+      const hasInstructor = response.hasInstructor === true;
+
+      console.log(' Roles del usuario:', { hasLearner, hasInstructor });
+
+      if (hasInstructor && hasLearner) {
+        this.router.navigate(['/app/dashboard'], { replaceUrl: true });
+      } else if (hasInstructor) {
+       
+        this.router.navigate(['/app/dashboard'], { replaceUrl: true });
+      } else if (hasLearner) {
+      
+        this.router.navigate(['/app/dashboard'], { replaceUrl: true });
+      } else {
+      
+        this.router.navigate(['/app/dashboard'], { replaceUrl: true });
+      }
+
+    } catch (error: any) {
+      console.error(' Error en autenticación:', error);
+      this.handleError(
+        'Error al iniciar sesión',
+        error.message
+      );
     }
   }
 
@@ -234,7 +262,7 @@ this.router.navigate(['/auth/role-selection'], { queryParams: { code } });
     this.loading = false;
     this.error = message;
     this.errorDetail = detail || '';
-    console.error('❌ Error:', message, detail);
+    console.error(' Error:', message, detail);
   }
 
   public redirectToLogin(): void {

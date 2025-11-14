@@ -66,7 +66,7 @@
   position: relative;
 }
 
-/* Línea vertical (eje Y) */
+/* Línea vertical  */
 .chart::before {
   content: '';
   position: absolute;
@@ -78,7 +78,7 @@
   z-index: 1;
 }
 
-/* Línea horizontal (eje X) */
+/* Línea horizontal */
 .chart::after {
   content: '';
   position: absolute;

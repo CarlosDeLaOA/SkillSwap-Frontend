@@ -34,14 +34,14 @@ export class AttendanceChartComponent implements OnInit {
       if (profile && (profile.instructor !== undefined || profile.learner !== undefined)) {
         console.log('🔄 Signal actualizado con datos reales, recalculando rol...');
         
-        // IMPORTANTE: Resetear el flag cuando cambia el usuario
+      
         this.dataLoaded = false;
         
-        // Limpiar datos anteriores
+  
         this.monthlyData = [];
         this.isLoading = true;
         
-        // Recalcular rol y cargar datos nuevos
+        
         this.determineUserRole();
         this.loadData();
         this.dataLoaded = true;
@@ -62,7 +62,7 @@ export class AttendanceChartComponent implements OnInit {
       console.log('✅ Perfil ya cargado, usando datos existentes');
       this.determineUserRole();
       
-      // Generar meses vacíos por defecto
+   
       this.monthlyData = this.generateLast4Months([]);
       this.calculateMaxValue();
       
@@ -84,12 +84,12 @@ export class AttendanceChartComponent implements OnInit {
       this.chartTitle = 'Asistentes';
       this.legend1Label = 'Presentes';
       this.legend2Label = 'Registrados';
-      console.log('✅ ROL: INSTRUCTOR - Mostrando Asistentes');
+      console.log(' ROL: INSTRUCTOR - Mostrando Asistentes');
     } else {
       this.chartTitle = 'Logros obtenidos';
       this.legend1Label = 'Credenciales';
       this.legend2Label = 'Certificados';
-      console.log('✅ ROL: LEARNER - Mostrando Logros');
+      console.log(' ROL: LEARNER - Mostrando Logros');
     }
   }
 
@@ -97,10 +97,10 @@ export class AttendanceChartComponent implements OnInit {
     this.isLoading = true;
 
     if (this.isInstructor) {
-      console.log('📊 Cargando ASISTENCIA para instructor...');
+      console.log(' Cargando ASISTENCIA para instructor...');
       this.loadMonthlyAttendance();
     } else {
-      console.log('📊 Cargando LOGROS para learner...');
+      console.log(' Cargando LOGROS para learner...');
       this.loadMonthlyAchievements();
     }
   }
@@ -108,7 +108,7 @@ export class AttendanceChartComponent implements OnInit {
   private loadMonthlyAttendance(): void {
     this.dashboardService.getMonthlyAttendance().subscribe({
       next: (data: any) => {
-        console.log('✅ Datos de asistencia mensual recibidos:', data);
+        console.log(' Datos de asistencia mensual recibidos:', data);
         
         let attendanceData: IMonthlyAttendance[] = [];
         
@@ -124,17 +124,17 @@ export class AttendanceChartComponent implements OnInit {
           certificates: a.registrados ?? 0
         }));
         
-        // Siempre generar 4 meses, incluso si no hay datos
+       
         this.monthlyData = this.generateLast4Months(mappedData);
         this.calculateMaxValue();
         console.log('📊 Datos finales de asistencia:', this.monthlyData);
         this.isLoading = false;
       },
       error: (error: any) => {
-        console.error('❌ Error cargando asistencia:', error);
-        console.warn('⚠️ Mostrando datos vacíos debido a error');
+        console.error(' Error cargando asistencia:', error);
+        console.warn(' Mostrando datos vacíos debido a error');
         
-        // Generar 4 meses vacíos en caso de error
+
         this.monthlyData = this.generateLast4Months([]);
         this.calculateMaxValue();
         this.isLoading = false;
@@ -145,7 +145,7 @@ export class AttendanceChartComponent implements OnInit {
   private loadMonthlyAchievements(): void {
     this.dashboardService.getMonthlyAchievements().subscribe({
       next: (data: any) => {
-        console.log('✅ Datos de logros mensuales recibidos:', data);
+        console.log(' Datos de logros mensuales recibidos:', data);
         
         let logrosData: IMonthlyAchievement[] = [];
         
@@ -161,7 +161,7 @@ export class AttendanceChartComponent implements OnInit {
           certificates: l.certificates ?? 0
         }));
         
-        // Siempre generar 4 meses, incluso si no hay datos
+   
         this.monthlyData = this.generateLast4Months(safeLogrosData);
         this.calculateMaxValue();
         
@@ -169,10 +169,10 @@ export class AttendanceChartComponent implements OnInit {
         this.isLoading = false;
       },
       error: (error: any) => {
-        console.error('❌ Error cargando logros mensuales:', error);
-        console.warn('⚠️ Mostrando datos vacíos debido a error');
+        console.error(' Error cargando logros mensuales:', error);
+        console.warn(' Mostrando datos vacíos debido a error');
         
-        // Generar 4 meses vacíos en caso de error
+       
         this.monthlyData = this.generateLast4Months([]);
         this.calculateMaxValue();
         this.isLoading = false;
@@ -180,9 +180,7 @@ export class AttendanceChartComponent implements OnInit {
     });
   }
 
-  /**
-   * Genera los últimos 4 meses con datos del backend o con valores en 0
-   */
+
   private generateLast4Months(backendData: Array<{month: string, credentials: number, certificates: number}>): Array<{month: string, credentials: number, certificates: number}> {
     const months: Array<{month: string, credentials: number, certificates: number}> = [];
     const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
@@ -201,7 +199,7 @@ export class AttendanceChartComponent implements OnInit {
         )
       );
       
-      // Siempre agregar el mes, con valores 0 si no hay datos del backend
+    
       months.push({
         month: monthName,
         credentials: backendMonth?.credentials ?? 0,
@@ -212,10 +210,7 @@ export class AttendanceChartComponent implements OnInit {
     return months;
   }
 
-  /**
-   * Calcula el valor máximo para escalar las barras
-   * Si no hay datos, usa 10 como valor por defecto
-   */
+  
   private calculateMaxValue(): void {
     let max = 0;
     this.monthlyData.forEach(data => {
@@ -224,8 +219,7 @@ export class AttendanceChartComponent implements OnInit {
         max = maxInMonth;
       }
     });
-    
-    // Si no hay datos, usar 10 como escala base
+
     this.maxValue = max > 0 ? max : 10;
     console.log('📈 Valor máximo calculado:', this.maxValue);
   }

@@ -289,7 +289,7 @@ export class RoleSelectionPopupComponent implements OnInit {
   public selectedRole: 'LEARNER' | 'INSTRUCTOR' | null = null;
   public isLoading: boolean = false;
   public error: string = '';
-  private authCode: string = '';
+    private googleUserInfo: any = null; 
 
   constructor(
     private route: ActivatedRoute,
@@ -300,119 +300,85 @@ export class RoleSelectionPopupComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      this.authCode = params['code'];
-      const error = params['error'];
-
-      if (error) {
-        this.error = 'Autenticación cancelada o rechazada';
-        return;
-      }
-
-      if (!this.authCode) {
-        this.error = 'No se recibió el código de autorización';
-        return;
-      }
-    });
+ 
+  const pendingAuthData = sessionStorage.getItem('pendingGoogleAuth');
+  
+  if (!pendingAuthData) {
+    this.error = 'No se encontró información de autenticación';
+    console.error(' No hay datos de autenticación en sessionStorage');
+    setTimeout(() => this.router.navigate(['/login']), 3000);
+    return;
   }
 
-  public selectRole(role: 'LEARNER' | 'INSTRUCTOR'): void {
-    this.selectedRole = role;
-    this.error = '';
+  try {
+    this.googleUserInfo = JSON.parse(pendingAuthData);
+    console.log(' Datos de Google cargados:', this.googleUserInfo);
+  } catch (e) {
+    this.error = 'Error al procesar datos de autenticación';
+    console.error(' Error parseando datos:', e);
   }
+}
+
+public selectRole(role: 'LEARNER' | 'INSTRUCTOR'): void {
+  this.selectedRole = role;
+  this.error = '';
+}
 
   public continueWithRole(): void {
-    if (!this.selectedRole) {
-      this.error = 'Por favor selecciona un rol';
-      return;
-    }
-
-    if (!this.authCode) {
-      this.error = 'Código de autorización no disponible';
-      return;
-    }
-
-    this.isLoading = true;
-    this.error = '';
-
-    this.googleAuthService
-      .authenticateWithGoogleAndRole(this.authCode, this.selectedRole)
-      .subscribe({
-        next: (response) => {
-          console.log('✅ Autenticación exitosa con rol:', response);
-
-          // 1) Guardar token
-          if (response.token) {
-            this.authService.setToken(response.token);
-          }
-
-          // 2) Normalizar usuario mínimo para AuthService
-          const userData = response.authUser || response.profile || response.user || response.authPerson;
-          if (userData) {
-            const normalizedUser = {
-              email: userData.email || '',
-              authorities: Array.isArray(userData.authorities) ? userData.authorities : []
-            };
-            this.authService.setUser(normalizedUser);
-          }
-
-          // 3) Cargar perfil completo a través de ProfileService (llenar signal)
-          this.profileService.getUserProfile();
-
-          // 4) Decidir navegación según onboarding y rol
-          const requiresOnboarding: boolean = response.requiresOnboarding === true;
-
-          const profile = response.profile || response.authPerson || response.user || userData;
-          const hasInstructor: boolean =
-            !!(profile?.hasInstructor || profile?.instructor);
-          const hasLearner: boolean =
-            !!(profile?.hasLearner || profile?.learner);
-
-          if (requiresOnboarding) {
-            // 👉 Ir a onboarding para escoger skills
-            //    OJO: aquí usamos la ruta real: onboarding/skills
-            this.router.navigate(['/onboarding/skills'], {
-              queryParams: {
-                role: this.selectedRole,
-                mode: 'google'
-              },
-              replaceUrl: true
-            });
-          } else {
-            // 👉 Ya está registrado y con roles creados: enviarlo directo al dashboard
-            if (hasInstructor && hasLearner) {
-              // SkillSwapper completo: ambos roles
-              this.router.navigate(['/app/dashboard'], { replaceUrl: true });
-            } else if (hasInstructor) {
-              // TODO: cuando tengas un dashboard específico de instructor,
-              // cambia esta ruta por ejemplo a '/app/instructor-dashboard'
-              this.router.navigate(['/app/dashboard'], { replaceUrl: true });
-            } else if (hasLearner) {
-              // TODO: cuando tengas un dashboard específico de learner,
-              // cambia esta ruta por ejemplo a '/app/learner-dashboard'
-              this.router.navigate(['/app/dashboard'], { replaceUrl: true });
-            } else {
-              // Fallback: dashboard genérico
-              this.router.navigate(['/app/dashboard'], { replaceUrl: true });
-            }
-          }
-        },
-        error: (err) => {
-          console.error('❌ Error en autenticación:', err);
-          this.isLoading = false;
-
-          if (err.status === 0) {
-            this.error = 'No se pudo conectar con el servidor';
-          } else if (err.error?.message) {
-            this.error = err.error.message;
-          } else if (typeof err.error === 'string') {
-            this.error = err.error;
-          } else {
-            this.error = 'Error al autenticar. Por favor intenta de nuevo.';
-          }
-        }
-      });
+  if (!this.selectedRole) {
+    this.error = 'Por favor selecciona un rol';
+    return;
   }
+
+  if (!this.googleUserInfo) {
+    this.error = 'Información de autenticación no disponible';
+    return;
+  }
+
+  this.isLoading = true;
+  this.error = '';
+
+  
+  this.googleAuthService
+    .completeRegistrationWithUserInfo(this.googleUserInfo, this.selectedRole)
+    .subscribe({
+      next: (response) => {
+        console.log(' Registro completado:', response);
+
+        // Limpiar sessionStorage
+        sessionStorage.removeItem('pendingGoogleAuth');
+
+        // Guardar token y usuario
+        if (response.token) {
+          this.authService.setToken(response.token);
+        }
+
+        if (response.profile) {
+          this.authService.setUser({
+            email: response.profile.email || '',
+            authorities: []
+          });
+        }
+
+        // Cargar perfil
+        this.profileService.getUserProfile();
+
+        // Redirigir a onboarding
+        this.router.navigate(['/onboarding/skills'], {
+          queryParams: {
+            role: this.selectedRole,
+            mode: 'google'
+          },
+          replaceUrl: true
+        });
+      },
+      error: (err) => {
+        console.error(' Error:', err);
+        this.isLoading = false;
+        this.error = err.error?.error || 'Error al completar el registro';
+      }
+    });
+}
 
   public cancel(): void {
     this.router.navigate(['/login']);

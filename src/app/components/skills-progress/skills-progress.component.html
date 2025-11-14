@@ -9,7 +9,7 @@
     </div>
 
     <div class="chart-container" *ngIf="selectedSkill !== null">
-      <!-- Área expandida que incluye gráfico + tooltip -->
+     
       <div class="hover-area" 
            (mouseenter)="showTooltipInfo()" 
            (mouseleave)="hideTooltipInfo()">
@@ -39,7 +39,7 @@
           </div>
         </div>
 
-        <!-- Tooltip dentro del área de hover -->
+        
         <div class="tooltip" *ngIf="showTooltip">
           <div class="tooltip-content">
             <div class="tooltip-row completed-row">

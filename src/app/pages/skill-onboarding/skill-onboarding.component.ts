@@ -142,117 +142,78 @@ export class SkillOnboardingComponent implements OnInit, OnDestroy {
    * - Si viene de Google: solo agrega skills al usuario autenticado.
    */
   completeOnboarding(): void {
-    if (this.selectedSkills.length === 0) {
-      this.errorMessage = 'Por favor selecciona al menos una habilidad';
-      return;
-    }
+  if (this.selectedSkills.length === 0) {
+    this.errorMessage = 'Por favor selecciona al menos una habilidad';
+    return;
+  }
 
-    // IDs de skills seleccionadas
-    const skillIds = this.selectedSkills.map(skill => skill.id);
-    console.log('📊 Skills seleccionadas:', this.selectedSkills.map(s => `${s.name} (ID: ${s.id})`));
-    console.log('🔢 Skill IDs a enviar:', skillIds);
+  const skillIds = this.selectedSkills.map(skill => skill.id);
+  
+  this.isLoading = true;
+  this.errorMessage = '';
 
-    this.isLoading = true;
-    this.errorMessage = '';
-
-    if (this.onboardingMode === 'register') {
-      // =========================
-      // 🟩 MODO REGISTRO NORMAL
-      // =========================
-      if (!this.registerData) {
-        this.errorMessage = 'No se encontraron datos de registro. Por favor vuelve a registrarte.';
-        this.router.navigate(['/register']);
-        this.isLoading = false;
-        return;
-      }
-
-      const registerRequest: any = {
-        email: this.registerData.email,
-        password: this.registerData.password,
-        fullName: this.registerData.fullName,
-        role: this.registerData.role,
-        skillIds: skillIds
-      };
-
-      const registerObservable = this.registerData.role === 'LEARNER' 
-        ? this.registerService.registerLearner(registerRequest)
-        : this.registerService.registerInstructor(registerRequest);
-
-      registerObservable.pipe(takeUntil(this.destroy$)).subscribe({
+  if (this.onboardingMode === 'google') {
+    // ✅ Modo Google: Solo guardar skills
+    this.userSkillService
+      .addUserSkills(skillIds)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
         next: (response) => {
-          console.log('✅ Registro completado exitosamente:', response);
-          this.registerService.clearTemporaryData();
-          
-          this.router.navigate(['/login'], { 
-            queryParams: { 
-              registered: 'true',
-              email: this.registerData?.email,
-              message: 'Registro exitoso. Por favor verifica tu correo electrónico antes de iniciar sesión.' 
-            } 
-          });
+          console.log('✅ Skills guardadas:', response);
+
+          // Refrescar perfil
+          this.profileService.getUserProfile();
+
+          // Redirigir según rol
+          if (this.googleRole === 'INSTRUCTOR') {
+            this.router.navigate(['/app/dashboard'], { replaceUrl: true });
+          } else {
+            this.router.navigate(['/app/dashboard'], { replaceUrl: true });
+          }
+
+          this.isLoading = false;
         },
         error: (error) => {
-          console.error('❌ Error completing registration:', error);
-          
-          if (typeof error.error === 'string') {
-            this.errorMessage = error.error;
-          } else if (error.error?.message) {
-            this.errorMessage = error.error.message;
-          } else if (error.message) {
-            this.errorMessage = error.message;
-          } else {
-            this.errorMessage = 'Error al completar el registro. Por favor intenta de nuevo.';
-          }
-          
+          console.error('❌ Error guardando skills:', error);
+          this.errorMessage = error.error?.message || 'Error al guardar habilidades';
           this.isLoading = false;
         }
       });
+  } else {
+    // ✅ Modo registro normal: Registrar persona completa
+    const registerRequest: any = {
+      email: this.registerData!.email,
+      password: this.registerData!.password,
+      fullName: this.registerData!.fullName,
+      role: this.registerData!.role,
+      skillIds: skillIds
+    };
 
-    } else {
-      // =====================
-      // 🟦 MODO GOOGLE
-      // =====================
-      console.log('🟦 [Onboarding] Guardando skills para usuario Google...');
+    const registerObservable = this.registerData!.role === 'LEARNER' 
+      ? this.registerService.registerLearner(registerRequest)
+      : this.registerService.registerInstructor(registerRequest);
 
-      this.userSkillService
-        .addUserSkills(skillIds)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (response) => {
-            console.log('✅ [Onboarding] Skills guardadas para usuario Google:', response);
-
-            // Refrescar perfil para que personSignal tenga las nuevas skills
-            this.profileService.getUserProfile();
-
-            // Ir directo al dashboard según rol (por ahora ambos al mismo dashboard)
-            if (this.googleRole === 'INSTRUCTOR') {
-              // Cuando tengas un dashboard específico de instructor, cambias esta ruta
-              this.router.navigate(['/app/dashboard'], { replaceUrl: true });
-            } else {
-              // Learner o por defecto
-              this.router.navigate(['/app/dashboard'], { replaceUrl: true });
-            }
-
-            this.isLoading = false;
-          },
-          error: (error) => {
-            console.error('❌ [Onboarding] Error guardando skills Google:', error);
-
-            if (typeof error.error === 'string') {
-              this.errorMessage = error.error;
-            } else if (error.error?.message) {
-              this.errorMessage = error.error.message;
-            } else if (error.message) {
-              this.errorMessage = error.message;
-            } else {
-              this.errorMessage = 'Error al guardar tus habilidades. Por favor intenta de nuevo.';
-            }
-
-            this.isLoading = false;
-          }
+    registerObservable.pipe(takeUntil(this.destroy$)).subscribe({
+      next: (response) => {
+        console.log('✅ Registro completado:', response);
+        this.registerService.clearTemporaryData();
+        
+        this.router.navigate(['/login'], { 
+          queryParams: { 
+            registered: 'true',
+            email: this.registerData?.email,
+            message: 'Registro exitoso. Por favor verifica tu correo.' 
+          } 
         });
-    }
+      },
+      error: (error) => {
+        console.error('❌ Error en registro:', error);
+        this.errorMessage = error.error?.message || 'Error al completar el registro';
+        this.isLoading = false;
+      }
+    });
   }
+}
   //#endregion
 
   //#region Private Methods

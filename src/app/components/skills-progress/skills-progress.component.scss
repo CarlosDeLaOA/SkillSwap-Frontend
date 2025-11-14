@@ -57,13 +57,12 @@
   padding: 0 20px;
 }
 
-/* CRÍTICO: Área de hover expandida que incluye gráfico + espacio + tooltip */
 .hover-area {
   position: relative;
   display: flex;
   align-items: center;
   flex: 1;
-  /* Padding a la derecha para cubrir el espacio hasta el tooltip */
+  
   padding-right: 300px;
 }
 
@@ -120,7 +119,6 @@
   font-size: 36px;
 }
 
-/* Tooltip - ahora está dentro del área de hover */
 .tooltip {
   position: absolute;
   top: 50%;
