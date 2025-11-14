@@ -22,12 +22,12 @@ export class ForgotPasswordComponent implements OnDestroy {
   canOpenCode = computed(() => !!this.submittedEmail());
   canOpenNew  = computed(() => !!this.resetToken());
 
-  // #NEW cooldown de reenvío (segundos restantes)
   cooldown = signal(0);
-  // #NEW id del setInterval para poder limpiar
   private cooldownTimerId: any = null;
-  // #NEW habilitación del botón de reenvío
   canResend = computed(() => this.cooldown() === 0 && !!this.submittedEmail() && !this.loading());
+  
+  // Validación de contraseña
+  passwordValidationError = signal<string>('');
   //#endregion
 
   //#region forms
@@ -60,9 +60,72 @@ export class ForgotPasswordComponent implements OnDestroy {
   //#endregion
 
   //#region lifecycle
-  // #NEW limpiar timer para evitar fugas
   ngOnDestroy(): void {
     this.clearCooldown();
+  }
+  //#endregion
+
+  //#region password validation methods
+  public hasMinLength(): boolean {
+    const pwd = this.newPwdForm.value.password || '';
+    return pwd.length >= 8;
+  }
+
+  public hasUpperCase(): boolean {
+    const pwd = this.newPwdForm.value.password || '';
+    return /[A-Z]/.test(pwd);
+  }
+
+  public hasLowerCase(): boolean {
+    const pwd = this.newPwdForm.value.password || '';
+    return /[a-z]/.test(pwd);
+  }
+
+  public hasNumber(): boolean {
+    const pwd = this.newPwdForm.value.password || '';
+    return /\d/.test(pwd);
+  }
+
+  public hasSpecialChar(): boolean {
+    const pwd = this.newPwdForm.value.password || '';
+    return /[@$!%*?&]/.test(pwd);
+  }
+
+  private validatePassword(password: string): boolean {
+    if (!password || password.length < 8) {
+      this.passwordValidationError.set('La contraseña debe tener al menos 8 caracteres');
+      return false;
+    }
+
+    if (!this.hasUpperCase()) {
+      this.passwordValidationError.set('La contraseña debe contener al menos una letra mayúscula');
+      return false;
+    }
+
+    if (!this.hasLowerCase()) {
+      this.passwordValidationError.set('La contraseña debe contener al menos una letra minúscula');
+      return false;
+    }
+
+    if (!this.hasNumber()) {
+      this.passwordValidationError.set('La contraseña debe contener al menos un número');
+      return false;
+    }
+
+    if (!this.hasSpecialChar()) {
+      this.passwordValidationError.set('La contraseña debe contener al menos un carácter especial (@$!%*?&)');
+      return false;
+    }
+
+    this.passwordValidationError.set('');
+    return true;
+  }
+
+  public onPasswordChange(): void {
+    const pwd = this.newPwdForm.value.password || '';
+    if (pwd && this.newPwdForm.controls.password.touched) {
+      this.validatePassword(pwd);
+    }
   }
   //#endregion
 
@@ -89,7 +152,6 @@ export class ForgotPasswordComponent implements OnDestroy {
         this.codeInput?.nativeElement.focus();
       }, 50);
 
-      // #NEW inicia cooldown de 90s tras primer envío
       this.startCooldown(90);
     } catch (e: any) {
       this.error.set(e?.error?.message ?? 'No pudimos enviar el código. Intenta de nuevo en un momento.');
@@ -99,7 +161,6 @@ export class ForgotPasswordComponent implements OnDestroy {
   }
 
   async resendCode() {
-    // #NEW: reenvío con cooldown
     if (!this.canResend()) return;
     const email = this.submittedEmail()!;
     this.loading.set(true); this.error.set(null); this.message.set(null);
@@ -107,10 +168,8 @@ export class ForgotPasswordComponent implements OnDestroy {
     try {
       await this.fp.request(email).toPromise();
       this.message.set('Hemos reenviado el código. Revisa tu correo.');
-      // Reinicia cooldown
       this.startCooldown(90);
     } catch (e: any) {
-      // Nota: el backend puede tener cooldown propio; mostramos mensaje genérico
       this.error.set(e?.error?.message ?? 'No pudimos reenviar el código todavía. Intenta más tarde.');
     } finally {
       this.loading.set(false);
@@ -143,22 +202,29 @@ export class ForgotPasswordComponent implements OnDestroy {
 
   async setNewPassword() {
     this.touch(this.newPwdForm);
-    if (this.newPwdForm.invalid || !this.passwordsMatch() || !this.resetToken()) return;
+    
+    const newPassword = this.newPwdForm.value.password?.trim() || '';
+    const isPasswordValid = this.validatePassword(newPassword);
+    
+    if (this.newPwdForm.invalid || !this.passwordsMatch() || !this.resetToken() || !isPasswordValid) {
+      return;
+    }
 
     this.loading.set(true); this.error.set(null); this.message.set(null);
+    this.passwordValidationError.set('');
+    
     const email = this.submittedEmail()!;
     const code  = this.resetToken()!;
-    const newPassword = this.newPwdForm.value.password!.trim();
 
     try {
       await this.fp.confirm(email, code, newPassword).toPromise();
       this.message.set('Contraseña actualizada. Ya puedes iniciar sesión.');
 
-      // Limpieza total del flujo
       this.openPanel.set('email');
       this.emailForm.reset(); this.codeForm.reset(); this.newPwdForm.reset();
       this.submittedEmail.set(null); this.resetToken.set(null);
-      this.clearCooldown(); // #NEW detener cooldown
+      this.passwordValidationError.set('');
+      this.clearCooldown();
       setTimeout(() =>
         this.emailPanel?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50
       );
@@ -171,7 +237,6 @@ export class ForgotPasswordComponent implements OnDestroy {
   //#endregion
 
   //#region cooldown helpers
-  // #NEW inicia el cooldown y actualiza la señal cada segundo
   private startCooldown(seconds: number) {
     this.clearCooldown();
     this.cooldown.set(seconds);
@@ -182,13 +247,11 @@ export class ForgotPasswordComponent implements OnDestroy {
     }, 1000);
   }
 
-  // #NEW limpia el intervalo si existe
   private clearCooldown() {
     if (this.cooldownTimerId) {
       clearInterval(this.cooldownTimerId);
       this.cooldownTimerId = null;
     }
-    // No reseteo la señal a 0 aquí para no pisar un posible update en curso
   }
   //#endregion
 
