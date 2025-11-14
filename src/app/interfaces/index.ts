@@ -126,6 +126,7 @@ export interface IPerson {
   lastConnection?: string;
   instructor?: IInstructor;
   learner?: ILearner;
+  userSkills?: IUserSkill[];
 }
 
 /**
@@ -255,6 +256,7 @@ export interface IKnowledgeArea {
   description?: string;
   iconUrl?: string;
   active: boolean;
+  skills?: ISkill[];  
 }
 
 export interface ISessionFilters {

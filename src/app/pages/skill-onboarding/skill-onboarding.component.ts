@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { SkillService } from '../../services/skill.service';
 import { RegisterService } from '../../services/register.service';
-import { IKnowledgeArea, IRegisterData, IRegisterRequest } from '../../interfaces';
+import { IKnowledgeArea, IRegisterData } from '../../interfaces';
 import { Subject, takeUntil } from 'rxjs';
 
 /**
@@ -49,9 +49,6 @@ export class SkillOnboardingComponent implements OnInit, OnDestroy {
   //#endregion
 
   //#region Lifecycle Hooks
-  /**
-   * Inicializa el componente y carga las áreas de conocimiento
-   */
   ngOnInit(): void {
     this.registerData = this.registerService.getTemporaryData();
     
@@ -63,9 +60,6 @@ export class SkillOnboardingComponent implements OnInit, OnDestroy {
     this.loadKnowledgeAreas();
   }
 
-  /**
-   * Limpia las suscripciones al destruir el componente
-   */
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
@@ -73,10 +67,6 @@ export class SkillOnboardingComponent implements OnInit, OnDestroy {
   //#endregion
 
   //#region Public Methods
-  /**
-   * Alterna la selección de una habilidad
-   * @param skill - Habilidad a seleccionar/deseleccionar
-   */
   toggleSkillSelection(skill: ISkill): void {
     const index = this.selectedSkills.findIndex(s => s.id === skill.id);
     
@@ -87,19 +77,10 @@ export class SkillOnboardingComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Verifica si una habilidad está seleccionada
-   * @param skillId - ID de la habilidad
-   * @returns true si la habilidad está seleccionada
-   */
   isSkillSelected(skillId: number): boolean {
     return this.selectedSkills.some(s => s.id === skillId);
   }
 
-  /**
-   * Elimina una habilidad de la selección
-   * @param skill - Habilidad a eliminar
-   */
   removeSelectedSkill(skill: ISkill): void {
     const index = this.selectedSkills.findIndex(s => s.id === skill.id);
     if (index > -1) {
@@ -107,17 +88,11 @@ export class SkillOnboardingComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Cambia a la categoría anterior en el carrusel
-   */
   previousCategory(): void {
     this.currentCategoryIndex = (this.currentCategoryIndex - 1 + this.knowledgeAreas.length) % this.knowledgeAreas.length;
     this.loadSkillsForCurrentCategory();
   }
 
-  /**
-   * Cambia a la siguiente categoría en el carrusel
-   */
   nextCategory(): void {
     this.currentCategoryIndex = (this.currentCategoryIndex + 1) % this.knowledgeAreas.length;
     this.loadSkillsForCurrentCategory();
@@ -125,6 +100,7 @@ export class SkillOnboardingComponent implements OnInit, OnDestroy {
 
   /**
    * Completa el registro guardando usuario y habilidades seleccionadas
+   * ✅ CORREGIDO: Ahora envía los skill IDs específicos
    */
   completeOnboarding(): void {
     if (this.selectedSkills.length === 0) {
@@ -141,18 +117,19 @@ export class SkillOnboardingComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.errorMessage = '';
 
-    const uniqueCategories = [...new Set(
-      this.selectedSkills
-        .map(s => s.knowledgeArea?.name)
-        .filter(name => name !== undefined && name !== '')
-    )] as string[];
+    // ✅ FIX: Extraer los IDs de las skills seleccionadas
+    const skillIds = this.selectedSkills.map(skill => skill.id);
+    
+    console.log('📊 Skills seleccionadas:', this.selectedSkills.map(s => `${s.name} (ID: ${s.id})`));
+    console.log('🔢 Skill IDs a enviar:', skillIds);
 
-    const registerRequest: IRegisterRequest = {
+    // ✅ FIX: Enviar skillIds en lugar de categories
+    const registerRequest: any = {
       email: this.registerData.email,
       password: this.registerData.password,
       fullName: this.registerData.fullName,
       role: this.registerData.role,
-      categories: uniqueCategories
+      skillIds: skillIds  // ⭐ Cambio principal
     };
 
     const registerObservable = this.registerData.role === 'LEARNER' 
@@ -161,7 +138,7 @@ export class SkillOnboardingComponent implements OnInit, OnDestroy {
 
     registerObservable.pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {
-        console.log('Registro completado exitosamente:', response);
+        console.log('✅ Registro completado exitosamente:', response);
         this.registerService.clearTemporaryData();
         
         this.router.navigate(['/login'], { 
@@ -173,7 +150,7 @@ export class SkillOnboardingComponent implements OnInit, OnDestroy {
         });
       },
       error: (error) => {
-        console.error('Error completing registration:', error);
+        console.error('❌ Error completing registration:', error);
         
         if (typeof error.error === 'string') {
           this.errorMessage = error.error;
@@ -192,9 +169,6 @@ export class SkillOnboardingComponent implements OnInit, OnDestroy {
   //#endregion
 
   //#region Private Methods
-  /**
-   * Carga todas las áreas de conocimiento activas
-   */
   private loadKnowledgeAreas(): void {
     this.isLoading = true;
     
@@ -216,9 +190,6 @@ export class SkillOnboardingComponent implements OnInit, OnDestroy {
       });
   }
 
-  /**
-   * Carga las habilidades de la categoría actual
-   */
   private loadSkillsForCurrentCategory(): void {
     if (this.knowledgeAreas.length === 0) {
       return;

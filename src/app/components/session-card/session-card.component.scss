@@ -20,18 +20,70 @@
   flex: 1;
 }
 
+.session-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
 .session-title {
   font-size: 1.5rem;
   font-weight: 700;
   color: #ffffff;
-  margin-bottom: 0.75rem;
+  margin: 0;
+  
+  &.clickable {
+    cursor: pointer;
+    transition: color 0.3s ease;
+    
+    &:hover {
+      color: #AAE16B;
+    }
+  }
+}
+
+.session-category {
+  background-color: rgba(170, 225, 107, 0.2);
+  color: #AAE16B;
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(170, 225, 107, 0.3);
+  
+  i {
+    font-size: 1rem;
+  }
 }
 
 .session-description {
   font-size: 0.95rem;
   color: rgba(255, 255, 255, 0.7);
   line-height: 1.6;
-  margin: 0;
+  margin: 0 0 1rem 0;
+}
+
+.session-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+    
+    i {
+      font-size: 1.1rem;
+      color: #AAE16B;
+    }
+  }
 }
 
 .session-info {
@@ -43,25 +95,35 @@
 .session-datetime {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  text-align: right;
+  gap: 0.75rem;
 }
 
 .info-item {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.75rem;
   align-items: center;
-  justify-content: flex-end;
+  
+  i {
+    font-size: 1.3rem;
+    color: #AAE16B;
+    flex-shrink: 0;
+  }
+}
+
+.info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
 }
 
 .info-label {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
   font-weight: 500;
 }
 
 .info-value {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: #ffffff;
   font-weight: 600;
 }
@@ -76,11 +138,29 @@
   font-size: 1rem;
   transition: all 0.3s ease;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
   
-  &:hover {
+  i {
+    font-size: 1.2rem;
+  }
+  
+  &:hover:not(:disabled) {
     background-color: #8ec756;
     transform: scale(1.05);
     box-shadow: 0 4px 12px rgba(170, 225, 107, 0.4);
+  }
+  
+  &:disabled {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.5);
+    cursor: not-allowed;
+    
+    &:hover {
+      transform: none;
+      box-shadow: none;
+    }
   }
 }
 
@@ -94,19 +174,28 @@
   .session-info {
     width: 100%;
     justify-content: space-between;
+    flex-wrap: wrap;
   }
   
   .session-datetime {
-    text-align: left;
-    align-items: flex-start;
+    flex: 1;
   }
   
-  .info-item {
-    justify-content: flex-start;
+  .btn-register {
+    flex: 1;
+    justify-content: center;
   }
 }
 
 @media (max-width: 576px) {
+  .session-card {
+    padding: 1.25rem;
+  }
+  
+  .session-title {
+    font-size: 1.25rem;
+  }
+  
   .session-info {
     flex-direction: column;
     align-items: stretch;
@@ -115,5 +204,14 @@
   
   .btn-register {
     width: 100%;
+    justify-content: center;
+  }
+  
+  .session-meta {
+    gap: 0.75rem;
+    
+    .meta-item {
+      font-size: 0.85rem;
+    }
   }
 }
