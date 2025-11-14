@@ -177,7 +177,6 @@ export class SessionListComponent implements OnInit {
         this.applyFilters();
       },
       () => {
-        // Modal dismissed
       }
     );
   }
@@ -309,7 +308,6 @@ export class SessionListComponent implements OnInit {
    */
   onRegister(sessionId: number): void {
     console.log('Registrarse en sesión:', sessionId);
-    // TODO: Implementar lógica de registro (crear booking)
   }
 
   /**
@@ -332,7 +330,6 @@ export class SessionListComponent implements OnInit {
         this.onRegister(sessionId);
       },
       () => {
-        // Modal dismissed
       }
     );
   }

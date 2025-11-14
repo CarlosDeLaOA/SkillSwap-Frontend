@@ -14,7 +14,6 @@ import { CommonModule } from '@angular/common';
         <div *ngIf="loading" class="loading-state">
           <div class="spinner"></div>
           <p>Autenticando con Google...</p>
-          <!-- ✅ ELIMINADO: debugInfo ya no se muestra -->
         </div>
         
         <div *ngIf="error" class="error-state">

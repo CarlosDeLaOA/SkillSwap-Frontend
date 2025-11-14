@@ -105,10 +105,6 @@ export interface IEmailCheckResponse {
 
 //#endregion
 
-// ========================================
-// INTERFACES DE SKILLSWAP
-// ========================================
-
 /**
  * Entidad Person del sistema SkillSwap
  */

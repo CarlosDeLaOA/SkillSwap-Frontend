@@ -47,7 +47,6 @@ export const routes: Routes = [
   {
     path: 'onboarding/skills',
     component: SkillOnboardingComponent
-    // SIN canActivate - permite acceso sin autenticación
   },
   {
     path: 'verify-email',

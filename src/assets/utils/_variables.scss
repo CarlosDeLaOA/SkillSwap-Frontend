@@ -1,11 +1,10 @@
-// General variables
+
 $theme-font-color: #242934;
 $theme-body-font-color: #2f2f3b;
 $theme-body-sub-title-color: #52526c;
 $body-color: #f8f8f8;
 $main-body-color: #f7f8f9;
 
-// Theme colors variables
 $primary-color: #7366ff;
 $secondary-color: #ff3364;
 $success-color: #54ba4a;
@@ -42,7 +41,6 @@ $off-white: #f7f6ff;
 $theme-medium-color: #eae8ff;
 $dropdown-border-color: #918e99;
 
-// gradient colors
 $gradient-primary: linear-gradient(
   26deg,
   var(--theme-default) 0%,
@@ -53,24 +51,19 @@ $gradient-bg-primary: linear-gradient(
   #33b1ee -13.9%,
   var(--theme-default) 79.68%
 );
-
-//social colors
 $fb: #50598e;
 $twitter: #6fa2d8;
 $google-plus: #c64e40;
 $linkedin: #0077b5;
 
-// soical table
 $fb-color: #2f84f4;
 $insta-color: #fc971e;
 $pintrest-color: $secondary-color;
 $twitter-color: #57b9f6;
 $youtube-color: #f42f2f;
 
-//error input color start
 $light-body-bg-color: #fafdff;
 
-//fonts
 $font-rubik: Rubik;
 $font-roboto: Roboto;
 $font-serif: sans-serif;
@@ -79,7 +72,6 @@ $font-themify: themify;
 $font-awesome: FontAwesome;
 $font-ICO: IcoFont;
 
-// dark layout variables
 $dark-body-background: #1d1e26;
 $dark-card-background: hsl(225, 14%, 17%);
 $dark-card-inbox: #323846;
@@ -96,7 +88,6 @@ $dark-datatable-sorting: #1c212b;
 $dark-datatable-sorting-even: #22262f;
 $dark-even-hover-sorting: #191e27;
 
-//General tag settings
 $body-font-size: 14px;
 $body-font-color: $theme-body-font-color;
 $ul-padding-left: 0px;
@@ -128,7 +119,6 @@ $list-group-active-border-color: var(--theme-default);
 $list-group-img-size: 40px;
 $list-group-margin: 10px;
 
-// Tables settings
 $table-b-margin: 0px;
 $table-heading-color: $theme-body-font-color;
 $table-row-color: $theme-body-font-color;
@@ -150,7 +140,6 @@ $horizontal-border-color: #f2f4ff;
 $horizontal-padding: 0.75rem 2rem;
 $table-inverse-bg-color: #292b2c;
 
-//According setting
 $according-card-top-margin: 10px;
 $according-btn-weight: 500;
 $according-btn-color: $theme-body-font-color;
@@ -159,28 +148,23 @@ $according-card-header-icon: $font-ICO;
 $according-open-icon: "\eb73";
 $according-close-icon: "\eb7a";
 
-//Alert settings
 $alert-hover-color: $dark-color;
 $alert-border-radious: 0.15rem;
 $alert-padding: 15px;
 $alert-msg-icon-size: 16px;
 
-//badge settings
 $badge-padding: 0.44em 0.7em;
 $badge-svg-size: 12px;
 
-//form input settings
 $form-group-margin-bottom: 1.25em;
 $col-form-label-font-size: 14px;
 $form-control-font-size: 14px;
 $form-control-border-radious: 2px;
 $form-control-border-color: $light-gray;
 
-//breadcrumb setting
 $breadcrumb-ancher-color: $white;
 $breadcrumb-ancher-dark-color: $black;
 
-//buttons setting
 $btn-font-size: 14px;
 $btn-padding: 0.375rem 1.75rem;
 $btn-lg-font-size: 18px;
@@ -188,7 +172,6 @@ $btn-sm-font-size: 12px;
 $btn-xs-font-size: 11px;
 $btn-xs-padding: 0.05rem 0.4rem;
 
-//Card settings
 $card-padding: 30px;
 $card-margin-bottom: 30px;
 $card-border-color: 1px solid $light-gray;
@@ -203,13 +186,11 @@ $card-body-bg-color: $transparent-color;
 $card-footer-bg-color: $white;
 $card-hover-box-shadow: 0 0 40px rgba(8, 21, 66, 0.05);
 
-//footer settings
 $footer_bg_color: $white;
 $footer_box_shadow: 0 0 20px rgba($semi-dark, 0.1);
 $footer_dark_color: $theme-font-color;
 $footer_dark__txt_color: $white;
 
-//form settings
 $form-group-margin-bottom: 20px;
 $sm-form-margin-bottom: 14px;
 $form-placeholder-color: $dark-gray;
@@ -219,10 +200,8 @@ $form-placeholder-font-weight: 100;
 $form-input-border-color: $light-semi-gray;
 $form-input-bg-color: $white;
 
-//Tour settings
 $tour-color: var(--theme-default);
 
-//sidabr main settings
 $sidebar-width: 255px;
 $sidebar-position: fixed;
 $sidebar-background-color: $white;
@@ -232,7 +211,6 @@ $sidebar-z-index: 9;
 $sidebar-transition: 0.5s;
 $sidebar-fill-icon-color: #757589;
 
-//sidebar profile settings
 $sidebar-profile-edit-icon-size: 14px;
 $sidebar-profile-name-txt-color: var(--theme-default);
 $sidebar-profile-name-txt-transfer: uppercase;
@@ -243,7 +221,6 @@ $sidebar-profile-sub-title-font-size: 10px;
 $sidebar-profile-sub-title-margin: 0px;
 $sidebar-profile-img-shadow: 0 0 15px rgba(68, 102, 242, 0.3);
 
-//Sidebar main menu setting
 $sidebar-menu-padding: 15px;
 $sidebar-menu-list-style: none;
 $sidebar-menu-list-margin: 0;
@@ -270,13 +247,11 @@ $sidebar-icon-font-family: $font-awesome;
 $sidebar-height: calc(100vh - 115px);
 $sidebar-compact-width: 265px;
 
-//Header settings
 $main-header-position: fixed;
 $main-header-top: 0;
 $main-header-shadow: 0 0 20px rgba($semi-dark, 0.1);
 $main-header-shadow-1: 0px 4px 40px rgba(39, 32, 120, 0.1);
 
-//page settings
 $page-body-padding: 0 15px 0 15px;
 $page-body-bg-color: $light-color;
 $page-body-margin-bottom: 0px;
@@ -293,7 +268,6 @@ $page-small-title-text-color: $theme-body-sub-title-color;
 $breadcrumb-size: 16px;
 $breadcrumb-content: "/";
 
-//main header left settings
 $header-left-bg-color: $white;
 $main-header-padding: 27px 22px;
 $main-header-z-index: 8;
@@ -305,6 +279,5 @@ $header-wrapper-nav-icon-align: middle;
 $header-size: 136px;
 $box-layout-space: 40px;
 
-// widgets variables
 $widget-shadow: 1px 2px 21px -2px rgba(214, 214, 227, 0.83);
 $white: #fff;

@@ -37,7 +37,6 @@ export class VerifyEmailComponent implements OnInit, OnDestroy {
    * Inicializa el componente y verifica el token de la URL
    */
   ngOnInit(): void {
-    // Obtener el token de los query params
     this.route.queryParams.subscribe(params => {
       const token = params['token'];
       
@@ -74,9 +73,6 @@ export class VerifyEmailComponent implements OnInit, OnDestroy {
         this.verificationMessage = response.message;
         this.verificationStatus = response.status || '';
 
-       
-
-        // Si la verificación fue exitosa, iniciar countdown
         if (response.success) {
           this.startCountdown();
         }
@@ -85,9 +81,6 @@ export class VerifyEmailComponent implements OnInit, OnDestroy {
         this.isLoading = false;
         this.verificationSuccess = false;
         
-    
-
-        // Manejar diferentes tipos de errores
         if (error.error && typeof error.error === 'object') {
           this.verificationMessage = error.error.message || 'Error al verificar el correo electrónico.';
           this.verificationStatus = error.error.status || 'ERROR';

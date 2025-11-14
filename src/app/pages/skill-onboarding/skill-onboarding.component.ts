@@ -100,7 +100,7 @@ export class SkillOnboardingComponent implements OnInit, OnDestroy {
 
   /**
    * Completa el registro guardando usuario y habilidades seleccionadas
-   * ✅ CORREGIDO: Ahora envía los skill IDs específicos
+   * CORREGIDO: Ahora envía los skill IDs específicos
    */
   completeOnboarding(): void {
     if (this.selectedSkills.length === 0) {
@@ -117,19 +117,17 @@ export class SkillOnboardingComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.errorMessage = '';
 
-    // ✅ FIX: Extraer los IDs de las skills seleccionadas
     const skillIds = this.selectedSkills.map(skill => skill.id);
     
-    console.log('📊 Skills seleccionadas:', this.selectedSkills.map(s => `${s.name} (ID: ${s.id})`));
-    console.log('🔢 Skill IDs a enviar:', skillIds);
+    console.log('Skills seleccionadas:', this.selectedSkills.map(s => `${s.name} (ID: ${s.id})`));
+    console.log('Skill IDs a enviar:', skillIds);
 
-    // ✅ FIX: Enviar skillIds en lugar de categories
     const registerRequest: any = {
       email: this.registerData.email,
       password: this.registerData.password,
       fullName: this.registerData.fullName,
       role: this.registerData.role,
-      skillIds: skillIds  // ⭐ Cambio principal
+      skillIds: skillIds  
     };
 
     const registerObservable = this.registerData.role === 'LEARNER' 
@@ -138,7 +136,7 @@ export class SkillOnboardingComponent implements OnInit, OnDestroy {
 
     registerObservable.pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {
-        console.log('✅ Registro completado exitosamente:', response);
+        console.log('Registro completado exitosamente:', response);
         this.registerService.clearTemporaryData();
         
         this.router.navigate(['/login'], { 
@@ -150,7 +148,7 @@ export class SkillOnboardingComponent implements OnInit, OnDestroy {
         });
       },
       error: (error) => {
-        console.error('❌ Error completing registration:', error);
+        console.error('Error completing registration:', error);
         
         if (typeof error.error === 'string') {
           this.errorMessage = error.error;
