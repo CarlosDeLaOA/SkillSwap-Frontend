@@ -11,7 +11,6 @@
   align-items: center;
   margin-bottom: 30px;
   padding: 0 10px;
-
 }
 
 .title {
@@ -44,11 +43,24 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  transition: transform 0.2s ease;
+  transition: all 0.3s ease;
+  min-width: 140px;
+  justify-content: center;
 }
 
-.export-button:hover {
+.export-button:hover:not(:disabled) {
   transform: scale(1.05);
+  background-color: #C1F089;
+}
+
+.export-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #8BC653;
+}
+
+.export-button:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .export-icon {
@@ -89,4 +101,42 @@ app-upcoming-sessions {
 /* Reviews Section ocupa 3 columnas */
 app-reviews-section {
   grid-column: span 3;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .title {
+    margin-left: 20%;
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-page {
+    padding-left: 20px;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  .title {
+    margin-left: 0;
+    font-size: 1.8rem;
+  }
+
+  .dashboard-container {
+    grid-template-columns: 1fr;
+  }
+
+  app-balance-dashboard,
+  app-attendance-chart,
+  app-skills-progress,
+  app-learning-hours,
+  app-upcoming-sessions,
+  app-reviews-section {
+    grid-column: span 1;
+  }
 }

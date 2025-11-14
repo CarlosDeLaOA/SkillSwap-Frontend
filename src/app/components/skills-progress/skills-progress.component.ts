@@ -3,8 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DashboardService } from '../../services/dashboard.service';
 import { ProfileService } from '../../services/profile.service';
-import { ISkillSessionStats } from '../../interfaces';
-
+import { ISkillSessionStats, ISkillsProgressData } from '../../interfaces';
 
 @Component({
   selector: 'app-skills-progress',
@@ -15,7 +14,6 @@ import { ISkillSessionStats } from '../../interfaces';
 })
 export class SkillsProgressComponent implements OnInit {
 
- 
   skillsData: ISkillSessionStats[] = [];
   selectedSkill: number | null = null;
   isLoading: boolean = true;
@@ -33,22 +31,17 @@ export class SkillsProgressComponent implements OnInit {
     private dashboardService: DashboardService,
     private profileService: ProfileService
   ) {
-  
     effect(() => {
       const profile = this.profileService.person$();
       
       if (profile && profile.id && (profile.instructor !== undefined || profile.learner !== undefined)) {
         console.log(' Perfil actualizado en skills-progress, recargando datos...');
         
-       
         this.dataLoaded = false;
-        
-      
         this.skillsData = [];
         this.selectedSkill = null;
         this.isLoading = true;
         
-      
         this.loadSkillSessionStats();
       }
     });
@@ -57,12 +50,10 @@ export class SkillsProgressComponent implements OnInit {
   ngOnInit(): void {
     const profile = this.profileService.person$();
     
-
     if (!profile || !profile.id) {
       console.log(' Esperando carga del perfil en skills-progress...');
       return;
     }
-    
     
     if (!this.dataLoaded) {
       console.log(' Perfil disponible, cargando datos de skills-progress...');
@@ -75,7 +66,6 @@ export class SkillsProgressComponent implements OnInit {
     this.updateTooltipData();
   }
 
- 
   getCompletedPercentage(): number {
     if (this.selectedSkill === null || this.skillsData.length === 0) {
       return 0;
@@ -89,17 +79,14 @@ export class SkillsProgressComponent implements OnInit {
     return Math.round((skill.completed / total) * 100);
   }
 
-
   getPendingPercentage(): number {
     return 100 - this.getCompletedPercentage();
   }
 
- 
   getStrokeDasharray(): string {
     const circumference = 2 * Math.PI * 80;
     return `${circumference} ${circumference}`;
   }
-
 
   getCompletedCircumference(): number {
     const circumference = 2 * Math.PI * 80;
@@ -107,12 +94,11 @@ export class SkillsProgressComponent implements OnInit {
     return -circumference * (percentage / 100);
   }
 
- 
   hasData(): boolean {
     return true;
   }
 
- 
+
   showTooltipInfo(): void {
 
     if (this.hideTooltipTimeout) {
@@ -124,7 +110,6 @@ export class SkillsProgressComponent implements OnInit {
     this.updateTooltipData();
   }
 
- 
   hideTooltipInfo(): void {
 
     this.hideTooltipTimeout = setTimeout(() => {
@@ -140,6 +125,28 @@ export class SkillsProgressComponent implements OnInit {
     return this.skillsData[this.selectedSkill];
   }
 
+  /**
+   * Obtiene los datos para exportación
+   */
+  getExportData(): ISkillsProgressData {
+    const skillData = this.getSelectedSkillData();
+    
+    if (!skillData) {
+      return {
+        selectedSkill: null
+      };
+    }
+
+    return {
+      selectedSkill: {
+        skillName: skillData.skillName,
+        completed: skillData.completed,
+        pending: skillData.pending,
+        percentage: this.getCompletedPercentage()
+      }
+    };
+  }
+
   private updateTooltipData(): void {
     const skillData = this.getSelectedSkillData();
     if (skillData) {
@@ -152,7 +159,6 @@ export class SkillsProgressComponent implements OnInit {
     }
   }
 
- 
   private loadSkillSessionStats(): void {
     this.isLoading = true;
     this.dataLoaded = true;
@@ -163,16 +169,13 @@ export class SkillsProgressComponent implements OnInit {
         
         let estadisticas: ISkillSessionStats[] = [];
         
-   
         if (data && data.data && Array.isArray(data.data)) {
           estadisticas = data.data;
         } else if (Array.isArray(data)) {
           estadisticas = data;
         }
         
-        
         estadisticas = estadisticas.filter(e => e.skillName && e.skillName.trim() !== '');
-        
         
         if (estadisticas.length === 0) {
           console.warn(' No hay datos de habilidades, creando habilidades por defecto');
@@ -189,15 +192,14 @@ export class SkillsProgressComponent implements OnInit {
         this.selectedSkill = 0;
         this.updateTooltipData();
         
-        console.log(' Estadísticas procesadas:', this.skillsData);
+        console.log('📊 Estadísticas procesadas:', this.skillsData);
         this.isLoading = false;
       },
       error: (error) => {
-        console.error(' Error cargando estadísticas:', error);
+        console.error('Error cargando estadísticas:', error);
         console.error('Detalles del error:', error.error);
-        console.warn(' Creando habilidades por defecto debido a error');
+        console.warn('Creando habilidades por defecto debido a error');
         
- 
         this.skillsData = [
           { skillName: 'Java', completed: 7, pending: 3 },
           { skillName: 'Python', completed: 5, pending: 5 },
@@ -211,5 +213,4 @@ export class SkillsProgressComponent implements OnInit {
       }
     });
   }
- 
 }

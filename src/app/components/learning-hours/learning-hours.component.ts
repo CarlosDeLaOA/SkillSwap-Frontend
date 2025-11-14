@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardService } from '../../services/dashboard.service';
-import { ILearningHoursResponse  } from '../../interfaces';
+import { ILearningHoursResponse, ILearningHoursData} from '../../interfaces';
 
 /**
  * Component to display learning hours statistics
@@ -47,6 +47,16 @@ export class LearningHoursComponent implements OnInit {
     return this.role === 'INSTRUCTOR' 
       ? 'De aprendizaje impartidas' 
       : 'De aprendizaje acumuladas';
+  }
+
+  /**
+   * Obtiene los datos para exportación
+   */
+  getExportData(): ILearningHoursData {
+    return {
+      hours: this.learningHours,
+      description: this.getDescriptionText()
+    };
   }
   //#endregion
 
