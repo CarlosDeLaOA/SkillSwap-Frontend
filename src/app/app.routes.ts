@@ -11,11 +11,13 @@ import { GuestGuard } from './guards/guest.guard';
 import { IRoleType } from './interfaces';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { AuthCallbackComponent } from './pages/auth/auth-callback.component/auth-callback.component';
+import { RoleSelectionPopupComponent } from './pages/auth/auth-callback.component/role-selection-popup.component'; // ← RUTA CORREGIDA
 import { ForgotPasswordComponent } from './pages/auth/forgotpassword/forgot-password.component';
 import { SessionListComponent} from './pages/session-list/session-list.component';  
 import { LandingComponent } from './pages/landing/landing.component';
 import { SkillOnboardingComponent } from './pages/skill-onboarding/skill-onboarding.component';
-import { VerifyEmailComponent } from './pages/verify-email/verify-email.component';import { LandingskillswapComponent } from './pages/landingskillswap/landingskillswap.component';
+import { VerifyEmailComponent } from './pages/verify-email/verify-email.component';
+import { LandingskillswapComponent } from './pages/landingskillswap/landingskillswap.component';
 
 
 export const routes: Routes = [
@@ -32,6 +34,10 @@ export const routes: Routes = [
   {
     path: 'auth/callback',
     component: AuthCallbackComponent
+  },
+  { 
+    path: 'auth/role-selection', 
+    component: RoleSelectionPopupComponent 
   },
   {
     path: 'forgot-password',
@@ -60,10 +66,10 @@ export const routes: Routes = [
     path: '',
     component: LandingComponent,
   },
-{
-  path: 'skillswap',
-  component: LandingskillswapComponent,
-},
+  {
+    path: 'skillswap',
+    component: LandingskillswapComponent,
+  },
 
   {
     path: 'app',
