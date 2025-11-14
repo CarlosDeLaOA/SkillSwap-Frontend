@@ -42,23 +42,30 @@ export class UserSkillService {
     console.log('📤 [UserSkillService] Body completo:', JSON.stringify(body));
     console.log('📤 [UserSkillService] URL:', `${this.apiUrl}/user-skills`);
     
-    // Obtener el token actual para verificar
-    const token = localStorage.getItem('authToken');
-    console.log('🔑 [UserSkillService] Token (primeros 20 chars):', token?.substring(0, 20));
+  // Obtener el token actual para verificar (lo guarda AuthService como access_token)
+const token = localStorage.getItem('access_token');
+console.log('🔑 [UserSkillService] Token (primeros 20 chars):', token?.substring(0, 20));
+
     
-    return this.http.post(`${this.apiUrl}/user-skills`, body).pipe(
-      tap(response => {
-        console.log('✅ [UserSkillService] Respuesta addUserSkills:', response);
-      }),
-      catchError(error => {
-        console.error('❌ [UserSkillService] Error addUserSkills:', error);
-        console.error('❌ [UserSkillService] Error status:', error.status);
-        console.error('❌ [UserSkillService] Error message:', error.message);
-        console.error('❌ [UserSkillService] Error body:', error.error);
-        console.error('❌ [UserSkillService] Headers enviados:', error.headers);
-        return throwError(() => error);
-      })
-    );
+    const headers = new HttpHeaders({
+  'Content-Type': 'application/json',
+  'Authorization': token ? `Bearer ${token}` : ''
+});
+
+return this.http.post(`${this.apiUrl}/user-skills`, body, { headers }).pipe(
+  tap(response => {
+    console.log('✅ [UserSkillService] Respuesta addUserSkills:', response);
+  }),
+  catchError(error => {
+    console.error('❌ [UserSkillService] Error addUserSkills:', error);
+    console.error('❌ [UserSkillService] Error status:', error.status);
+    console.error('❌ [UserSkillService] Error message:', error.message);
+    console.error('❌ [UserSkillService] Error body:', error.error);
+    console.error('❌ [UserSkillService] Headers enviados:', error.headers);
+    return throwError(() => error);
+  })
+);
+
   }
 
   /**
