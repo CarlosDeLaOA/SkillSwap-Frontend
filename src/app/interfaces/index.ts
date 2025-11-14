@@ -292,3 +292,66 @@ export interface IUserSkill {
 export interface ISaveUserSkillsRequest {
   skillIds: number[];
 }
+
+// ========================================
+// INTERFACES DE BOOKING
+// ========================================
+
+/**
+ * Tipos de booking
+ */
+export enum BookingType {
+  INDIVIDUAL = 'INDIVIDUAL',
+  GROUP = 'GROUP'
+}
+
+/**
+ * Estados de un booking
+ */
+export enum BookingStatus {
+  CONFIRMED = 'CONFIRMED',
+  WAITING = 'WAITING',
+  CANCELLED = 'CANCELLED'
+}
+
+/**
+ * Entidad Booking completa
+ */
+export interface IBooking {
+  id: number;
+  learningSession: ILearningSession;
+  learner: ILearner;
+  type: BookingType;
+  status: BookingStatus;
+  accessLink: string;
+  attended: boolean;
+  entryTime?: string;
+  exitTime?: string;
+  bookingDate: string;
+  community?: any;
+}
+
+/**
+ * Request para crear un booking
+ */
+export interface ICreateBookingRequest {
+  learningSessionId: number;
+}
+
+/**
+ * Response del servidor al crear/obtener bookings
+ */
+export interface IBookingResponse {
+  success: boolean;
+  message: string;
+  data: IBooking;
+}
+
+/**
+ * Response del servidor al obtener lista de bookings
+ */
+export interface IBookingsListResponse {
+  success: boolean;
+  data: IBooking[];
+  count: number;
+}
