@@ -30,11 +30,7 @@ import { ProfileService } from '../../../services/profile.service';
               class="role-btn"
               [class.active]="selectedRole === 'LEARNER'"
               (click)="selectRole('LEARNER')">
-              <div class="role-icon">🎓</div>
-              <div class="role-info">
-                <h3>SkillSeeker</h3>
-                <p>Aprende nuevas habilidades</p>
-              </div>
+              SkillSeeker
             </button>
 
             <button 
@@ -42,11 +38,7 @@ import { ProfileService } from '../../../services/profile.service';
               class="role-btn role-btn-instructor"
               [class.active]="selectedRole === 'INSTRUCTOR'"
               (click)="selectRole('INSTRUCTOR')">
-              <div class="role-icon">🎯</div>
-              <div class="role-info">
-                <h3>SkillSwapper</h3>
-                <p>Comparte tus conocimientos</p>
-              </div>
+              SkillSwapper
             </button>
           </div>
 
@@ -79,6 +71,15 @@ import { ProfileService } from '../../../services/profile.service';
   styles: [`
     @import url('https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;700&display=swap');
 
+    /* Variables de color */
+    $color-primary: #504ab7;
+    $color-secondary: #aae16b;
+    $color-neutral: #3E3E43;
+    $color-dark: #141414;
+    $color-white: #ffffff;
+    $color-error: #ff4444;
+
+    /* Overlay */
     .popup-overlay {
       position: fixed;
       top: 0;
@@ -93,6 +94,7 @@ import { ProfileService } from '../../../services/profile.service';
       font-family: 'Epilogue', sans-serif;
     }
 
+    /* Container */
     .popup-container {
       background-color: #3e3e43;
       border-radius: 16px;
@@ -120,132 +122,127 @@ import { ProfileService } from '../../../services/profile.service';
       gap: 24px;
     }
 
-    .popup-header {
-      text-align: center;
-    }
+   
+.popup-header {
+  text-align: center;
+  margin-bottom: 8px;
+}
 
-    .logo {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 0 auto 16px auto;
+  width: fit-content;
+}
 
-    .logo i {
-      font-size: 48px;
-      color: #aae16b;
-    }
+.logo i {
+  font-size: 48px;
+  color: #aae16b;
+}
 
-    .logo-text {
-      color: #aae16b;
-      font-weight: 700;
-      font-size: 28px;
-    }
+.logo-text {
+  color: #aae16b;
+  font-weight: 700;
+  font-size: 28px;
+  font-family: 'Epilogue', sans-serif;
+}
 
-    .popup-header h2 {
-      color: #ffffff;
-      font-size: 28px;
-      font-weight: 700;
-      margin: 0 0 8px 0;
-    }
+.popup-header h2 {
+  color: #ffffff;
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  line-height: 1.5;
+}
 
-    .popup-header p {
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 16px;
-      margin: 0;
-    }
+.popup-header p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 16px;
+  font-weight: 400;
+  margin: 0;
+  line-height: 1.5;
+}
 
+    /* Role Selection - Estilo register */
     .role-selection {
       display: flex;
-      flex-direction: column;
       gap: 16px;
+      margin-top: 8px;
     }
 
     .role-btn {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 20px;
-      background-color: #141414;
+      flex: 1;
+      padding: 14px 24px;
       border: 2px solid transparent;
-      border-radius: 12px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: 'Epilogue', sans-serif;
       cursor: pointer;
       transition: all 0.3s ease;
-      text-align: left;
+      background-color: #4a4a4f;
+      color: rgba(255, 255, 255, 0.6);
+      text-align: center;
     }
 
-    .role-btn:hover {
-      background-color: #1a1a1a;
+    .role-btn:hover:not(.active) {
+      background-color: #555559;
+      color: #ffffff;
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
 
+    /* SkillSeeker - Morado */
     .role-btn.active {
       background-color: #504ab7;
+      color: #ffffff;
       border-color: #504ab7;
-      box-shadow: 0 4px 16px rgba(80, 74, 183, 0.4);
+      box-shadow: 0 4px 12px rgba(80, 74, 183, 0.3);
     }
 
+    /* SkillSwapper - Verde */
     .role-btn.role-btn-instructor.active {
       background-color: #aae16b;
-      border-color: #aae16b;
-      box-shadow: 0 4px 16px rgba(170, 225, 107, 0.4);
-    }
-
-    .role-icon {
-      font-size: 48px;
-      flex-shrink: 0;
-    }
-
-    .role-info {
-      flex: 1;
-    }
-
-    .role-info h3 {
       color: #ffffff;
-      font-size: 20px;
-      font-weight: 700;
-      margin: 0 0 4px 0;
+      border-color: #aae16b;
+      box-shadow: 0 4px 12px rgba(170, 225, 107, 0.3);
     }
 
-    .role-info p {
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 14px;
-      margin: 0;
-    }
-
-    .role-btn.active .role-info h3,
-    .role-btn.active .role-info p {
-      color: #141414;
-    }
-
+    /* Error Message */
     .error-message {
       display: flex;
       align-items: center;
       gap: 8px;
       padding: 12px 16px;
-      background-color: rgba(255, 68, 68, 0.1);
+      background-color: rgba(255, 68, 68, 0.15);
       border: 1px solid #ff4444;
       border-radius: 8px;
       color: #ff4444;
       font-size: 14px;
+      font-weight: 400;
+      font-family: 'Epilogue', sans-serif;
+      text-align: center;
+      line-height: 1.5;
     }
 
     .error-message i {
       font-size: 20px;
+      flex-shrink: 0;
     }
 
+    /* Action Buttons */
     .action-buttons {
       display: flex;
       flex-direction: column;
       gap: 12px;
+      margin-top: 8px;
     }
 
     .btn-continue,
     .btn-cancel {
       width: 100%;
-      padding: 14px 24px;
+      padding: 16px 24px;
       font-size: 16px;
       font-weight: 700;
       font-family: 'Epilogue', sans-serif;
@@ -263,11 +260,15 @@ import { ProfileService } from '../../../services/profile.service';
     .btn-continue:hover:not(:disabled) {
       background-color: #3e3a8f;
       transform: translateY(-2px);
-      box-shadow: 0 8px 16px rgba(80, 74, 183, 0.3);
+      box-shadow: 0 4px 12px rgba(80, 74, 183, 0.4);
+    }
+
+    .btn-continue:active:not(:disabled) {
+      transform: translateY(0);
     }
 
     .btn-continue:disabled {
-      opacity: 0.5;
+      opacity: 0.6;
       cursor: not-allowed;
     }
 
@@ -282,6 +283,26 @@ import { ProfileService } from '../../../services/profile.service';
       border-color: rgba(255, 255, 255, 0.4);
       color: #ffffff;
     }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .popup-container {
+        padding: 30px;
+        width: 95%;
+      }
+
+      .popup-header h2 {
+        font-size: 24px;
+      }
+
+      .role-selection {
+        flex-direction: column;
+      }
+
+      .role-btn {
+        width: 100%;
+      }
+    }
   `]
 })
 export class RoleSelectionPopupComponent implements OnInit {
@@ -289,7 +310,7 @@ export class RoleSelectionPopupComponent implements OnInit {
   public selectedRole: 'LEARNER' | 'INSTRUCTOR' | null = null;
   public isLoading: boolean = false;
   public error: string = '';
-    private googleUserInfo: any = null; 
+  private googleUserInfo: any = null; 
 
   constructor(
     private route: ActivatedRoute,
@@ -300,87 +321,82 @@ export class RoleSelectionPopupComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
- 
-  const pendingAuthData = sessionStorage.getItem('pendingGoogleAuth');
-  
-  if (!pendingAuthData) {
-    this.error = 'No se encontró información de autenticación';
-    console.error(' No hay datos de autenticación en sessionStorage');
-    setTimeout(() => this.router.navigate(['/login']), 3000);
-    return;
+    const pendingAuthData = sessionStorage.getItem('pendingGoogleAuth');
+    
+    if (!pendingAuthData) {
+      this.error = 'No se encontró información de autenticación';
+      console.error(' No hay datos de autenticación en sessionStorage');
+      setTimeout(() => this.router.navigate(['/login']), 3000);
+      return;
+    }
+
+    try {
+      this.googleUserInfo = JSON.parse(pendingAuthData);
+      console.log(' Datos de Google cargados:', this.googleUserInfo);
+    } catch (e) {
+      this.error = 'Error al procesar datos de autenticación';
+      console.error(' Error parseando datos:', e);
+    }
   }
 
-  try {
-    this.googleUserInfo = JSON.parse(pendingAuthData);
-    console.log(' Datos de Google cargados:', this.googleUserInfo);
-  } catch (e) {
-    this.error = 'Error al procesar datos de autenticación';
-    console.error(' Error parseando datos:', e);
+  public selectRole(role: 'LEARNER' | 'INSTRUCTOR'): void {
+    this.selectedRole = role;
+    this.error = '';
   }
-}
-
-public selectRole(role: 'LEARNER' | 'INSTRUCTOR'): void {
-  this.selectedRole = role;
-  this.error = '';
-}
 
   public continueWithRole(): void {
-  if (!this.selectedRole) {
-    this.error = 'Por favor selecciona un rol';
-    return;
-  }
+    if (!this.selectedRole) {
+      this.error = 'Por favor selecciona un rol';
+      return;
+    }
 
-  if (!this.googleUserInfo) {
-    this.error = 'Información de autenticación no disponible';
-    return;
-  }
+    if (!this.googleUserInfo) {
+      this.error = 'Información de autenticación no disponible';
+      return;
+    }
 
-  this.isLoading = true;
-  this.error = '';
+    this.isLoading = true;
+    this.error = '';
 
-  
-  this.googleAuthService
-    .completeRegistrationWithUserInfo(this.googleUserInfo, this.selectedRole)
-    .subscribe({
-      next: (response) => {
-        console.log(' Registro completado:', response);
+    this.googleAuthService
+      .completeRegistrationWithUserInfo(this.googleUserInfo, this.selectedRole)
+      .subscribe({
+        next: (response) => {
+          console.log(' Registro completado:', response);
 
-        // Limpiar sessionStorage
-        sessionStorage.removeItem('pendingGoogleAuth');
+          sessionStorage.removeItem('pendingGoogleAuth');
 
-        // Guardar token y usuario
-        if (response.token) {
-          this.authService.setToken(response.token);
-        }
+          if (response.token) {
+            this.authService.setToken(response.token);
+          }
 
-        if (response.profile) {
-          this.authService.setUser({
-            email: response.profile.email || '',
-            authorities: []
+          if (response.profile) {
+            this.authService.setUser({
+              email: response.profile.email || '',
+              authorities: []
+            });
+          }
+
+          this.profileService.getUserProfile();
+
+          this.router.navigate(['/onboarding/skills'], {
+            queryParams: {
+              role: this.selectedRole,
+              mode: 'google'
+            },
+            replaceUrl: true
           });
+        },
+        error: (err) => {
+          console.error(' Error:', err);
+          this.isLoading = false;
+          this.error = err.error?.error || 'Error al completar el registro';
         }
-
-        // Cargar perfil
-        this.profileService.getUserProfile();
-
-        // Redirigir a onboarding
-        this.router.navigate(['/onboarding/skills'], {
-          queryParams: {
-            role: this.selectedRole,
-            mode: 'google'
-          },
-          replaceUrl: true
-        });
-      },
-      error: (err) => {
-        console.error(' Error:', err);
-        this.isLoading = false;
-        this.error = err.error?.error || 'Error al completar el registro';
-      }
-    });
-}
+      });
+  }
 
   public cancel(): void {
+    sessionStorage.removeItem('pendingGoogleAuth');
     this.router.navigate(['/login']);
   }
 }
