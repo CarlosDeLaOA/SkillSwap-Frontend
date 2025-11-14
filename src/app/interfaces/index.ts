@@ -317,3 +317,54 @@ export interface ISessionFilters {
 export interface ISaveUserSkillsRequest {
   skillIds: number[];
 }
+
+
+export interface IDashboardExportData {
+  balance: IBalanceData;
+  learningHours: ILearningHoursData;
+  attendanceData: IAttendanceChartData;
+  skillsProgress: ISkillsProgressData;
+  upcomingSessions: IUpcomingSessionData[];
+  reviews: IReviewData;
+}
+
+export interface IBalanceData {
+  skillCoins: number;
+}
+
+export interface ILearningHoursData {
+  hours: number;
+  description: string;
+}
+
+export interface IAttendanceChartData {
+  title: string;
+  label1: string;
+  label2: string;
+  monthlyData: Array<{
+    month: string;
+    value1: number;
+    value2: number;
+  }>;
+}
+
+export interface ISkillsProgressData {
+  selectedSkill: {
+    skillName: string;
+    completed: number;
+    pending: number;
+    percentage: number;
+  } | null;
+}
+
+export interface IUpcomingSessionData {
+  title: string;
+  datetime: string;
+  duration: string;
+}
+
+export interface IReviewData {
+  title: string;
+  type: 'FEEDBACK' | 'CREDENTIAL';
+  items: any[];
+}
