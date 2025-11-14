@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardService } from '../../services/dashboard.service';
-import { ICredential, IFeedback } from '../../interfaces';
+import { ICredential, IFeedback, IReviewData } from '../../interfaces';
 
 /**
  * Component to display reviews/credentials carousel
@@ -137,6 +137,17 @@ export class ReviewsSectionComponent implements OnInit, OnDestroy {
    */
   asCredential(achievement: ICredential | IFeedback): ICredential {
     return achievement as ICredential;
+  }
+
+  /**
+   * Obtiene los datos para exportación
+   */
+  getExportData(): IReviewData {
+    return {
+      title: this.getTitle(),
+      type: this.role === 'INSTRUCTOR' ? 'FEEDBACK' : 'CREDENTIAL',
+      items: this.achievements
+    };
   }
   //#endregion
 

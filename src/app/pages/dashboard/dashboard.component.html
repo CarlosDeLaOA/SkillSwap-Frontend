@@ -4,11 +4,15 @@
       <span class="title-mi">Mi </span>
       <span class="title-skilltrip">SkillTrip</span>
     </h1>
-    <button class="export-button">
-      Exportar
-      <i class='bx bxs-download export-icon'></i>
+    <button 
+      class="export-button" 
+      (click)="onExportDashboard()"
+      [disabled]="isExporting">
+      <span *ngIf="!isExporting">Exportar</span>
+      <span *ngIf="isExporting">Generando...</span>
+      <i class='bx bxs-download export-icon' *ngIf="!isExporting"></i>
+      <i class='bx bx-loader-alt bx-spin export-icon' *ngIf="isExporting"></i>
     </button>
-
   </header>
 
   <div class="dashboard-container">

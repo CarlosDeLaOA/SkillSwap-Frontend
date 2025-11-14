@@ -2,7 +2,7 @@ import { Component, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardService } from '../../services/dashboard.service';
 import { ProfileService } from '../../services/profile.service';
-import { IMonthlyAchievement, IMonthlyAttendance } from '../../interfaces';
+import { IMonthlyAchievement, IMonthlyAttendance, IAttendanceChartData} from '../../interfaces';
 
 @Component({
   selector: 'app-attendance-chart',
@@ -34,13 +34,9 @@ export class AttendanceChartComponent implements OnInit {
       if (profile && (profile.instructor !== undefined || profile.learner !== undefined)) {
         console.log('🔄 Signal actualizado con datos reales, recalculando rol...');
         
-      
         this.dataLoaded = false;
-        
-  
         this.monthlyData = [];
         this.isLoading = true;
-        
         
         this.determineUserRole();
         this.loadData();
@@ -62,7 +58,6 @@ export class AttendanceChartComponent implements OnInit {
       console.log('✅ Perfil ya cargado, usando datos existentes');
       this.determineUserRole();
       
-   
       this.monthlyData = this.generateLast4Months([]);
       this.calculateMaxValue();
       
@@ -77,6 +72,22 @@ export class AttendanceChartComponent implements OnInit {
     return Math.max(height, 0);
   }
 
+  /**
+   * Obtiene los datos para exportación
+   */
+  getExportData(): IAttendanceChartData {
+    return {
+      title: this.chartTitle,
+      label1: this.legend1Label,
+      label2: this.legend2Label,
+      monthlyData: this.monthlyData.map(data => ({
+        month: data.month,
+        value1: data.credentials,
+        value2: data.certificates
+      }))
+    };
+  }
+
   private determineUserRole(): void {
     this.isInstructor = this.profileService.isInstructor();
     
@@ -84,12 +95,12 @@ export class AttendanceChartComponent implements OnInit {
       this.chartTitle = 'Asistentes';
       this.legend1Label = 'Presentes';
       this.legend2Label = 'Registrados';
-      console.log(' ROL: INSTRUCTOR - Mostrando Asistentes');
+      console.log('👨‍🏫 ROL: INSTRUCTOR - Mostrando Asistentes');
     } else {
       this.chartTitle = 'Logros obtenidos';
       this.legend1Label = 'Credenciales';
       this.legend2Label = 'Certificados';
-      console.log(' ROL: LEARNER - Mostrando Logros');
+      console.log('👨‍🎓 ROL: LEARNER - Mostrando Logros');
     }
   }
 
@@ -97,10 +108,10 @@ export class AttendanceChartComponent implements OnInit {
     this.isLoading = true;
 
     if (this.isInstructor) {
-      console.log(' Cargando ASISTENCIA para instructor...');
+      console.log('📊 Cargando ASISTENCIA para instructor...');
       this.loadMonthlyAttendance();
     } else {
-      console.log(' Cargando LOGROS para learner...');
+      console.log('📊 Cargando LOGROS para learner...');
       this.loadMonthlyAchievements();
     }
   }
@@ -108,7 +119,7 @@ export class AttendanceChartComponent implements OnInit {
   private loadMonthlyAttendance(): void {
     this.dashboardService.getMonthlyAttendance().subscribe({
       next: (data: any) => {
-        console.log(' Datos de asistencia mensual recibidos:', data);
+        console.log('✅ Datos de asistencia mensual recibidos:', data);
         
         let attendanceData: IMonthlyAttendance[] = [];
         
@@ -124,17 +135,15 @@ export class AttendanceChartComponent implements OnInit {
           certificates: a.registrados ?? 0
         }));
         
-       
         this.monthlyData = this.generateLast4Months(mappedData);
         this.calculateMaxValue();
         console.log('📊 Datos finales de asistencia:', this.monthlyData);
         this.isLoading = false;
       },
       error: (error: any) => {
-        console.error(' Error cargando asistencia:', error);
-        console.warn(' Mostrando datos vacíos debido a error');
+        console.error('❌ Error cargando asistencia:', error);
+        console.warn('⚠️ Mostrando datos vacíos debido a error');
         
-
         this.monthlyData = this.generateLast4Months([]);
         this.calculateMaxValue();
         this.isLoading = false;
@@ -145,7 +154,7 @@ export class AttendanceChartComponent implements OnInit {
   private loadMonthlyAchievements(): void {
     this.dashboardService.getMonthlyAchievements().subscribe({
       next: (data: any) => {
-        console.log(' Datos de logros mensuales recibidos:', data);
+        console.log('✅ Datos de logros mensuales recibidos:', data);
         
         let logrosData: IMonthlyAchievement[] = [];
         
@@ -161,7 +170,6 @@ export class AttendanceChartComponent implements OnInit {
           certificates: l.certificates ?? 0
         }));
         
-   
         this.monthlyData = this.generateLast4Months(safeLogrosData);
         this.calculateMaxValue();
         
@@ -169,17 +177,15 @@ export class AttendanceChartComponent implements OnInit {
         this.isLoading = false;
       },
       error: (error: any) => {
-        console.error(' Error cargando logros mensuales:', error);
-        console.warn(' Mostrando datos vacíos debido a error');
+        console.error('❌ Error cargando logros mensuales:', error);
+        console.warn('⚠️ Mostrando datos vacíos debido a error');
         
-       
         this.monthlyData = this.generateLast4Months([]);
         this.calculateMaxValue();
         this.isLoading = false;
       }
     });
   }
-
 
   private generateLast4Months(backendData: Array<{month: string, credentials: number, certificates: number}>): Array<{month: string, credentials: number, certificates: number}> {
     const months: Array<{month: string, credentials: number, certificates: number}> = [];
@@ -199,7 +205,6 @@ export class AttendanceChartComponent implements OnInit {
         )
       );
       
-    
       months.push({
         month: monthName,
         credentials: backendMonth?.credentials ?? 0,
@@ -210,7 +215,6 @@ export class AttendanceChartComponent implements OnInit {
     return months;
   }
 
-  
   private calculateMaxValue(): void {
     let max = 0;
     this.monthlyData.forEach(data => {

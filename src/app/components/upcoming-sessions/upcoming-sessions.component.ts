@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardService } from '../../services/dashboard.service';
-import { IUpcomingSession } from '../../interfaces';
+import { IUpcomingSession,  IUpcomingSessionData } from '../../interfaces';
 
 /**
  * Component to display upcoming sessions
@@ -86,6 +86,17 @@ export class UpcomingSessionsComponent implements OnInit {
    */
   isInstructor(): boolean {
     return this.role === 'INSTRUCTOR';
+  }
+
+  /**
+   * Obtiene los datos para exportación
+   */
+  getExportData(): IUpcomingSessionData[] {
+    return this.sessions.map(session => ({
+      title: session.title,
+      datetime: this.formatDateTime(session.scheduledDatetime),
+      duration: `${session.durationMinutes} min`
+    }));
   }
   //#endregion
 
