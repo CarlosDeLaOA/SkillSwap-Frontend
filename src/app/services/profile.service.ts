@@ -6,9 +6,6 @@ import { Observable } from 'rxjs';
 
 /**
  * Servicio para gestionar el perfil de usuario en SkillSwap
- * 
- * @author SkillSwap Team
- * @version 4.0.0
  */
 @Injectable({
   providedIn: 'root'
