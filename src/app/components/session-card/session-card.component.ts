@@ -1,95 +1,95 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ILearningSession } from '../../interfaces';
-import { Router } from '@angular/router';
-
-/**
- * Componente de tarjeta para mostrar información resumida de una sesión de aprendizaje
- */
-@Component({
-  selector: 'app-session-card',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './session-card.component.html',
-  styleUrls: ['./session-card.component.scss']
-})
-export class SessionCardComponent {
-  
-  //#region Input/Output Properties
-  @Input() session!: ILearningSession;
-  @Output() register = new EventEmitter<number>();
-  @Output() viewDetails = new EventEmitter<ILearningSession>();
-  //#endregion
-
-  //#region Constants
-  languageNames: { [key: string]: string } = {
-    'es': 'Español',
-    'en': 'Inglés',
-    'fr': 'Francés',
-    'de': 'Alemán',
-    'pt': 'Portugués'
-  };
-  //#endregion
-
-  //#region Event Handlers
-  constructor(private router: Router) {}
-
-  onRegister() {
-    // Navegar a los detalles de la sesión
-    this.router.navigate(['/app/sessions', this.session.id]);
-  }
+  import { Component, Input, Output, EventEmitter } from '@angular/core';
+  import { CommonModule } from '@angular/common';
+  import { ILearningSession } from '../../interfaces';
+  import { Router } from '@angular/router';
 
   /**
-   * Emite evento para ver detalles de la sesión
+   * Componente de tarjeta para mostrar información resumida de una sesión de aprendizaje
    */
-  onViewDetails(): void {
-    this.viewDetails.emit(this.session);
-  }
-  //#endregion
+  @Component({
+    selector: 'app-session-card',
+    standalone: true,
+    imports: [CommonModule],
+    templateUrl: './session-card.component.html',
+    styleUrls: ['./session-card.component.scss']
+  })
+  export class SessionCardComponent {
+    
+    //#region Input/Output Properties
+    @Input() session!: ILearningSession;
+    @Output() register = new EventEmitter<number>();
+    @Output() viewDetails = new EventEmitter<ILearningSession>();
+    //#endregion
 
-  //#region Formatting Methods
-  /**
-   * Formatea una fecha en formato dd/mm/yyyy
-   * @param dateString Cadena de fecha ISO
-   * @returns Fecha formateada
-   */
-  formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', { 
-      day: '2-digit', 
-      month: '2-digit', 
-      year: 'numeric' 
-    });
-  }
+    //#region Constants
+    languageNames: { [key: string]: string } = {
+      'es': 'Español',
+      'en': 'Inglés',
+      'fr': 'Francés',
+      'de': 'Alemán',
+      'pt': 'Portugués'
+    };
+    //#endregion
 
-  /**
-   * Formatea una hora en formato HH:mm
-   * @param dateString Cadena de fecha ISO
-   * @returns Hora formateada
-   */
-  formatTime(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString('es-ES', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
-  }
+    //#region Event Handlers
+    constructor(private router: Router) {}
 
-  /**
-   * Obtiene el nombre del idioma en español
-   * @param code Código ISO del idioma
-   * @returns Nombre del idioma
-   */
-  getLanguageName(code: string): string {
-    return this.languageNames[code] || code;
-  }
+    onRegister() {
+      // Navegar a los detalles de la sesión
+      this.router.navigate(['/app/sessions', this.session.id]);
+    }
 
-  /**
-   * Calcula los cupos disponibles
-   * @returns Número de cupos disponibles
-   */
-  getAvailableSpots(): number {
-    return this.session.maxCapacity - (this.session.bookings?.length || 0);
+    /**
+     * Emite evento para ver detalles de la sesión
+     */
+    onViewDetails(): void {
+      this.viewDetails.emit(this.session);
+    }
+    //#endregion
+
+    //#region Formatting Methods
+    /**
+     * Formatea una fecha en formato dd/mm/yyyy
+     * @param dateString Cadena de fecha ISO
+     * @returns Fecha formateada
+     */
+    formatDate(dateString: string): string {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('es-ES', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric' 
+      });
+    }
+
+    /**
+     * Formatea una hora en formato HH:mm
+     * @param dateString Cadena de fecha ISO
+     * @returns Hora formateada
+     */
+    formatTime(dateString: string): string {
+      const date = new Date(dateString);
+      return date.toLocaleTimeString('es-ES', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      });
+    }
+
+    /**
+     * Obtiene el nombre del idioma en español
+     * @param code Código ISO del idioma
+     * @returns Nombre del idioma
+     */
+    getLanguageName(code: string): string {
+      return this.languageNames[code] || code;
+    }
+
+    /**
+     * Calcula los cupos disponibles
+     * @returns Número de cupos disponibles
+     */
+    getAvailableSpots(): number {
+      return this.session.maxCapacity - (this.session.bookings?.length || 0);
+    }
+    //#endregion
   }
-  //#endregion
-}
