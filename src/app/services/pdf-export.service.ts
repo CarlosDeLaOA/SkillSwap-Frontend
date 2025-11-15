@@ -456,7 +456,7 @@ export class PdfExportService {
    * Agrega footer a todas las páginas
    */
   private addFooter(doc: jsPDF): void {
-    const pageCount = doc.getNumberOfPages();
+    const pageCount = (doc as any).getNumberOfPages();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
 
