@@ -7,11 +7,7 @@ import { UserSkillService } from '../../services/user-skill.service';
 import { IUserSkill, IKnowledgeArea, ISkill } from '../../interfaces';
 
 /**
- * Componente de perfil de usuario para SkillSwap
  * Permite ver y editar información del usuario autenticado
- * 
- * @author SkillSwap Team
- * @version 4.0.0
  */
 @Component({
   selector: 'app-profile',
@@ -65,9 +61,7 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  /**
-   * Muestra una notificación tipo toast
-   */
+  
   private showToast(type: 'success' | 'warning' | 'error' | 'info', title: string, message: string): void {
     this.notificationType = type;
     this.notificationTitle = title;
@@ -82,9 +76,6 @@ export class ProfileComponent implements OnInit {
     }, 4000);
   }
 
-  /**
-   * Cierra la notificación manualmente
-   */
   public closeNotification(): void {
     this.showNotification = false;
     if (this.notificationTimeout) {
