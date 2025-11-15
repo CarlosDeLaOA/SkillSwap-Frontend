@@ -84,7 +84,7 @@ export class SessionDetailComponent implements OnInit {
       learningSessionId: this.session.id 
     }).subscribe({
       next: (response) => {
-        console.log('✅ Booking creado:', response);
+        console.log('Booking creado:', response);
         this.isRegistering = false;
         this.registrationSuccess = true;
         
@@ -96,7 +96,7 @@ export class SessionDetailComponent implements OnInit {
         }, 3000);
       },
       error: (error) => {
-        console.error('❌ Error al crear booking:', error);
+        console.error('Error al crear booking:', error);
         this.isRegistering = false;
         
         // Manejar diferentes tipos de errores
