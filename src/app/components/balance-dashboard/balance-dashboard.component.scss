@@ -1,7 +1,175 @@
 .balance-dashboard {
   background-color: #39434B;
   border-radius: 15px;
-  padding: 30px;
+  padding: 30px 40px;
   height: 100%;
   min-height: 250px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  height: 100%;
+  position: relative;
+}
+
+.balance-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-left: 80px;
+}
+
+.balance-label {
+  color: #FFFFFF;
+  font-size: 35px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.balance-amount {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.amount {
+  color: #AAE16B;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.currency {
+  color: #AAE16B;
+  font-size: 35px;
+  font-weight: 500;
+}
+
+.skillup-container {
+  margin-top: 12px;
+  margin-left: 80px;
+}
+
+.skillup-button {
+  background: linear-gradient(135deg, #504AB7 0%, #6B5DD4 100%);
+  border: none;
+  border-radius: 10px;
+  padding: 16px 32px;
+  color: #FFFFFF;
+  font-size: 20px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: fit-content;
+}
+
+.skillup-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(80, 74, 183, 0.4);
+}
+
+.skillup-button:active {
+  transform: translateY(0);
+}
+
+.skillup-icon {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.coins-illustration {
+  position: absolute;
+  right: 80px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 350px;
+  height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.coins-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #39434B;
+  border-top: 4px solid #AAE16B;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 1200px) {
+  .coins-illustration {
+    width: 300px;
+    height: 220px;
+    right: 60px;
+  }
+  
+  .amount {
+    font-size: 48px;
+  }
+  
+  .currency {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .balance-header {
+    max-width: 100%;
+    margin-left: 0;
+  }
+  
+  .skillup-container {
+    max-width: 100%;
+    margin-left: 0;
+  }
+  
+  .coins-illustration {
+    position: relative;
+    transform: none;
+    right: 0;
+    top: 0;
+    margin: 20px auto 0;
+    width: 200px;
+    height: 150px;
+  }
+  
+  .amount {
+    font-size: 36px;
+  }
+  
+  .currency {
+    font-size: 18px;
+  }
 }

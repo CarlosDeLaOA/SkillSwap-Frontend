@@ -69,6 +69,7 @@ export class LoginComponent implements OnInit {
     }
   }
   
+  //Validaciones
   public hasMinLength(): boolean {
     return this.loginForm.password.length >= 8;
   }
@@ -124,6 +125,7 @@ export class LoginComponent implements OnInit {
     return true;
   }
 
+    
   public onPasswordChange(): void {
     if (this.loginForm.password && this.passwordModel.touched) {
       this.validatePassword(this.loginForm.password);

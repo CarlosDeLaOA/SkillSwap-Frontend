@@ -1,14 +1,11 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { IPerson, IUserSkill } from '../interfaces';
+import { IPerson } from '../interfaces';
 import { Observable } from 'rxjs';
 
 /**
  * Servicio para gestionar el perfil de usuario en SkillSwap
- * 
- * @author SkillSwap Team
- * @version 4.0.0
  */
 @Injectable({
   providedIn: 'root'
@@ -49,6 +46,19 @@ export class ProfileService {
     });
   }
 
+  /**
+   * Limpia el perfil del usuario (útil para logout o cambio de usuario)
+   */
+  clearProfile() {
+    console.log('🧹 Limpiando perfil del usuario');
+    this.personSignal.set({
+      preferredLanguage: ''
+    });
+  }
+
+  /**
+   * Actualiza el idioma preferido del usuario
+   */
   updateLanguage(language: string): Observable<any> {
     console.log('[ProfileService] Actualizando idioma a:', language);
     return this.http.put(`${this.apiUrl}/me/language`, { language });
@@ -75,16 +85,19 @@ deleteProfilePhoto(): Observable<any> {
     return this.http.put(`${this.apiUrl}/me/profile-photo`, formData);
   }
 
+  /** Verifica si el usuario es Instructor */
   isInstructor(): boolean {
     return this.personSignal().instructor !== null && 
            this.personSignal().instructor !== undefined;
   }
 
+  /** Verifica si el usuario es Learner */
   isLearner(): boolean {
     return this.personSignal().learner !== null && 
            this.personSignal().learner !== undefined;
   }
 
+  /** Obtiene el rol del usuario */
   getUserRole(): string {
     if (this.isInstructor() && this.isLearner()) return 'SkillSwapper';
     if (this.isInstructor()) return 'SkillSwapper';
@@ -92,8 +105,8 @@ deleteProfilePhoto(): Observable<any> {
     return 'Usuario';
   }
 
+  /** Obtiene el idioma preferido del usuario */
   getPreferredLanguage(): string {
     return this.personSignal().preferredLanguage || 'No especificado';
   }
 }
-

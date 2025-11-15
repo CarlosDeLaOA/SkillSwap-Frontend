@@ -51,8 +51,6 @@ export interface IRole {
   updatedAt: string;
 }
 
-
-
 export interface ISearch {
   page?: number;
   size?: number;
@@ -104,6 +102,28 @@ export interface IEmailCheckResponse {
 }
 
 //#endregion
+
+/**
+ * Interfaz para Skill (Habilidad)
+ */
+export interface ISkill {
+  id: number;
+  name: string;
+  description?: string;
+  active: boolean;
+  knowledgeArea?: IKnowledgeArea;
+}
+
+/**
+ * Interfaz para UserSkill (Habilidad del Usuario)
+ */
+export interface IUserSkill {
+  id: number;
+  person: IPerson;
+  skill: ISkill;
+  selectedDate: string;
+  active: boolean;
+}
 
 /**
  * Entidad Person del sistema SkillSwap
@@ -159,6 +179,7 @@ export interface ILoginResponseSkillSwap {
   expiresIn: number;
   authPerson: IPerson;
 }
+
 /** 
  * Respuesta del endpoint de horas de aprendizaje
  */
@@ -204,6 +225,36 @@ export interface IFeedback {
   learnerName: string;
   sessionTitle: string;
 }
+
+// ========================================
+// INTERFACES DE DASHBOARD
+// ========================================
+
+export interface IAccountBalance {
+  skillCoins: number;
+}
+
+export interface IMonthlyAchievement {
+  month: string;
+  credentials: number;
+  certificates: number;
+}
+
+export interface ISkillSessionStats {
+  skillName: string;
+  completed: number;
+  pending: number;
+}
+
+export interface IMonthlyAttendance {
+  month: string;
+  presentes: number;
+  registrados: number;
+}
+
+// ========================================
+// INTERFACES DE LEARNING SESSIONS
+// ========================================
 
 export interface ILearningSession {
   id: number;
@@ -261,93 +312,59 @@ export interface ISessionFilters {
 }
 
 /**
- * Interfaz para Skill (Habilidad)
- */
-export interface ISkill {
-  id: number;
-  name: string;
-  description?: string;
-  active: boolean;
-  knowledgeArea?: IKnowledgeArea;
-}
-
-/**
- * Interfaz para UserSkill (Habilidad del Usuario)
- */
-export interface IUserSkill {
-  id: number;
-  person: IPerson;
-  skill: ISkill;
-  selectedDate: string;
-  active: boolean;
-}
-
-/**
  * Request para guardar habilidades del usuario
  */
 export interface ISaveUserSkillsRequest {
   skillIds: number[];
 }
 
-// ========================================
-// INTERFACES DE BOOKING
-// ========================================
 
-/**
- * Tipos de booking
- */
-export enum BookingType {
-  INDIVIDUAL = 'INDIVIDUAL',
-  GROUP = 'GROUP'
+export interface IDashboardExportData {
+  balance: IBalanceData;
+  learningHours: ILearningHoursData;
+  attendanceData: IAttendanceChartData;
+  skillsProgress: ISkillsProgressData;
+  upcomingSessions: IUpcomingSessionData[];
+  reviews: IReviewData;
 }
 
-/**
- * Estados de un booking
- */
-export enum BookingStatus {
-  CONFIRMED = 'CONFIRMED',
-  WAITING = 'WAITING',
-  CANCELLED = 'CANCELLED'
+export interface IBalanceData {
+  skillCoins: number;
 }
 
-/**
- * Entidad Booking completa
- */
-export interface IBooking {
-  id: number;
-  learningSession: ILearningSession;
-  learner: ILearner;
-  type: BookingType;
-  status: BookingStatus;
-  accessLink: string;
-  attended: boolean;
-  entryTime?: string;
-  exitTime?: string;
-  bookingDate: string;
-  community?: any;
+export interface ILearningHoursData {
+  hours: number;
+  description: string;
 }
 
-/**
- * Request para crear un booking
- */
-export interface ICreateBookingRequest {
-  learningSessionId: number;
+export interface IAttendanceChartData {
+  title: string;
+  label1: string;
+  label2: string;
+  monthlyData: Array<{
+    month: string;
+    value1: number;
+    value2: number;
+  }>;
 }
 
-/**
- * Response del servidor al crear/obtener bookings
- */
-export interface IBookingResponse {
-  success: boolean;
-  message: string;
-  data: IBooking;
+export interface ISkillsProgressData {
+  selectedSkill: {
+    skillName: string;
+    completed: number;
+    pending: number;
+    percentage: number;
+  } | null;
 }
 
-/**
- * Response del servidor al obtener lista de bookings
- */
-export interface IBookingsListResponse {
-  success: boolean;
-  data: IBooking[];
-  count: number;
+export interface IUpcomingSessionData {
+  title: string;
+  datetime: string;
+  duration: string;
+}
+
+export interface IReviewData {
+  title: string;
+  type: 'FEEDBACK' | 'CREDENTIAL';
+  items: any[];
 }
