@@ -255,6 +255,15 @@ export interface IMonthlyAttendance {
 // ========================================
 // INTERFACES DE LEARNING SESSIONS
 // ========================================
+export interface ICreateSessionRequest {
+  skill: { id: number };
+  title: string;
+  description: string;
+  scheduledDatetime: string; // ISO string de fecha y hora
+  durationMinutes: number;
+  language: string;
+  maxCapacity: number;
+}
 
 export interface ILearningSession {
   id: number;
@@ -367,4 +376,133 @@ export interface IReviewData {
   title: string;
   type: 'FEEDBACK' | 'CREDENTIAL';
   items: any[];
+}
+
+// ========================================
+// INTERFACES DE BOOKING
+// ========================================
+
+/**
+ * Tipos de booking
+ */
+export enum BookingType {
+  INDIVIDUAL = 'INDIVIDUAL',
+  GROUP = 'GROUP'
+}
+
+/**
+ * Estados de un booking
+ */
+export enum BookingStatus {
+  CONFIRMED = 'CONFIRMED',
+  WAITING = 'WAITING',
+  CANCELLED = 'CANCELLED'
+}
+
+/**
+ * Entidad Booking completa
+ */
+export interface IBooking {
+  id: number;
+  learningSession: ILearningSession;
+  learner: ILearner;
+  type: BookingType;
+  status: BookingStatus;
+  accessLink: string;
+  attended: boolean;
+  entryTime?: string;
+  exitTime?: string;
+  bookingDate: string;
+  community?: any;
+}
+
+/**
+ * Request para crear un booking
+ */
+export interface ICreateBookingRequest {
+  learningSessionId: number;
+}
+
+/**
+ * Response del servidor al crear/obtener bookings
+ */
+export interface IBookingResponse {
+  success: boolean;
+  message: string;
+  data: IBooking;
+}
+
+/**
+ * Response del servidor al obtener lista de bookings
+ */
+export interface IBookingsListResponse {
+  success: boolean;
+  data: IBooking[];
+  count: number;
+}
+
+// ========================================
+// INTERFACES DE COMUNIDADES
+// ========================================
+
+/**
+ * Roles de miembro en una comunidad
+ */
+export enum MemberRole {
+  CREATOR = 'CREATOR',
+  MEMBER = 'MEMBER'
+}
+
+/**
+ * Entidad LearningCommunity
+ */
+export interface ILearningCommunity {
+  id: number;
+  name: string;
+  description?: string;
+  maxMembers: number;
+  invitationCode?: string;
+  active: boolean;
+  creationDate: string;
+  creator?: ILearner;
+  members?: ICommunityMember[];
+}
+
+/**
+ * Entidad CommunityMember
+ */
+export interface ICommunityMember {
+  id: number;
+  learningCommunity?: ILearningCommunity;
+  learner: ILearner;
+  role: MemberRole;
+  joinDate: string;
+  active: boolean;
+}
+
+/**
+ * Response del servidor al obtener comunidades
+ */
+export interface ICommunitiesResponse {
+  success: boolean;
+  data: ILearningCommunity[];
+  count: number;
+}
+
+/**
+ * Request para crear booking grupal
+ */
+export interface ICreateGroupBookingRequest {
+  learningSessionId: number;
+  communityId: number;
+}
+
+/**
+ * Response del servidor al crear booking grupal
+ */
+export interface IGroupBookingResponse {
+  success: boolean;
+  message: string;
+  data: IBooking[];
+  count: number;
 }

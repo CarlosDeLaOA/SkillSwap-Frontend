@@ -1,0 +1,193 @@
+<div class="session-detail-page">
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="errorMessage && !isLoading" class="error-container">
+    <div class="alert alert-danger">
+      <i class='bx bx-error-circle me-2'></i>
+      {{ errorMessage }}
+    </div>
+    <button class="btn btn-primary" (click)="goBack()">
+      <i class='bx bx-arrow-back me-2'></i>
+      Volver a sesiones
+    </button>
+  </div>
+
+  <!-- Session Detail -->
+  <div *ngIf="session && !isLoading" class="session-detail-container">
+    <!-- Header -->
+    <div class="page-header">
+      <h1 class="page-title">
+        <span class="title-register">Regístrate</span> a una 
+        <span class="title-session">sesión</span>
+      </h1>
+      <p class="page-subtitle">
+        Conecta con un SkillSwapper experto en 
+        <span class="skill-name">{{ session.skill?.name || 'habilidad' }}</span>.
+      </p>
+    </div>
+
+    <!-- Success Message -->
+    <div *ngIf="registrationSuccess" class="alert alert-success alert-dismissible fade show" role="alert">
+      <i class='bx bx-check-circle me-2'></i>
+      <strong>¡Registro exitoso!</strong> 
+      <span *ngIf="registrationType === 'individual'">
+        Te has registrado correctamente en la sesión. Revisa tu correo electrónico para más detalles.
+      </span>
+      <span *ngIf="registrationType === 'group'">
+        Tu comunidad se ha registrado correctamente. Todos los miembros recibirán un correo con los detalles.
+      </span>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="registrationError" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <i class='bx bx-error-circle me-2'></i>
+      <strong>Error:</strong> {{ registrationError }}
+    </div>
+
+    <!-- Main Card -->
+    <div class="detail-card">
+      <!-- Left Side - Session Info -->
+      <div class="session-info">
+        <h2 class="session-name">{{ session.title }}</h2>
+        
+        <p class="session-description">{{ session.description }}</p>
+
+        <div class="session-details">
+          <div class="detail-item">
+            <strong>Fecha y hora:</strong>
+            <span>{{ formatDate(session.scheduledDatetime) }} - {{ formatTime(session.scheduledDatetime) }}</span>
+          </div>
+
+          <div class="detail-item">
+            <strong>Duración de la sesión:</strong>
+            <span>{{ session.durationMinutes }} minutos</span>
+          </div>
+
+          <div class="detail-item">
+            <strong>Categoría de la sesión:</strong>
+            <span>{{ session.skill?.knowledgeArea?.name || 'Categoría' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Side - Registration -->
+      <div class="registration-section">
+        <div class="registration-type">
+          <h3>Tipo de registro:</h3>
+          
+          <div class="radio-group">
+            <label class="radio-option">
+              <input 
+                type="radio" 
+                name="registrationType" 
+                value="individual"
+                [(ngModel)]="registrationType"
+                (change)="onRegistrationTypeChange()">
+              <span>Individual</span>
+            </label>
+
+            <label class="radio-option">
+              <input 
+                type="radio" 
+                name="registrationType" 
+                value="group"
+                [(ngModel)]="registrationType"
+                (change)="onRegistrationTypeChange()">
+              <span>Grupal</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Community Selector (solo para registro grupal) -->
+        <div *ngIf="registrationType === 'group'" class="community-selector">
+          <h4>Selecciona tu comunidad:</h4>
+          
+          <div *ngIf="isLoadingCommunities" class="loading-communities">
+            <div class="spinner-border spinner-border-sm text-primary" role="status">
+              <span class="visually-hidden">Cargando comunidades...</span>
+            </div>
+            <span class="ms-2">Cargando comunidades...</span>
+          </div>
+
+          <select 
+            *ngIf="!isLoadingCommunities && communities.length > 0"
+            class="form-select community-select"
+            [(ngModel)]="selectedCommunityId">
+            <option [value]="null">Selecciona una comunidad</option>
+            <option *ngFor="let community of communities" [value]="community.id">
+              {{ community.name }} ({{ getActiveMembersCount(community) }} miembros)
+            </option>
+          </select>
+
+          <div *ngIf="!isLoadingCommunities && communities.length === 0" class="no-communities">
+            <i class='bx bx-info-circle'></i>
+            <p>No tienes comunidades disponibles para registro grupal.</p>
+          </div>
+        </div>
+
+        <!-- Illustration -->
+        <div class="illustration">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="250" height="200">
+            <!-- Documento principal -->
+            <rect x="120" y="60" width="160" height="200" rx="8" fill="#504ab7" opacity="0.3"/>
+            <rect x="120" y="60" width="160" height="200" rx="8" fill="none" stroke="#504ab7" stroke-width="2"/>
+            
+            <!-- Líneas del documento -->
+            <line x1="140" y1="90" x2="260" y2="90" stroke="#aae16b" stroke-width="3" stroke-linecap="round"/>
+            <line x1="140" y1="110" x2="240" y2="110" stroke="#aae16b" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+            <line x1="140" y1="130" x2="250" y2="130" stroke="#aae16b" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+            <line x1="140" y1="150" x2="230" y2="150" stroke="#aae16b" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+            
+            <!-- Checkmark circular -->
+            <circle cx="200" cy="190" r="25" fill="#aae16b"/>
+            <path d="M 190 190 L 197 197 L 210 180" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            
+            <!-- Personas (iconos simplificados) - Más si es grupal -->
+            <g *ngIf="registrationType === 'individual'">
+              <circle cx="80" cy="180" r="15" fill="#504ab7" opacity="0.6"/>
+              <ellipse cx="80" cy="210" rx="20" ry="12" fill="#504ab7" opacity="0.6"/>
+            </g>
+            
+            <g *ngIf="registrationType === 'group'">
+              <circle cx="60" cy="180" r="12" fill="#504ab7" opacity="0.6"/>
+              <ellipse cx="60" cy="205" rx="16" ry="10" fill="#504ab7" opacity="0.6"/>
+              
+              <circle cx="90" cy="180" r="12" fill="#504ab7" opacity="0.7"/>
+              <ellipse cx="90" cy="205" rx="16" ry="10" fill="#504ab7" opacity="0.7"/>
+              
+              <circle cx="75" cy="165" r="12" fill="#504ab7" opacity="0.8"/>
+              <ellipse cx="75" cy="190" rx="16" ry="10" fill="#504ab7" opacity="0.8"/>
+            </g>
+            
+            <circle cx="320" cy="140" r="12" fill="#aae16b" opacity="0.5"/>
+            <ellipse cx="320" cy="162" rx="16" ry="10" fill="#aae16b" opacity="0.5"/>
+            
+            <!-- Decoración adicional -->
+            <circle cx="340" cy="90" r="8" fill="#504ab7" opacity="0.3"/>
+            <circle cx="60" cy="100" r="6" fill="#aae16b" opacity="0.4"/>
+          </svg>
+        </div>
+
+        <!-- Register Button -->
+        <button 
+          class="btn-register" 
+          (click)="registerToSession()"
+          [disabled]="isRegistering || registrationSuccess || (registrationType === 'group' && !selectedCommunityId)">
+          <span *ngIf="!isRegistering && !registrationSuccess">Registrarme</span>
+          <span *ngIf="isRegistering">
+            <i class='bx bx-loader-alt bx-spin'></i> Registrando...
+          </span>
+          <span *ngIf="registrationSuccess">
+            <i class='bx bx-check'></i> Registrado
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

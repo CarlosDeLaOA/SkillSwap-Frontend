@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { SessionDetailComponent } from './pages/session-detail/session-detail.component';
 import { LoginComponent } from './pages/auth/login/login.component';
 import { AppLayoutComponent } from './components/app-layout/app-layout.component';
 import { SigUpComponent } from './pages/auth/sign-up/signup.component';
@@ -18,7 +19,7 @@ import { LandingComponent } from './pages/landing/landing.component';
 import { SkillOnboardingComponent } from './pages/skill-onboarding/skill-onboarding.component';
 import { VerifyEmailComponent } from './pages/verify-email/verify-email.component';
 import { LandingskillswapComponent } from './pages/landingskillswap/landingskillswap.component';
-
+import { CreateSessionComponent } from './pages/create-session/create-session.component';
 
 
 export const routes: Routes = [
@@ -109,6 +110,15 @@ export const routes: Routes = [
           showInSidebar: true
         }
       },
+      {
+      path: 'sessions/:id',
+      component: SessionDetailComponent,
+      data: {
+        authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+        name: 'Detalle de Sesión',
+        showInSidebar: false
+      },
+       },
     ],
   },
   { path: '**', redirectTo: 'login' }
