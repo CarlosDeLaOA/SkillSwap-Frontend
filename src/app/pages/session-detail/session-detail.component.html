@@ -35,7 +35,13 @@
     <!-- Success Message -->
     <div *ngIf="registrationSuccess" class="alert alert-success alert-dismissible fade show" role="alert">
       <i class='bx bx-check-circle me-2'></i>
-      <strong>¡Registro exitoso!</strong> Te has registrado correctamente en la sesión. Revisa tu correo electrónico para más detalles.
+      <strong>¡Registro exitoso!</strong> 
+      <span *ngIf="registrationType === 'individual'">
+        Te has registrado correctamente en la sesión. Revisa tu correo electrónico para más detalles.
+      </span>
+      <span *ngIf="registrationType === 'group'">
+        Tu comunidad se ha registrado correctamente. Todos los miembros recibirán un correo con los detalles.
+      </span>
     </div>
 
     <!-- Error Message -->
@@ -81,7 +87,8 @@
                 type="radio" 
                 name="registrationType" 
                 value="individual"
-                checked>
+                [(ngModel)]="registrationType"
+                (change)="onRegistrationTypeChange()">
               <span>Individual</span>
             </label>
 
@@ -90,9 +97,37 @@
                 type="radio" 
                 name="registrationType" 
                 value="group"
-                disabled>
-              <span>Grupal (próximamente)</span>
+                [(ngModel)]="registrationType"
+                (change)="onRegistrationTypeChange()">
+              <span>Grupal</span>
             </label>
+          </div>
+        </div>
+
+        <!-- Community Selector (solo para registro grupal) -->
+        <div *ngIf="registrationType === 'group'" class="community-selector">
+          <h4>Selecciona tu comunidad:</h4>
+          
+          <div *ngIf="isLoadingCommunities" class="loading-communities">
+            <div class="spinner-border spinner-border-sm text-primary" role="status">
+              <span class="visually-hidden">Cargando comunidades...</span>
+            </div>
+            <span class="ms-2">Cargando comunidades...</span>
+          </div>
+
+          <select 
+            *ngIf="!isLoadingCommunities && communities.length > 0"
+            class="form-select community-select"
+            [(ngModel)]="selectedCommunityId">
+            <option [value]="null">Selecciona una comunidad</option>
+            <option *ngFor="let community of communities" [value]="community.id">
+              {{ community.name }} ({{ getActiveMembersCount(community) }} miembros)
+            </option>
+          </select>
+
+          <div *ngIf="!isLoadingCommunities && communities.length === 0" class="no-communities">
+            <i class='bx bx-info-circle'></i>
+            <p>No tienes comunidades disponibles para registro grupal.</p>
           </div>
         </div>
 
@@ -113,9 +148,22 @@
             <circle cx="200" cy="190" r="25" fill="#aae16b"/>
             <path d="M 190 190 L 197 197 L 210 180" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
             
-            <!-- Personas (iconos simplificados) -->
-            <circle cx="80" cy="180" r="15" fill="#504ab7" opacity="0.6"/>
-            <ellipse cx="80" cy="210" rx="20" ry="12" fill="#504ab7" opacity="0.6"/>
+            <!-- Personas (iconos simplificados) - Más si es grupal -->
+            <g *ngIf="registrationType === 'individual'">
+              <circle cx="80" cy="180" r="15" fill="#504ab7" opacity="0.6"/>
+              <ellipse cx="80" cy="210" rx="20" ry="12" fill="#504ab7" opacity="0.6"/>
+            </g>
+            
+            <g *ngIf="registrationType === 'group'">
+              <circle cx="60" cy="180" r="12" fill="#504ab7" opacity="0.6"/>
+              <ellipse cx="60" cy="205" rx="16" ry="10" fill="#504ab7" opacity="0.6"/>
+              
+              <circle cx="90" cy="180" r="12" fill="#504ab7" opacity="0.7"/>
+              <ellipse cx="90" cy="205" rx="16" ry="10" fill="#504ab7" opacity="0.7"/>
+              
+              <circle cx="75" cy="165" r="12" fill="#504ab7" opacity="0.8"/>
+              <ellipse cx="75" cy="190" rx="16" ry="10" fill="#504ab7" opacity="0.8"/>
+            </g>
             
             <circle cx="320" cy="140" r="12" fill="#aae16b" opacity="0.5"/>
             <ellipse cx="320" cy="162" rx="16" ry="10" fill="#aae16b" opacity="0.5"/>
@@ -130,7 +178,7 @@
         <button 
           class="btn-register" 
           (click)="registerToSession()"
-          [disabled]="isRegistering || registrationSuccess">
+          [disabled]="isRegistering || registrationSuccess || (registrationType === 'group' && !selectedCommunityId)">
           <span *ngIf="!isRegistering && !registrationSuccess">Registrarme</span>
           <span *ngIf="isRegistering">
             <i class='bx bx-loader-alt bx-spin'></i> Registrando...

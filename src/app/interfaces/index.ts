@@ -431,3 +431,69 @@ export interface IBookingsListResponse {
   data: IBooking[];
   count: number;
 }
+
+// ========================================
+// INTERFACES DE COMUNIDADES
+// ========================================
+
+/**
+ * Roles de miembro en una comunidad
+ */
+export enum MemberRole {
+  CREATOR = 'CREATOR',
+  MEMBER = 'MEMBER'
+}
+
+/**
+ * Entidad LearningCommunity
+ */
+export interface ILearningCommunity {
+  id: number;
+  name: string;
+  description?: string;
+  maxMembers: number;
+  invitationCode?: string;
+  active: boolean;
+  creationDate: string;
+  creator?: ILearner;
+  members?: ICommunityMember[];
+}
+
+/**
+ * Entidad CommunityMember
+ */
+export interface ICommunityMember {
+  id: number;
+  learningCommunity?: ILearningCommunity;
+  learner: ILearner;
+  role: MemberRole;
+  joinDate: string;
+  active: boolean;
+}
+
+/**
+ * Response del servidor al obtener comunidades
+ */
+export interface ICommunitiesResponse {
+  success: boolean;
+  data: ILearningCommunity[];
+  count: number;
+}
+
+/**
+ * Request para crear booking grupal
+ */
+export interface ICreateGroupBookingRequest {
+  learningSessionId: number;
+  communityId: number;
+}
+
+/**
+ * Response del servidor al crear booking grupal
+ */
+export interface IGroupBookingResponse {
+  success: boolean;
+  message: string;
+  data: IBooking[];
+  count: number;
+}
