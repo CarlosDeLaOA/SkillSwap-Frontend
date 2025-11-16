@@ -7,7 +7,9 @@ import { LearningHoursComponent } from '../../components/learning-hours/learning
 import { UpcomingSessionsComponent } from '../../components/upcoming-sessions/upcoming-sessions.component';
 import { ReviewsSectionComponent } from '../../components/reviews-section/reviews-section.component';
 import { PdfExportService } from '../../services/pdf-export.service';
-import { IDashboardExportData } from '../../interfaces/index';
+import { ExcelExportService } from '../../services/excel-export.service';
+import { IDashboardExportData } from '../../interfaces';
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -34,33 +36,76 @@ export class DashboardComponent {
   @ViewChild(ReviewsSectionComponent) reviewsComponent!: ReviewsSectionComponent;
 
   isExporting = false;
+  showExportMenu = false;
 
-  constructor(private pdfExportService: PdfExportService) { }
+  constructor(
+    private pdfExportService: PdfExportService,
+    private excelExportService: ExcelExportService
+  ) { }
+
+  /**
+   * Toggle del menú de exportación
+   */
+  toggleExportMenu(): void {
+    this.showExportMenu = !this.showExportMenu;
+  }
+
+  /**
+   * Cierra el menú de exportación
+   */
+  closeExportMenu(): void {
+    this.showExportMenu = false;
+  }
 
   /**
    * Exporta el dashboard a PDF
    */
-  async onExportDashboard(): Promise<void> {
+  async onExportPDF(): Promise<void> {
+    this.closeExportMenu();
     this.isExporting = true;
 
     try {
-      const dashboardData: IDashboardExportData = {
-        balance: this.balanceComponent.getExportData(),
-        learningHours: this.learningHoursComponent.getExportData(),
-        attendanceData: this.attendanceComponent.getExportData(),
-        skillsProgress: this.skillsComponent.getExportData(),
-        upcomingSessions: this.sessionsComponent.getExportData(),
-        reviews: this.reviewsComponent.getExportData()
-      };
-
+      const dashboardData = this.collectDashboardData();
       await this.pdfExportService.exportDashboard(dashboardData);
-
-      console.log('PDF generado exitosamente');
+      console.log('✅ PDF generado exitosamente');
     } catch (error) {
-      console.error('Error al generar PDF:', error);
+      console.error('❌ Error al generar PDF:', error);
       alert('Error al generar el reporte PDF. Por favor, intenta nuevamente.');
     } finally {
       this.isExporting = false;
     }
+  }
+
+  /**
+   * Exporta el dashboard a Excel
+   */
+  async onExportExcel(): Promise<void> {
+    this.closeExportMenu();
+    this.isExporting = true;
+
+    try {
+      const dashboardData = this.collectDashboardData();
+      await this.excelExportService.exportToExcel(dashboardData);
+      console.log('✅ Excel generado exitosamente');
+    } catch (error) {
+      console.error('❌ Error al generar Excel:', error);
+      alert('Error al generar el reporte Excel. Por favor, intenta nuevamente.');
+    } finally {
+      this.isExporting = false;
+    }
+  }
+
+  /**
+   * Recolecta datos de todos los componentes
+   */
+  private collectDashboardData(): IDashboardExportData {
+    return {
+      balance: this.balanceComponent.getExportData(),
+      learningHours: this.learningHoursComponent.getExportData(),
+      attendanceData: this.attendanceComponent.getExportData(),
+      skillsProgress: this.skillsComponent.getExportData(),
+      upcomingSessions: this.sessionsComponent.getExportData(),
+      reviews: this.reviewsComponent.getExportData()
+    };
   }
 }
