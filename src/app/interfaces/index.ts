@@ -255,6 +255,15 @@ export interface IMonthlyAttendance {
 // ========================================
 // INTERFACES DE LEARNING SESSIONS
 // ========================================
+export interface ICreateSessionRequest {
+  skill: { id: number };
+  title: string;
+  description: string;
+  scheduledDatetime: string; // ISO string de fecha y hora
+  durationMinutes: number;
+  language: string;
+  maxCapacity: number;
+}
 
 export interface ILearningSession {
   id: number;
@@ -367,4 +376,35 @@ export interface IReviewData {
   title: string;
   type: 'FEEDBACK' | 'CREDENTIAL';
   items: any[];
+}
+
+// ========================================
+// INTERFACES DE VALIDACIÓN DE SESIONES
+// ========================================
+
+export interface ISessionValidation {
+  title: {
+    isValid: boolean;
+    error: string;
+  };
+  description: {
+    isValid: boolean;
+    error: string;
+  };
+  skill: {
+    isValid: boolean;
+    error: string;
+  };
+  scheduledDatetime: {
+    isValid: boolean;
+    error: string;
+  };
+  durationMinutes: {
+    isValid: boolean;
+    error: string;
+  };
+  maxCapacity: {
+    isValid: boolean;
+    error: string;
+  };
 }
