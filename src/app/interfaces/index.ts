@@ -506,3 +506,30 @@ export interface IGroupBookingResponse {
   data: IBooking[];
   count: number;
 }
+
+export interface ISessionValidation {
+  title: {
+    isValid: boolean;
+    error: string;
+  };
+  description: {
+    isValid: boolean;
+    error: string;
+  };
+  skill: {
+    isValid: boolean;
+    error: string;
+  };
+  scheduledDatetime: {
+    isValid: boolean;
+    error: string;
+  };
+  durationMinutes: {
+    isValid: boolean;
+    error: string;
+  };
+  maxCapacity: {
+    isValid: boolean;
+    error: string;
+  };
+}
