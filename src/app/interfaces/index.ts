@@ -255,6 +255,15 @@ export interface IMonthlyAttendance {
 // ========================================
 // INTERFACES DE LEARNING SESSIONS
 // ========================================
+export interface ICreateSessionRequest {
+  skill: { id: number };
+  title: string;
+  description: string;
+  scheduledDatetime: string; // ISO string de fecha y hora
+  durationMinutes: number;
+  language: string;
+  maxCapacity: number;
+}
 
 export interface ILearningSession {
   id: number;
