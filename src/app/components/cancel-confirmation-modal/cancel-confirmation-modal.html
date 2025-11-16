@@ -14,10 +14,6 @@
     <!-- Body -->
     <div class="modal-body" *ngIf="cancellationInfo">
       
-      <div class="cancellation-title">
-        <p class="label">CANCELACIÓN DE:</p>
-        <p class="session-name">{{ cancellationInfo.sessionTitle }}</p>
-      </div>
 
       <div class="notification-info" *ngIf="cancellationInfo.participantsNotified > 0">
         <i class='bx bx-envelope'></i>

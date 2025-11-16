@@ -77,36 +77,40 @@ export class UpcomingSessionsComponent implements OnInit {
     console.log('Canceling session:', data.sessionId);
     console.log('Reason:', data.reason);
     
-    
-    // Mostrar modal de confirmación
-    this.showConfirmationModal = true;
-    
-    // Cerrar el modal de cancelación
-    this.closeCancelModal();
-    
-    // TODO: Cuando tengamos el servicio real:
-    // this.dashboardService.cancelSession(data.sessionId, data.reason).subscribe({
-    //   next: (response) => {
-    //     this.cancellationInfo = {
-    //       sessionTitle: this.selectedSession?.title || '',
-    //       participantsNotified: response.participantsNotified
-    //     };
-    //     this.showConfirmationModal = true;
-    //     this.closeCancelModal();
-    //     this.loadUpcomingSessions(); // Recargar lista
-    //   },
-    //   error: (error) => {
-    //     console.error('Error canceling session:', error);
-    //     // TODO: Mostrar mensaje de error
-    //   }
-    // });
+    // Llamar al servicio real
+    this.dashboardService.cancelSession(Number(data.sessionId), data.reason).subscribe({
+      next: (response) => {
+        console.log('Session cancelled successfully', response);
+        
+        // Preparar info para el modal de confirmación
+        this.cancellationInfo = {
+          sessionTitle: this.selectedSession?.title || '',
+          participantsNotified: response.participantsNotified || 0
+        };
+        
+        // Mostrar modal de confirmación
+        this.showConfirmationModal = true;
+        
+        // Cerrar modal de cancelación
+        this.closeCancelModal();
+      },
+      error: (error) => {
+        console.error('Error canceling session:', error);
+        
+        const errorMessage = error.error?.message || error.message || 'Error al cancelar la sesión';
+        alert(`Error: ${errorMessage}`);
+        
+        // Cerrar el modal de cancelación
+        this.closeCancelModal();
+      }
+    });
   }
 
   closeConfirmationModal(): void {
     this.showConfirmationModal = false;
     this.cancellationInfo = null;
     
-    // Recargar las sesiones para reflejar la cancelación
+    // IMPORTANTE: Recargar las sesiones para reflejar la cancelación
     this.loadUpcomingSessions();
   }
 

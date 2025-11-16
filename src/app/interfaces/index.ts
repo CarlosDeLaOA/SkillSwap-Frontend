@@ -265,6 +265,17 @@ export interface ICreateSessionRequest {
   maxCapacity: number;
 }
 
+/**
+ * Interface for session cancellation response
+ */
+export interface ICancelSessionResponse {
+  sessionId: number;
+  sessionTitle: string;
+  participantsNotified: number;
+  status: string;
+  cancellationDate: string;
+}
+
 export interface ILearningSession {
   id: number;
   title: string;
