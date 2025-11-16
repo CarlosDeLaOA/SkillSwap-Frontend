@@ -1,15 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardService } from '../../services/dashboard.service';
-import { IUpcomingSession,  IUpcomingSessionData } from '../../interfaces';
+import { IUpcomingSession, IUpcomingSessionData } from '../../interfaces';
+import { CancelSessionModalComponent } from '../cancel-session-modal/cancel-session-modal';
+import { CancelConfirmationModalComponent, CancellationInfo } from '../cancel-confirmation-modal/cancel-confirmation-modal';
 
-/**
- * Component to display upcoming sessions
- */
 @Component({
   selector: 'app-upcoming-sessions',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, CancelSessionModalComponent, CancelConfirmationModalComponent],
   templateUrl: './upcoming-sessions.component.html',
   styleUrls: ['./upcoming-sessions.component.scss']
 })
@@ -19,20 +18,21 @@ export class UpcomingSessionsComponent implements OnInit {
   sessions: IUpcomingSession[] = [];
   role: 'INSTRUCTOR' | 'LEARNER' = 'LEARNER';
   isLoading: boolean = true;
+  
+  // Cancel modal properties
+  showCancelModal: boolean = false;
+  selectedSession: IUpcomingSession | null = null;
+  
+  // Confirmation modal properties
+  showConfirmationModal: boolean = false;
+  cancellationInfo: CancellationInfo | null = null;
   //#endregion
 
   //#region Constructor
-  /**
-   * Creates an instance of UpcomingSessionsComponent
-   * @param dashboardService Service to fetch dashboard data
-   */
   constructor(private dashboardService: DashboardService) { }
   //#endregion
 
   //#region Lifecycle Hooks
-  /**
-   * Initializes the component and fetches upcoming sessions
-   */
   ngOnInit(): void {
     this.loadUpcomingSessions();
     this.detectUserRole();
@@ -40,11 +40,6 @@ export class UpcomingSessionsComponent implements OnInit {
   //#endregion
 
   //#region Public Methods
-  /**
-   * Formats a date string to a readable format
-   * @param dateString Date string to format
-   * @returns Formatted date and time string
-   */
   formatDateTime(dateString: string): string {
     const date = new Date(dateString);
     const dateOptions: Intl.DateTimeFormatOptions = { 
@@ -64,33 +59,61 @@ export class UpcomingSessionsComponent implements OnInit {
     return `${formattedDate} ${formattedTime}`;
   }
 
-  /**
-   * Handles edit action for a session
-   * @param session Session to edit
-   */
   onEdit(session: IUpcomingSession): void {
     console.log('Editing session:', session);
   }
 
-  /**
-   * Handles cancel action for a session
-   * @param session Session to cancel
-   */
-  onCancel(session: IUpcomingSession): void {
-    console.log('Canceling session:', session);
+  openCancelModal(session: IUpcomingSession): void {
+    this.selectedSession = session;
+    this.showCancelModal = true;
   }
 
-  /**
-   * Checks if the user is an instructor
-   * @returns True if user is instructor
-   */
+  closeCancelModal(): void {
+    this.showCancelModal = false;
+    this.selectedSession = null;
+  }
+
+  handleCancelSession(data: { sessionId: string, reason: string }): void {
+    console.log('Canceling session:', data.sessionId);
+    console.log('Reason:', data.reason);
+    
+    
+    // Mostrar modal de confirmación
+    this.showConfirmationModal = true;
+    
+    // Cerrar el modal de cancelación
+    this.closeCancelModal();
+    
+    // TODO: Cuando tengamos el servicio real:
+    // this.dashboardService.cancelSession(data.sessionId, data.reason).subscribe({
+    //   next: (response) => {
+    //     this.cancellationInfo = {
+    //       sessionTitle: this.selectedSession?.title || '',
+    //       participantsNotified: response.participantsNotified
+    //     };
+    //     this.showConfirmationModal = true;
+    //     this.closeCancelModal();
+    //     this.loadUpcomingSessions(); // Recargar lista
+    //   },
+    //   error: (error) => {
+    //     console.error('Error canceling session:', error);
+    //     // TODO: Mostrar mensaje de error
+    //   }
+    // });
+  }
+
+  closeConfirmationModal(): void {
+    this.showConfirmationModal = false;
+    this.cancellationInfo = null;
+    
+    // Recargar las sesiones para reflejar la cancelación
+    this.loadUpcomingSessions();
+  }
+
   isInstructor(): boolean {
     return this.role === 'INSTRUCTOR';
   }
 
-  /**
-   * Obtiene los datos para exportación
-   */
   getExportData(): IUpcomingSessionData[] {
     return this.sessions.map(session => ({
       title: session.title,
@@ -101,9 +124,6 @@ export class UpcomingSessionsComponent implements OnInit {
   //#endregion
 
   //#region Private Methods
-  /**
-   * Loads upcoming sessions from the API
-   */
   private loadUpcomingSessions(): void {
     this.isLoading = true;
     this.dashboardService.getIUpcomingSessions().subscribe({
@@ -118,9 +138,6 @@ export class UpcomingSessionsComponent implements OnInit {
     });
   }
 
-  /**
-   * Detects user role from learning hours endpoint
-   */
   private detectUserRole(): void {
     this.dashboardService.getLearningHours().subscribe({
       next: (data) => {

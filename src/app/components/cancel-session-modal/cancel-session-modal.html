@@ -1,0 +1,58 @@
+<div class="modal-overlay" *ngIf="isVisible" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    
+    <!-- Header -->
+    <div class="modal-header">
+      <h2>¿Cancelar sesión?</h2>
+      <button class="close-btn" (click)="closeModal()">
+        <i class='bx bx-x'></i>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      
+      <!-- Información de la sesión -->
+      <div class="session-info" *ngIf="sessionData">
+        <p><strong>Sesión:</strong> {{ sessionData.title }}</p>
+        <p><strong>Fecha:</strong> {{ formatDateTime(sessionData.scheduledDatetime) }}</p>
+      </div>
+
+      <!-- Advertencias -->
+      <div class="warning-message" *ngIf="sessionData && sessionData.participants && sessionData.participants > 0">
+        <span class="warning-icon">⚠️</span>
+        <p>Hay {{ sessionData.participants }} participante(s) inscrito(s) que serán notificados por email.</p>
+      </div>
+
+      <div class="warning-message alert" *ngIf="sessionData && (sessionData.status === 'activa' || sessionData.status === 'ACTIVE')">
+        <span class="warning-icon">⚠️</span>
+        <p>Esta sesión ya está activa. ¿Estás seguro de cancelarla? Se requerirá confirmación adicional.</p>
+      </div>
+
+      <!-- Campo de razón (opcional) -->
+      <div class="form-group">
+        <label for="cancelReason">Razón de cancelación (opcional):</label>
+        <textarea 
+          id="cancelReason"
+          [(ngModel)]="cancelReason"
+          placeholder="Ingresa la razón de cancelación..."
+          rows="3"
+          maxlength="500">
+        </textarea>
+        <small>{{ cancelReason?.length || 0 }}/500 caracteres</small>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeModal()">
+        Cancelar
+      </button>
+      <button class="btn-confirm" (click)="confirmCancellation()">
+        Confirmar cancelación
+      </button>
+    </div>
+
+  </div>
+</div>

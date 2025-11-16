@@ -11,7 +11,7 @@
         <button class="btn-edit" *ngIf="isInstructor()" (click)="onEdit(session)">
           <i class='bx bx-edit'></i>
         </button>
-        <button class="btn-cancel" (click)="onCancel(session)">
+        <button class="btn-cancel" (click)="openCancelModal(session)">
           <i class='bx bx-x'></i>
         </button>
       </div>
@@ -26,3 +26,19 @@
     <div class="spinner"></div>
   </div>
 </div>
+
+<!-- Cancel Session Modal -->
+<app-cancel-session-modal
+  [isVisible]="showCancelModal"
+  [sessionData]="selectedSession"
+  (onClose)="closeCancelModal()"
+  (onConfirm)="handleCancelSession($event)">
+</app-cancel-session-modal>
+
+<!-- Confirmation Modal -->
+<app-cancel-confirmation-modal
+  [isVisible]="showConfirmationModal"
+  [cancellationInfo]="cancellationInfo"
+  [autoCloseDuration]="1500"
+  (onClose)="closeConfirmationModal()">
+</app-cancel-confirmation-modal>

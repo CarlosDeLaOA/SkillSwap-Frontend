@@ -20,6 +20,7 @@ import { VerifyEmailComponent } from './pages/verify-email/verify-email.componen
 import { LandingskillswapComponent } from './pages/landingskillswap/landingskillswap.component';
 
 
+
 export const routes: Routes = [
   {
     path: 'login',
