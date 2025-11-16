@@ -118,6 +118,15 @@ export const routes: Routes = [
         showInSidebar: false
       },
        },
+        {
+        path: 'create-session',
+        component: CreateSessionComponent,
+        data: {
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+          name: 'Crear Sesión',
+          showInSidebar: false
+        }
+      },
     ],
   },
   { path: '**', redirectTo: 'login' }
