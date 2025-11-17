@@ -367,7 +367,7 @@
   }
 }
 
-// Estilos globales para asegurar dropdowns negros
+
 select {
   option {
     background-color: #000000 !important;
@@ -379,3 +379,211 @@ select {
     color: #ffffff !important;
   }
 }
+
+
+
+::ng-deep {
+  
+  .custom-datepicker {
+    width: 100%;
+    
+    .mat-mdc-text-field-wrapper {
+      background-color: rgba(0, 0, 0, 0.6) !important;
+      border-radius: 10px !important;
+      padding: 0 !important; 
+    }
+
+    .mat-mdc-form-field-flex {
+      height: 48px !important; 
+      align-items: center !important;
+    }
+
+    .mat-mdc-form-field-infix {
+      padding: 0 !important;
+      border: 0 !important;
+      min-height: 48px !important;
+      display: flex !important;
+      align-items: center !important;
+    }
+
+   
+    .mat-mdc-input-element {
+      color: #ffffff !important;
+      font-family: 'Epilogue', sans-serif !important;
+      font-size: 14px !important;
+      padding: 14px 16px !important;
+      height: 48px !important;
+      line-height: normal !important;
+      box-sizing: border-box !important;
+    }
+
+   
+    .mat-mdc-input-element::placeholder {
+      color: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border-color: rgba(255, 255, 255, 0.15) !important;
+    }
+
+    
+    &.mat-focused {
+      .mdc-notched-outline__leading,
+      .mdc-notched-outline__notch,
+      .mdc-notched-outline__trailing {
+        border-color: #6366F1 !important;
+        border-width: 2px !important;
+      }
+    }
+
+    
+    .mat-datepicker-toggle {
+      button {
+        color: rgba(255, 255, 255, 0.7) !important;
+        
+        &:hover {
+          color: #aae16b !important;
+        }
+      }
+    }
+
+    
+    .mat-mdc-form-field-label {
+      display: none !important;
+    }
+
+  
+    .mat-mdc-form-field-subscript-wrapper {
+      display: none !important;
+    }
+
+    .mat-mdc-form-field-bottom-align {
+      display: none !important;
+    }
+  }
+
+ 
+  .mat-datepicker-content {
+    background-color: #39434b !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  .mat-calendar {
+  background-color: #39434b !important;
+  color: #ffffff !important;
+  font-family: 'Epilogue', sans-serif !important;
+}
+
+.mat-calendar-header {
+  background-color: #2a3239 !important;
+  color: #ffffff !important;
+  padding: 16px !important;
+  border-radius: 12px 12px 0 0 !important;
+}
+
+.mat-calendar-period-button {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+}
+
+.mat-calendar-arrow {
+  fill: #ffffff !important;
+}
+
+.mat-calendar-previous-button,
+.mat-calendar-next-button {
+  color: #ffffff !important;
+  
+  &:hover {
+    background-color: rgba(170, 225, 107, 0.1) !important;
+  }
+}
+
+.mat-calendar-content {
+  padding: 0 8px 0px 8px !important; 
+  background-color: #39434b !important;
+}
+
+.mat-calendar-table-header {
+  th {
+    color: rgba(255, 255, 255, 0.5) !important;
+    font-weight: 600 !important;
+    font-size: 12px !important;
+    padding: 8px 0 !important;
+  }
+}
+
+ 
+  .mat-calendar-body-cell-content {
+    color: #ffffff !important;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+  }
+
+ 
+  .mat-calendar-body-today:not(.mat-calendar-body-selected) {
+    border-color: #aae16b !important;
+    border-width: 2px !important;
+    
+    .mat-calendar-body-cell-content {
+      color: #aae16b !important;
+    }
+  }
+
+  
+  .mat-calendar-body-selected {
+    background-color: #504ab7 !important;
+    
+    .mat-calendar-body-cell-content {
+      background-color: #504ab7 !important;
+      color: #ffffff !important;
+      font-weight: 700 !important;
+    }
+  }
+
+ 
+  .mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover {
+    .mat-calendar-body-cell-content {
+      background-color: rgba(170, 225, 107, 0.15) !important;
+    }
+  }
+
+  
+  .mat-calendar-body-disabled {
+    .mat-calendar-body-cell-content {
+      color: rgba(255, 255, 255, 0.3) !important;
+      cursor: not-allowed !important;
+    }
+  }
+
+  
+  .mat-calendar-body-label {
+    color: rgba(255, 255, 255, 0.4) !important;
+  }
+
+
+  .mat-datepicker-actions {
+    background-color: #2a3239 !important;
+    padding: 12px !important;
+    border-radius: 0 0 12px 12px !important;
+    
+    button {
+      color: #aae16b !important;
+      font-weight: 600 !important;
+    }
+  }
+
+ 
+  .mat-datepicker-toggle-default-icon {
+    display: none !important;
+  }
+
+  .bx-calendar {
+    font-size: 20px !important;
+  }
+} 
