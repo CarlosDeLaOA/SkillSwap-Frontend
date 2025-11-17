@@ -7,14 +7,14 @@
     </div>
   </div>
 
-
   <div class="header" *ngIf="!isLoadingProfile">
     <h1>Crear una nueva sesión</h1>
   </div>
 
-
-  <div *ngIf="showNotification" class="notification" [class.success]="notificationType === 'success'" 
-       [class.error]="notificationType === 'error'" [class.warning]="notificationType === 'warning'">
+  <div *ngIf="showNotification" class="notification" 
+       [class.success]="notificationType === 'success'" 
+       [class.error]="notificationType === 'error'" 
+       [class.warning]="notificationType === 'warning'">
     <div class="notification-content">
       <i class='bx' [ngClass]="{
         'bx-check-circle': notificationType === 'success',
@@ -28,7 +28,6 @@
     </button>
   </div>
 
-
   <form class="session-form" (ngSubmit)="onSubmit()" *ngIf="!isLoadingProfile">
     
     <div class="form-wrapper">
@@ -36,7 +35,6 @@
       <div class="form-section">
         <h2>Información general</h2>
         
-    
         <div class="form-group full-width">
           <label for="title">Título</label>
           <input 
@@ -53,7 +51,6 @@
           </small>
         </div>
 
-     
         <div class="form-group full-width">
           <label for="description">Descripción</label>
           <textarea 
@@ -70,13 +67,12 @@
         </div>
       </div>
 
-  
       <div class="form-section">
         <h2>Especificaciones de la sesión</h2>
         
-     
+       
         <div class="form-row-two">
-        
+          
           <div class="form-group">
             <label for="category">Categoría:</label>
             <select 
@@ -91,23 +87,31 @@
             </select>
           </div>
 
-          
           <div class="form-group">
             <label for="scheduledDate">Fecha</label>
-            <input 
-              type="date" 
-              id="scheduledDate" 
-              name="scheduledDate"
-              [(ngModel)]="sessionDate"
-              (blur)="validateScheduledDatetime()"
-              [class.invalid]="!validation.scheduledDatetime.isValid">
-            <small *ngIf="!validation.scheduledDatetime.isValid && sessionDate" class="error-text">
+            <mat-form-field appearance="outline" class="custom-datepicker">
+              <input 
+                matInput 
+                [matDatepicker]="picker"
+                [formControl]="dateControl"
+                [min]="minDate"
+                (dateChange)="validateScheduledDatetime()"
+                placeholder="Selecciona una fecha"
+                readonly>
+              <mat-datepicker-toggle matIconSuffix [for]="picker">
+                <mat-icon matDatepickerToggleIcon>
+                  <i class='bx bx-calendar'></i>
+                </mat-icon>
+              </mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+            <small *ngIf="!validation.scheduledDatetime.isValid" class="error-text">
               {{ validation.scheduledDatetime.error }}
             </small>
           </div>
+          
         </div>
-
-
+       
         <div class="form-row-skills-time">
          
           <div class="form-group">
@@ -128,7 +132,6 @@
             </small>
           </div>
 
-      
           <div class="form-group time-group">
             <label for="sessionHour">Hora:</label>
             <select
@@ -140,7 +143,6 @@
             </select>
           </div>
 
-        
           <div class="form-group time-group">
             <label for="sessionMinute">&nbsp;</label>
             <select
@@ -152,7 +154,6 @@
             </select>
           </div>
 
-     
           <div class="form-group">
             <label for="durationMinutes">Duración:</label>
             <select
@@ -173,7 +174,9 @@
               {{ validation.durationMinutes.error }}
             </small>
           </div>
+          
         </div>
+     
 
         <input type="hidden" [(ngModel)]="sessionData.language" name="language" value="es">
         <input type="hidden" [(ngModel)]="sessionData.maxCapacity" name="maxCapacity" value="10">
