@@ -1,0 +1,51 @@
+<div class="modal-overlay" *ngIf="isVisible" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    
+    <!-- Header -->
+    <div class="modal-header">
+      <h2>¿Cancelar registro?</h2>
+      <button class="close-btn" (click)="closeModal()">
+        <i class='bx bx-x'></i>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      
+      <!-- Información del registro -->
+      <div class="session-info" *ngIf="bookingData">
+        <p><strong>Sesión:</strong> {{ bookingData.sessionTitle }}</p>
+        <p><strong>Fecha:</strong> {{ formatDateTime(bookingData.scheduledDatetime) }}</p>
+        <p *ngIf="bookingData.type === 'GROUP'"><strong>Tipo:</strong> Registro grupal</p>
+      </div>
+
+      <!-- Advertencia grupal -->
+      <div class="warning-message" *ngIf="bookingData && bookingData.type === 'GROUP'">
+        <span class="warning-icon">⚠️</span>
+        <p>Esta es una cancelación grupal. Se cancelarán los registros de todos los miembros de tu comunidad.</p>
+      </div>
+
+      <!-- Advertencia sesión activa -->
+      <div class="warning-message alert" *ngIf="bookingData && bookingData.status === 'ACTIVE'">
+        <span class="warning-icon">⚠️</span>
+        <p>La sesión ya está activa. No podrás cancelar tu registro una vez iniciada.</p>
+      </div>
+
+      <p class="info-text">
+        Al cancelar tu registro, se liberará tu cupo y el instructor será notificado por email.
+      </p>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeModal()">
+        No cancelar
+      </button>
+      <button class="btn-confirm" (click)="confirmCancellation()">
+        Sí, cancelar registro
+      </button>
+    </div>
+
+  </div>
+</div>

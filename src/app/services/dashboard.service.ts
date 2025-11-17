@@ -104,5 +104,24 @@ getMonthlyAttendance(): Observable<IMonthlyAttendance[]> {
       'Content-Type': 'application/json'
     });
   }
+
+cancelSession(sessionId: number, reason?: string): Observable<any> {
+  const headers = this.getAuthHeaders();
+  const url = `http://localhost:8080/learning-sessions/${sessionId}/cancel`;
+  const body = reason ? { reason } : {};
+  
+  return this.http.put<any>(url, body, { headers }).pipe(
+    map(response => response.data || response)
+  );
+}
+
+cancelBooking(bookingId: number): Observable<any> {
+  const headers = this.getAuthHeaders();
+  const url = `http://localhost:8080/api/bookings/${bookingId}/cancel`;
+  
+  return this.http.put<any>(url, {}, { headers }).pipe(
+    map(response => response.data || response)
+  );
+}
   //#endregion
 }

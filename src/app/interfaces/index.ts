@@ -201,6 +201,9 @@ export interface IUpcomingSession {
   status: string;
   videoCallLink: string;
   skillName: string;
+  bookingId?: number;  // ← NUEVO - ID del booking del usuario
+  bookingType?: 'INDIVIDUAL' | 'GROUP';  // ← NUEVO - Tipo de registro
+  currentParticipants?: number;  // ← NUEVO - Para instructores
 }
 
 /**

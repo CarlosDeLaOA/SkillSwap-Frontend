@@ -11,7 +11,7 @@
         <button class="btn-edit" *ngIf="isInstructor()" (click)="onEdit(session)">
           <i class='bx bx-edit'></i>
         </button>
-        <button class="btn-cancel" (click)="onCancel(session)">
+        <button class="btn-cancel" (click)="openCancelModal(session)">
           <i class='bx bx-x'></i>
         </button>
       </div>
@@ -26,3 +26,38 @@
     <div class="spinner"></div>
   </div>
 </div>
+
+<!-- Modal para INSTRUCTORES (cancelar sesión completa) -->
+<app-cancel-session-modal
+  [isVisible]="showCancelSessionModal" 
+  [sessionData]="{
+    id: selectedSession?.id || 0,
+    title: selectedSession?.title || '',
+    scheduledDatetime: selectedSession?.scheduledDatetime || '',
+    status: selectedSession?.status,
+    participants: selectedSession?.currentParticipants
+  }"
+  (onClose)="closeCancelSessionModal()"  
+  (onConfirm)="handleCancelSession($event)">
+</app-cancel-session-modal>
+
+<!-- Modal para LEARNERS (cancelar registro/booking) -->
+<app-cancel-booking-modal
+  [isVisible]="showCancelBookingModal"   
+  [bookingData]="{
+    id: selectedSession?.bookingId || 0,
+    sessionTitle: selectedSession?.title || '',
+    scheduledDatetime: selectedSession?.scheduledDatetime || '',
+    status: selectedSession?.status,
+    type: selectedSession?.bookingType
+  }"
+  (onClose)="closeCancelBookingModal()"   
+  (onConfirm)="handleCancelBooking($event)">
+</app-cancel-booking-modal>
+
+<!-- Modal de confirmación (para ambos roles) -->
+<app-cancel-confirmation-modal
+  [isVisible]="showConfirmationModal"
+  [cancellationInfo]="cancellationInfo"
+  (onClose)="closeConfirmationModal()">
+</app-cancel-confirmation-modal>

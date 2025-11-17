@@ -21,6 +21,7 @@ import { VerifyEmailComponent } from './pages/verify-email/verify-email.componen
 import { LandingskillswapComponent } from './pages/landingskillswap/landingskillswap.component';
 import { CreateSessionComponent } from './pages/create-session/create-session.component';
 
+
 export const routes: Routes = [
   {
     path: 'login',
