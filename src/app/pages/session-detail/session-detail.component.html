@@ -32,7 +32,7 @@
       </p>
     </div>
 
-    <!-- Success Message -->
+    <!-- Success Message para Registro -->
     <div *ngIf="registrationSuccess" class="alert alert-success alert-dismissible fade show" role="alert">
       <i class='bx bx-check-circle me-2'></i>
       <strong>¡Registro exitoso!</strong> 
@@ -42,6 +42,20 @@
       <span *ngIf="registrationType === 'group'">
         Tu comunidad se ha registrado correctamente. Todos los miembros recibirán un correo con los detalles.
       </span>
+    </div>
+
+    <!-- Success Message para Waitlist -->
+    <div *ngIf="waitlistSuccess" class="alert alert-success alert-dismissible fade show" role="alert">
+      <i class='bx bx-check-circle me-2'></i>
+      <strong>¡Unido a lista de espera!</strong> 
+      Te notificaremos por email cuando se libere un cupo en esta sesión.
+    </div>
+
+    <!-- Success Message para Leave Waitlist -->
+    <div *ngIf="showLeaveSuccess" class="alert alert-warning alert-dismissible fade show" role="alert">
+      <i class='bx bx-check-circle me-2'></i>
+      <strong>¡Has salido de la lista de espera!</strong> 
+      Ya no recibirás notificaciones sobre esta sesión.
     </div>
 
     <!-- Error Message -->
@@ -73,12 +87,23 @@
             <strong>Categoría de la sesión:</strong>
             <span>{{ session.skill?.knowledgeArea?.name || 'Categoría' }}</span>
           </div>
+
+          <div class="detail-item" *ngIf="!isSessionFull">
+            <strong>Cupos disponibles:</strong>
+            <span class="cupos-badge">{{ getAvailableSpots() }}</span>
+          </div>
+
+          <div class="detail-item" *ngIf="isSessionFull">
+            <strong>Estado:</strong>
+            <span class="session-full-badge">Sesión llena</span>
+          </div>
         </div>
       </div>
 
       <!-- Right Side - Registration -->
       <div class="registration-section">
-        <div class="registration-type">
+        <!-- Solo mostrar opciones de registro si NO está llena -->
+        <div class="registration-type" *ngIf="!isSessionFull">
           <h3>Tipo de registro:</h3>
           
           <div class="radio-group">
@@ -104,8 +129,8 @@
           </div>
         </div>
 
-        <!-- Community Selector (solo para registro grupal) -->
-        <div *ngIf="registrationType === 'group'" class="community-selector">
+        <!-- Community Selector (solo para registro grupal y si NO está llena) -->
+        <div *ngIf="registrationType === 'group' && !isSessionFull" class="community-selector">
           <h4>Selecciona tu comunidad:</h4>
           
           <div *ngIf="isLoadingCommunities" class="loading-communities">
@@ -131,6 +156,15 @@
           </div>
         </div>
 
+        <!-- Waitlist Info (cuando está llena) -->
+        <div *ngIf="isSessionFull" class="waitlist-info">
+          <div class="waitlist-message">
+            <i class='bx bx-info-circle'></i>
+            <h4>Esta sesión está llena</h4>
+            <p>Únete a la lista de espera y te notificaremos cuando se libere un cupo.</p>
+          </div>
+        </div>
+
         <!-- Illustration -->
         <div class="illustration">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="250" height="200">
@@ -144,17 +178,24 @@
             <line x1="140" y1="130" x2="250" y2="130" stroke="#aae16b" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
             <line x1="140" y1="150" x2="230" y2="150" stroke="#aae16b" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
             
-            <!-- Checkmark circular -->
-            <circle cx="200" cy="190" r="25" fill="#aae16b"/>
-            <path d="M 190 190 L 197 197 L 210 180" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Checkmark circular o Lista (según estado) -->
+            <g *ngIf="!isSessionFull">
+              <circle cx="200" cy="190" r="25" fill="#aae16b"/>
+              <path d="M 190 190 L 197 197 L 210 180" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
             
-            <!-- Personas (iconos simplificados) - Más si es grupal -->
-            <g *ngIf="registrationType === 'individual'">
+            <g *ngIf="isSessionFull">
+              <circle cx="200" cy="190" r="25" fill="#ffa500"/>
+              <text x="200" y="198" text-anchor="middle" font-size="20" fill="white" font-weight="bold">...</text>
+            </g>
+            
+            <!-- Personas (iconos simplificados) -->
+            <g *ngIf="registrationType === 'individual' && !isSessionFull">
               <circle cx="80" cy="180" r="15" fill="#504ab7" opacity="0.6"/>
               <ellipse cx="80" cy="210" rx="20" ry="12" fill="#504ab7" opacity="0.6"/>
             </g>
             
-            <g *ngIf="registrationType === 'group'">
+            <g *ngIf="registrationType === 'group' && !isSessionFull">
               <circle cx="60" cy="180" r="12" fill="#504ab7" opacity="0.6"/>
               <ellipse cx="60" cy="205" rx="16" ry="10" fill="#504ab7" opacity="0.6"/>
               
@@ -174,8 +215,9 @@
           </svg>
         </div>
 
-        <!-- Register Button -->
+        <!-- Register Button (cuando NO está llena) -->
         <button 
+          *ngIf="!isSessionFull"
           class="btn-register" 
           (click)="registerToSession()"
           [disabled]="isRegistering || registrationSuccess || (registrationType === 'group' && !selectedCommunityId)">
@@ -186,6 +228,67 @@
           <span *ngIf="registrationSuccess">
             <i class='bx bx-check'></i> Registrado
           </span>
+        </button>
+
+        <!-- Waitlist Button (cuando está llena y NO está en lista) -->
+        <button 
+          *ngIf="isSessionFull && !userWaitlistBooking"
+          class="btn-waitlist" 
+          (click)="joinWaitlist()"
+          [disabled]="isJoiningWaitlist || waitlistSuccess">
+          <span *ngIf="!isJoiningWaitlist && !waitlistSuccess">
+            <i class='bx bx-list-ul me-2'></i>
+            Unirse a lista de espera
+          </span>
+          <span *ngIf="isJoiningWaitlist">
+            <i class='bx bx-loader-alt bx-spin'></i> Uniéndose...
+          </span>
+          <span *ngIf="waitlistSuccess">
+            <i class='bx bx-check'></i> En lista de espera
+          </span>
+        </button>
+
+        <!-- Mensaje cuando está en lista de espera -->
+        <div *ngIf="userWaitlistBooking" class="alert alert-info">
+          <i class='bx bx-info-circle me-2'></i>
+          Estás en la lista de espera. Te notificaremos cuando se libere un cupo.
+        </div>
+
+        <!-- Leave Waitlist Button (cuando YA está en lista de espera) -->
+        <button 
+          *ngIf="userWaitlistBooking"
+          class="btn-leave-waitlist" 
+          (click)="showLeaveConfirmation()"
+          [disabled]="isLeavingWaitlist">
+          <span *ngIf="!isLeavingWaitlist">
+            <i class='bx bx-x-circle me-2'></i>
+            Salir de lista de espera
+          </span>
+          <span *ngIf="isLeavingWaitlist">
+            <i class='bx bx-loader-alt bx-spin'></i> Saliendo...
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de confirmación para salir de lista de espera -->
+  <div *ngIf="showLeaveConfirmModal" class="modal-overlay" (click)="cancelLeaveWaitlist()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <i class='bx bx-error-circle'></i>
+        <h3>¿Estás seguro?</h3>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro que deseas salir de la lista de espera?</p>
+        <p class="modal-warning">Ya no recibirás notificaciones cuando se libere un cupo en esta sesión.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="cancelLeaveWaitlist()">
+          Cancelar
+        </button>
+        <button class="btn-confirm" (click)="confirmLeaveWaitlist()">
+          Sí, salir
         </button>
       </div>
     </div>
