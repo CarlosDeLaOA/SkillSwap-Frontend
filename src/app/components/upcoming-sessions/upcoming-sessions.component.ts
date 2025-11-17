@@ -3,12 +3,18 @@ import { CommonModule } from '@angular/common';
 import { DashboardService } from '../../services/dashboard.service';
 import { IUpcomingSession, IUpcomingSessionData } from '../../interfaces';
 import { CancelSessionModalComponent } from '../cancel-session-modal/cancel-session-modal';
+import { CancelBookingModalComponent } from '../cancel-booking-modal/cancel-booking-modal.component'; // ← SIN .component
 import { CancelConfirmationModalComponent, CancellationInfo } from '../cancel-confirmation-modal/cancel-confirmation-modal';
 
 @Component({
   selector: 'app-upcoming-sessions',
   standalone: true,
-  imports: [CommonModule, CancelSessionModalComponent, CancelConfirmationModalComponent],
+  imports: [
+    CommonModule, 
+    CancelSessionModalComponent,
+    CancelBookingModalComponent,
+    CancelConfirmationModalComponent
+  ],
   templateUrl: './upcoming-sessions.component.html',
   styleUrls: ['./upcoming-sessions.component.scss']
 })
@@ -19,11 +25,11 @@ export class UpcomingSessionsComponent implements OnInit {
   role: 'INSTRUCTOR' | 'LEARNER' = 'LEARNER';
   isLoading: boolean = true;
   
-  // Cancel modal properties
-  showCancelModal: boolean = false;
+  showCancelSessionModal: boolean = false;
+  showCancelBookingModal: boolean = false;
+  
   selectedSession: IUpcomingSession | null = null;
   
-  // Confirmation modal properties
   showConfirmationModal: boolean = false;
   cancellationInfo: CancellationInfo | null = null;
   //#endregion
@@ -65,43 +71,66 @@ export class UpcomingSessionsComponent implements OnInit {
 
   openCancelModal(session: IUpcomingSession): void {
     this.selectedSession = session;
-    this.showCancelModal = true;
+    
+    if (this.role === 'INSTRUCTOR') {
+      this.showCancelSessionModal = true;
+    } else {
+      this.showCancelBookingModal = true;
+    }
   }
 
-  closeCancelModal(): void {
-    this.showCancelModal = false;
+  closeCancelSessionModal(): void {
+    this.showCancelSessionModal = false;
+    this.selectedSession = null;
+  }
+
+  closeCancelBookingModal(): void {
+    this.showCancelBookingModal = false;
     this.selectedSession = null;
   }
 
   handleCancelSession(data: { sessionId: string, reason: string }): void {
-    console.log('Canceling session:', data.sessionId);
-    console.log('Reason:', data.reason);
+    console.log('🎓 [INSTRUCTOR] Canceling session:', data.sessionId);
     
-    // Llamar al servicio real
     this.dashboardService.cancelSession(Number(data.sessionId), data.reason).subscribe({
-      next: (response) => {
-        console.log('Session cancelled successfully', response);
+      next: (response: any) => {  // ← Tipado explícito
+        console.log('✅ Session cancelled successfully');
         
-        // Preparar info para el modal de confirmación
         this.cancellationInfo = {
           sessionTitle: this.selectedSession?.title || '',
           participantsNotified: response.participantsNotified || 0
         };
         
-        // Mostrar modal de confirmación
         this.showConfirmationModal = true;
-        
-        // Cerrar modal de cancelación
-        this.closeCancelModal();
+        this.closeCancelSessionModal();
       },
-      error: (error) => {
-        console.error('Error canceling session:', error);
+      error: (error: any) => {  // ← Tipado explícito
+        console.error('❌ Error canceling session:', error);
+        alert(`Error: ${error.error?.message || 'Error al cancelar la sesión'}`);
+        this.closeCancelSessionModal();
+      }
+    });
+  }
+
+  handleCancelBooking(bookingId: number): void {
+    console.log('🎒 [LEARNER] Canceling booking:', bookingId);
+    
+    this.dashboardService.cancelBooking(bookingId).subscribe({
+      next: (response: any) => {  // ← Tipado explícito
+        console.log('✅ Booking cancelled successfully');
         
-        const errorMessage = error.error?.message || error.message || 'Error al cancelar la sesión';
-        alert(`Error: ${errorMessage}`);
+        this.cancellationInfo = {
+          sessionTitle: this.selectedSession?.title || '',
+          participantsNotified: 0
+        };
         
-        // Cerrar el modal de cancelación
-        this.closeCancelModal();
+        this.showConfirmationModal = true;
+        this.closeCancelBookingModal();
+      },
+      error: (error: any) => {  // ← Tipado explícito
+        console.error('❌ Error canceling booking:', error);
+        alert(`Error: ${error.error?.message || 'Error al cancelar el registro'}`);
+        this.closeCancelBookingModal();
       }
     });
   }
@@ -109,8 +138,6 @@ export class UpcomingSessionsComponent implements OnInit {
   closeConfirmationModal(): void {
     this.showConfirmationModal = false;
     this.cancellationInfo = null;
-    
-    // IMPORTANTE: Recargar las sesiones para reflejar la cancelación
     this.loadUpcomingSessions();
   }
 
@@ -135,7 +162,7 @@ export class UpcomingSessionsComponent implements OnInit {
         this.sessions = data;
         this.isLoading = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error loading upcoming sessions:', error);
         this.isLoading = false;
       }
@@ -147,7 +174,7 @@ export class UpcomingSessionsComponent implements OnInit {
       next: (data) => {
         this.role = data.role;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error detecting user role:', error);
       }
     });

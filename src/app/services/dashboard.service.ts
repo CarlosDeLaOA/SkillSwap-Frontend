@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ILearningHoursResponse, IUpcomingSession, ICredential, IFeedback, IAccountBalance, IMonthlyAchievement, ISkillSessionStats, IMonthlyAttendance } from '../interfaces';
+import { ILearningHoursResponse, IUpcomingSession, ICredential, IFeedback, IAccountBalance, IMonthlyAchievement, ISkillSessionStats, IMonthlyAttendance    } from '../interfaces';
 
 /**
  * Service to handle dashboard-related API calls
@@ -60,56 +60,35 @@ export class DashboardService {
   }
 
   /**
-   * Gets account balance
-   * @returns Observable with account balance data
-   */
-  getAccountBalance(): Observable<IAccountBalance> {
-    const headers = this.getAuthHeaders();
-    return this.http.get<IAccountBalance>(`${this.API_URL}/account-balance`, { headers });
-  }
+ * Gets account balance
+ * @returns Observable with account balance data
+ */
+getAccountBalance(): Observable<IAccountBalance> {
+  const headers = this.getAuthHeaders();
+  return this.http.get<IAccountBalance>(`${this.API_URL}/account-balance`, { headers });
+}
 
-  /**
-   * Gets monthly achievements for last 4 months
-   * @returns Observable with monthly achievements list
-   */
-  getMonthlyAchievements(): Observable<IMonthlyAchievement[]> {
-    const headers = this.getAuthHeaders();
-    return this.http.get<IMonthlyAchievement[]>(`${this.API_URL}/monthly-achievements`, { headers });
-  }
+/**
+ * Gets monthly achievements for last 4 months
+ * @returns Observable with monthly achievements list
+ */
+getMonthlyAchievements(): Observable<IMonthlyAchievement[]> {
+  const headers = this.getAuthHeaders();
+  return this.http.get<IMonthlyAchievement[]>(`${this.API_URL}/monthly-achievements`, { headers });
+}
 
-  /**
-   * Gets skill session statistics
-   * @returns Observable with skill session stats list
-   */
-  getSkillSessionStats(): Observable<ISkillSessionStats[]> {
-    const headers = this.getAuthHeaders();
-    return this.http.get<ISkillSessionStats[]>(`${this.API_URL}/skill-session-stats`, { headers });
-  }
-
-  /**
-   * Gets monthly attendance
-   * @returns Observable with monthly attendance list
-   */
-  getMonthlyAttendance(): Observable<IMonthlyAttendance[]> {
+/**
+ * Gets skill session statistics
+ * @returns Observable with skill session stats list
+ */
+getSkillSessionStats(): Observable<ISkillSessionStats[]> {
+  const headers = this.getAuthHeaders();
+  return this.http.get<ISkillSessionStats[]>(`${this.API_URL}/skill-session-stats`, { headers });
+}
+getMonthlyAttendance(): Observable<IMonthlyAttendance[]> {
     const headers = this.getAuthHeaders();
     return this.http.get<any>(`${this.API_URL}/monthly-attendance`, { headers })
       .pipe(map(res => res?.data ?? res));
-  }
-
-  /**
-   * Cancels a learning session
-   * @param sessionId ID of the session to cancel
-   * @param reason Cancellation reason (optional)
-   * @returns Observable with cancellation response
-   */
-  cancelSession(sessionId: number, reason?: string): Observable<any> {
-    const headers = this.getAuthHeaders();
-    const url = `http://localhost:8080/learning-sessions/${sessionId}/cancel`;
-    const body = reason ? { reason } : {};
-    
-    return this.http.put<any>(url, body, { headers }).pipe(
-      map(response => response.data)
-    );
   }
   //#endregion
 
@@ -125,5 +104,24 @@ export class DashboardService {
       'Content-Type': 'application/json'
     });
   }
+
+cancelSession(sessionId: number, reason?: string): Observable<any> {
+  const headers = this.getAuthHeaders();
+  const url = `http://localhost:8080/learning-sessions/${sessionId}/cancel`;
+  const body = reason ? { reason } : {};
+  
+  return this.http.put<any>(url, body, { headers }).pipe(
+    map(response => response.data || response)
+  );
+}
+
+cancelBooking(bookingId: number): Observable<any> {
+  const headers = this.getAuthHeaders();
+  const url = `http://localhost:8080/api/bookings/${bookingId}/cancel`;
+  
+  return this.http.put<any>(url, {}, { headers }).pipe(
+    map(response => response.data || response)
+  );
+}
   //#endregion
 }

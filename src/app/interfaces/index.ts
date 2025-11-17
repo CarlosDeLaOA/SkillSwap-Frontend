@@ -201,6 +201,9 @@ export interface IUpcomingSession {
   status: string;
   videoCallLink: string;
   skillName: string;
+  bookingId?: number;  // ← NUEVO - ID del booking del usuario
+  bookingType?: 'INDIVIDUAL' | 'GROUP';  // ← NUEVO - Tipo de registro
+  currentParticipants?: number;  // ← NUEVO - Para instructores
 }
 
 /**
@@ -263,17 +266,6 @@ export interface ICreateSessionRequest {
   durationMinutes: number;
   language: string;
   maxCapacity: number;
-}
-
-/**
- * Interface for session cancellation response
- */
-export interface ICancelSessionResponse {
-  sessionId: number;
-  sessionTitle: string;
-  participantsNotified: number;
-  status: string;
-  cancellationDate: string;
 }
 
 export interface ILearningSession {

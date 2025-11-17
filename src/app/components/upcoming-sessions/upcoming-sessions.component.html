@@ -27,18 +27,37 @@
   </div>
 </div>
 
-<!-- Cancel Session Modal -->
+<!-- Modal para INSTRUCTORES (cancelar sesión completa) -->
 <app-cancel-session-modal
-  [isVisible]="showCancelModal"
-  [sessionData]="selectedSession"
-  (onClose)="closeCancelModal()"
+  [isVisible]="showCancelSessionModal" 
+  [sessionData]="{
+    id: selectedSession?.id || 0,
+    title: selectedSession?.title || '',
+    scheduledDatetime: selectedSession?.scheduledDatetime || '',
+    status: selectedSession?.status,
+    participants: selectedSession?.currentParticipants
+  }"
+  (onClose)="closeCancelSessionModal()"  
   (onConfirm)="handleCancelSession($event)">
 </app-cancel-session-modal>
 
-<!-- Confirmation Modal -->
+<!-- Modal para LEARNERS (cancelar registro/booking) -->
+<app-cancel-booking-modal
+  [isVisible]="showCancelBookingModal"   
+  [bookingData]="{
+    id: selectedSession?.bookingId || 0,
+    sessionTitle: selectedSession?.title || '',
+    scheduledDatetime: selectedSession?.scheduledDatetime || '',
+    status: selectedSession?.status,
+    type: selectedSession?.bookingType
+  }"
+  (onClose)="closeCancelBookingModal()"   
+  (onConfirm)="handleCancelBooking($event)">
+</app-cancel-booking-modal>
+
+<!-- Modal de confirmación (para ambos roles) -->
 <app-cancel-confirmation-modal
   [isVisible]="showConfirmationModal"
   [cancellationInfo]="cancellationInfo"
-  [autoCloseDuration]="1500"
   (onClose)="closeConfirmationModal()">
 </app-cancel-confirmation-modal>
