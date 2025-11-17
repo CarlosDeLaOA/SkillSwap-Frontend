@@ -533,3 +533,27 @@ export interface ISessionValidation {
     error: string;
   };
 }
+
+/**
+ * Request para unirse a lista de espera
+ */
+export interface IJoinWaitlistRequest {
+  learningSessionId: number;
+}
+
+/**
+ * Response al unirse a lista de espera
+ */
+export interface IWaitlistResponse {
+  success: boolean;
+  message: string;
+  data: IBooking;
+}
+
+/**
+ * Response al salir de lista de espera
+ */
+export interface ILeaveWaitlistResponse {
+  success: boolean;
+  message: string;
+}
