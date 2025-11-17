@@ -1,3 +1,4 @@
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -6,7 +7,10 @@ import {
   IBookingsListResponse, 
   ICreateBookingRequest,
   IGroupBookingResponse,
-  ICreateGroupBookingRequest
+  ICreateGroupBookingRequest,
+  IJoinWaitlistRequest,
+  IWaitlistResponse,
+  ILeaveWaitlistResponse
 } from '../interfaces';
 
 @Injectable({
@@ -32,11 +36,11 @@ export class BookingService {
   }
 
   /**
-   * Obtiene todos los bookings del usuario autenticado
-   */
-  getMyBookings(): Observable<IBookingsListResponse> {
-    return this.http.get<IBookingsListResponse>(this.apiUrl);
-  }
+ * Obtiene los bookings del usuario actual
+ */
+getMyBookings(): Observable<any> {
+  return this.http.get<any>(`${this.apiUrl}/my-bookings`);
+}
 
   /**
    * Cancela un booking
@@ -44,4 +48,20 @@ export class BookingService {
   cancelBooking(bookingId: number): Observable<IBookingResponse> {
     return this.http.delete<IBookingResponse>(`${this.apiUrl}/${bookingId}`);
   }
+
+  /**
+ * Une al usuario a la lista de espera de una sesión
+ */
+joinWaitlist(request: IJoinWaitlistRequest): Observable<IWaitlistResponse> {
+  return this.http.post<IWaitlistResponse>(`${this.apiUrl}/waitlist`, request);
+}
+
+/**
+ * Permite al usuario salir de la lista de espera
+ */
+leaveWaitlist(bookingId: number): Observable<ILeaveWaitlistResponse> {
+  return this.http.delete<ILeaveWaitlistResponse>(`${this.apiUrl}/waitlist/${bookingId}`);
+}
+
+
 }

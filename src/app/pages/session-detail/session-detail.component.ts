@@ -34,6 +34,15 @@ export class SessionDetailComponent implements OnInit {
   selectedCommunityId: number | null = null;
   isLoadingCommunities: boolean = false;
 
+  // Waitlist
+  isSessionFull: boolean = false;
+  isJoiningWaitlist: boolean = false;
+  waitlistSuccess: boolean = false;
+  userWaitlistBooking: any = null;
+  isLeavingWaitlist: boolean = false;
+  showLeaveSuccess: boolean = false;
+  showLeaveConfirmModal: boolean = false;
+
   languageNames: { [key: string]: string } = {
     'es': 'Español',
     'en': 'Inglés',
@@ -67,6 +76,12 @@ export class SessionDetailComponent implements OnInit {
         
         if (!this.session) {
           this.errorMessage = 'Sesión no encontrada';
+        } else {
+          // Detectar si la sesión está llena
+          this.isSessionFull = this.getAvailableSpots() === 0;
+          
+          // Detectar si el usuario ya está en lista de espera
+          this.checkUserWaitlistStatus();
         }
         
         this.isLoading = false;
@@ -75,6 +90,30 @@ export class SessionDetailComponent implements OnInit {
         console.error('Error loading session:', error);
         this.errorMessage = 'Error al cargar la sesión';
         this.isLoading = false;
+      }
+    });
+  }
+
+  /**
+   * Verifica si el usuario actual ya está en lista de espera
+   */
+  private checkUserWaitlistStatus(): void {
+    if (!this.session) return;
+    
+    // Obtener todos los bookings del usuario
+    this.bookingService.getMyBookings().subscribe({
+      next: (response) => {
+        const myBookings = response.data || [];
+        
+        // Buscar si tiene un booking WAITING para esta sesión
+        this.userWaitlistBooking = myBookings.find(
+          (b: any) => b.learningSession?.id === this.sessionId && b.status === 'WAITING'
+        ) || null;
+        
+        console.log('✅ Usuario en lista de espera:', this.userWaitlistBooking);
+      },
+      error: (error) => {
+        console.error('❌ Error al verificar estado de lista de espera:', error);
       }
     });
   }
@@ -92,43 +131,42 @@ export class SessionDetailComponent implements OnInit {
     }
   }
 
- /**
- * Carga las comunidades del usuario
- */
-loadCommunities(): void {
-  this.isLoadingCommunities = true;
-  this.registrationError = '';
-  
-  // Verificar que hay token
-  const token = localStorage.getItem('access_token');
-  console.log('🔑 Verificando token:', token ? 'Existe' : 'No existe');
-  
-  if (!token) {
-    this.isLoadingCommunities = false;
-    this.registrationError = 'No hay sesión activa. Por favor, inicia sesión nuevamente.';
-    console.error('❌ No hay token');
-    return;
-  }
-  
-  console.log('📡 Haciendo petición a comunidades...');
-  
-  this.communityService.getMyCommunities().subscribe({
-    next: (response) => {
-      console.log('✅ Comunidades cargadas:', response);
-      this.communities = response.data || [];
+  /**
+   * Carga las comunidades del usuario
+   */
+  loadCommunities(): void {
+    this.isLoadingCommunities = true;
+    this.registrationError = '';
+    
+    const token = localStorage.getItem('access_token');
+    console.log('🔑 Verificando token:', token ? 'Existe' : 'No existe');
+    
+    if (!token) {
       this.isLoadingCommunities = false;
-      
-      if (this.communities.length === 0) {
-        this.registrationError = 'No tienes comunidades disponibles para registro grupal.';
-      }
-    },
-    error: (error) => {
-      console.error('❌ Error loading communities:', error);
-      this.isLoadingCommunities = false;
-      this.registrationError = 'Error al cargar comunidades: ' + (error.error?.message || error.message);
+      this.registrationError = 'No hay sesión activa. Por favor, inicia sesión nuevamente.';
+      console.error('❌ No hay token');
+      return;
     }
-  });
-}
+    
+    console.log('📡 Haciendo petición a comunidades...');
+    
+    this.communityService.getMyCommunities().subscribe({
+      next: (response) => {
+        console.log('✅ Comunidades cargadas:', response);
+        this.communities = response.data || [];
+        this.isLoadingCommunities = false;
+        
+        if (this.communities.length === 0) {
+          this.registrationError = 'No tienes comunidades disponibles para registro grupal.';
+        }
+      },
+      error: (error) => {
+        console.error('❌ Error loading communities:', error);
+        this.isLoadingCommunities = false;
+        this.registrationError = 'Error al cargar comunidades: ' + (error.error?.message || error.message);
+      }
+    });
+  }
 
   /**
    * Maneja el registro en la sesión
@@ -212,6 +250,89 @@ loadCommunities(): void {
   }
 
   /**
+   * Une al usuario a la lista de espera
+   */
+  joinWaitlist(): void {
+    if (!this.session) return;
+
+    this.isJoiningWaitlist = true;
+    this.registrationError = '';
+    this.waitlistSuccess = false;
+
+    this.bookingService.joinWaitlist({ 
+      learningSessionId: this.session.id 
+    }).subscribe({
+      next: (response) => {
+        console.log('✅ Unido a lista de espera:', response);
+        this.isJoiningWaitlist = false;
+        this.waitlistSuccess = true;
+        
+        // Actualizar el estado para mostrar el botón de salir
+        this.userWaitlistBooking = response.data;
+        
+        setTimeout(() => {
+          this.waitlistSuccess = false;
+        }, 4000);
+      },
+      error: (error) => {
+        console.error('❌ Error al unirse a lista de espera:', error);
+        this.isJoiningWaitlist = false;
+        this.handleRegistrationError(error);
+      }
+    });
+  }
+
+  /**
+   * Muestra el modal de confirmación para salir
+   */
+  showLeaveConfirmation(): void {
+    this.showLeaveConfirmModal = true;
+  }
+
+  /**
+   * Cancela la salida de lista de espera
+   */
+  cancelLeaveWaitlist(): void {
+    this.showLeaveConfirmModal = false;
+  }
+
+  /**
+   * Confirma y ejecuta la salida de lista de espera
+   */
+  confirmLeaveWaitlist(): void {
+    if (!this.userWaitlistBooking) return;
+
+    this.showLeaveConfirmModal = false;
+    this.isLeavingWaitlist = true;
+    this.registrationError = '';
+
+    this.bookingService.leaveWaitlist(this.userWaitlistBooking.id).subscribe({
+      next: (response) => {
+        console.log('✅ Salida de lista de espera exitosa:', response);
+        this.isLeavingWaitlist = false;
+        
+        // Limpiar el estado
+        this.userWaitlistBooking = null;
+        
+        // Mostrar mensaje de éxito
+        this.showLeaveSuccess = true;
+        
+        setTimeout(() => {
+          this.showLeaveSuccess = false;
+        }, 4000);
+        
+        // Recargar sesión
+        this.loadSession();
+      },
+      error: (error) => {
+        console.error('❌ Error al salir de lista de espera:', error);
+        this.isLeavingWaitlist = false;
+        this.handleRegistrationError(error);
+      }
+    });
+  }
+
+  /**
    * Maneja errores de registro
    */
   private handleRegistrationError(error: any): void {
@@ -268,7 +389,13 @@ loadCommunities(): void {
 
   getAvailableSpots(): number {
     if (!this.session) return 0;
-    return this.session.maxCapacity - (this.session.bookings?.length || 0);
+    
+    // Solo contar bookings CONFIRMED, no WAITING
+    const confirmedBookings = this.session.bookings?.filter(
+      b => b.status === 'CONFIRMED'
+    ).length || 0;
+    
+    return this.session.maxCapacity - confirmedBookings;
   }
 
   goBack(): void {
