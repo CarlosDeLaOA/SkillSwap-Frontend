@@ -20,6 +20,7 @@ import { SkillOnboardingComponent } from './pages/skill-onboarding/skill-onboard
 import { VerifyEmailComponent } from './pages/verify-email/verify-email.component';
 import { LandingskillswapComponent } from './pages/landingskillswap/landingskillswap.component';
 import { CreateSessionComponent } from './pages/create-session/create-session.component';
+import { InstructorSessionsComponent } from './pages/instructor-sessions/instructor-sessions.component';
 
 
 export const routes: Routes = [
@@ -128,6 +129,16 @@ export const routes: Routes = [
           showInSidebar: false
         }
       },
+{
+  path: 'instructor/sessions', 
+  component: InstructorSessionsComponent,
+  data: {
+    authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+    name: 'Mis Sesiones',
+    showInSidebar: false
+  }
+},
+
     ],
   },
   { path: '**', redirectTo: 'login' }

@@ -1,0 +1,42 @@
+<div class="modal-overlay" *ngIf="isVisible">
+  <div class="modal-content">
+    
+    <!-- Success Icon -->
+    <div class="success-icon">
+      <i class='bx bx-check-circle'></i>
+    </div>
+
+    <!-- Header -->
+    <div class="modal-header">
+      <h2>Sesión actualizada exitosamente</h2>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body" *ngIf="editInfo">
+      
+      <!-- Título de la sesión editada -->
+      <div class="edit-title">
+        <p class="label">SESIÓN EDITADA</p>
+        <h3 class="session-name">{{ editInfo.sessionTitle }}</h3>
+      </div>
+
+      <!-- Información de cambios -->
+      <div class="notification-info" *ngIf="editInfo.changesApplied.length > 0">
+        <i class='bx bx-edit-alt'></i>
+        <div class="changes-list">
+          <p>Los siguientes cambios han sido aplicados:</p>
+          <ul>
+            <li *ngFor="let change of editInfo.changesApplied">{{ change }}</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="notification-info" *ngIf="editInfo.changesApplied.length === 0">
+        <i class='bx bx-info-circle'></i>
+        <p>La sesión ha sido actualizada correctamente.</p>
+      </div>
+
+    </div>
+
+  </div>
+</div>
