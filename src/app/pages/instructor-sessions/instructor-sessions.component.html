@@ -1,0 +1,211 @@
+<div class="sessions-page">
+  <!-- Header con imagen de fondo morado -->
+  <div class="sessions-header">
+    <h1 class="header-title">
+        <br>
+      <span class="title-span"></span> 
+      Mis Sesiones
+  
+    </h1>
+
+  </div>
+
+  <!-- Contenedor principal -->
+  <div class="sessions-container">
+    <br>
+    <!-- Filtros por estado -->
+    <div class="status-filters">
+        <br><br>
+      <button 
+        class="filter-chip"
+        [class.active]="selectedStatus === 'SCHEDULED'"
+        (click)="changeStatus('SCHEDULED')">
+        Programadas
+      </button>
+      <button 
+        class="filter-chip"
+        [class.active]="selectedStatus === 'ACTIVE'"
+        (click)="changeStatus('ACTIVE')">
+        En curso
+      </button>
+      <button 
+        class="filter-chip"
+        [class.active]="selectedStatus === 'FINISHED'"
+        (click)="changeStatus('FINISHED')">
+        Completadas
+      </button>
+      <button 
+        class="filter-chip"
+        [class.active]="selectedStatus === 'CANCELLED'"
+        (click)="changeStatus('CANCELLED')">
+        Canceladas
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="loading-container">
+      <div class="spinner-border"></div>
+      <p class="loading-text">Cargando sesiones...</p>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="errorMessage && !isLoading" class="error-container">
+      <div class="alert alert-danger">
+        <i class='bx bx-error-circle me-2'></i>
+        {{ errorMessage }}
+      </div>
+    </div>
+
+    <!-- Sin sesiones -->
+    <div *ngIf="!isLoading && !errorMessage && (!filteredSessions || filteredSessions.length === 0)" class="no-sessions">
+      <i class='bx bx-calendar-x'></i>
+      <h3>No hay sesiones {{ getStatusText(selectedStatus).toLowerCase() }}</h3>
+      <p>Aún no tienes sesiones en este estado</p>
+    </div>
+
+    <!-- Lista de sesiones -->
+    <div *ngIf="!isLoading && !errorMessage && filteredSessions && filteredSessions.length > 0" class="sessions-list">
+      <div *ngFor="let session of filteredSessions" class="session-item">
+        <div class="session-content">
+          <h3 class="session-title">{{ session.title }}</h3>
+          <p class="session-description">{{ session.description }}</p>
+        </div>
+        
+        <div class="session-meta">
+          <div class="meta-info">
+            <span class="meta-label">Fecha:</span>
+            <span class="meta-value">{{ formatDateShort(session.scheduledDatetime) }}</span>
+          </div>
+          <div class="meta-info">
+            <span class="meta-label">Hora:</span>
+            <span class="meta-value">{{ formatTimeShort(session.scheduledDatetime) }}</span>
+          </div>
+        </div>
+
+        <button 
+          *ngIf="session.status === 'SCHEDULED'"
+          class="btn-edit"
+          (click)="openEditModal(session)">
+          Editar
+        </button>
+        
+        <button 
+          *ngIf="session.status !== 'SCHEDULED'"
+          class="btn-disabled"
+          disabled>
+          No editable
+        </button>
+      </div>
+    </div>
+
+    <!-- Paginación -->
+    <div *ngIf="filteredSessions && filteredSessions.length > 0 && totalPages > 1" class="pagination-container">
+      <nav aria-label="Paginación de sesiones">
+        <ul class="pagination">
+          <!-- Botón Anterior -->
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <button class="page-link" (click)="previousPage()" [disabled]="currentPage === 1">
+              <i class='bx bx-chevron-left'></i>
+              <span class="d-none d-sm-inline ms-1">Anterior</span>
+            </button>
+          </li>
+
+          <!-- Primera página -->
+          <li class="page-item" *ngIf="getPageNumbers()[0] > 1">
+            <button class="page-link" (click)="goToPage(1)">1</button>
+          </li>
+          <li class="page-item disabled" *ngIf="getPageNumbers()[0] > 2">
+            <span class="page-link">...</span>
+          </li>
+
+          <!-- Páginas numeradas -->
+          <li class="page-item" 
+              *ngFor="let page of getPageNumbers()" 
+              [class.active]="page === currentPage">
+            <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+          </li>
+
+          <!-- Última página -->
+          <li class="page-item disabled" *ngIf="getPageNumbers()[getPageNumbers().length - 1] < totalPages - 1">
+            <span class="page-link">...</span>
+          </li>
+          <li class="page-item" *ngIf="getPageNumbers()[getPageNumbers().length - 1] < totalPages">
+            <button class="page-link" (click)="goToPage(totalPages)">{{ totalPages }}</button>
+          </li>
+
+          <!-- Botón Siguiente -->
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <button class="page-link" (click)="nextPage()" [disabled]="currentPage === totalPages">
+              <span class="d-none d-sm-inline me-1">Siguiente</span>
+              <i class='bx bx-chevron-right'></i>
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Información de paginación -->
+      <div class="pagination-info">
+        Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }} - 
+        {{ Math.min(currentPage * itemsPerPage, totalElements) }} 
+        de {{ totalElements }} sesiones
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de edición -->
+<div *ngIf="showEditModal" class="modal-overlay" (click)="closeEditModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Editar Sesión</h2>
+      <button class="close-btn" (click)="closeEditModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Descripción</label>
+        <textarea 
+          [(ngModel)]="editForm.description"
+          rows="4"
+          placeholder="Describe tu sesión..."
+          [class.error]="editErrors.description"></textarea>
+        <span *ngIf="editErrors.description" class="error-text">
+          {{ editErrors.description }}
+        </span>
+        <small>{{ editForm.description.length }} / 500 caracteres</small>
+      </div>
+
+      <div class="form-group">
+        <label>Duración (minutos)</label>
+        <input 
+          type="number"
+          [(ngModel)]="editForm.durationMinutes"
+          min="15"
+          max="480"
+          [class.error]="editErrors.durationMinutes">
+        <span *ngIf="editErrors.durationMinutes" class="error-text">
+          {{ editErrors.durationMinutes }}
+        </span>
+        <small *ngIf="editingSession && editingSession.currentBookings > 0" class="warning-text">
+          Esta sesión tiene {{ editingSession.currentBookings }} participante(s). 
+          No podrás cambiar la duración.
+        </small>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeEditModal()">Cancelar</button>
+      <button class="btn-save" (click)="saveChanges()">
+        <i></i> Guardar Cambios
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación de éxito - COMPLETAMENTE FUERA -->
+<app-edit-confirmation-modal
+  [isVisible]="showSuccessModal"
+  [editInfo]="successEditInfo"
+  [autoCloseDuration]="3000"
+  (onClose)="onSuccessModalClose()">
+</app-edit-confirmation-modal>
