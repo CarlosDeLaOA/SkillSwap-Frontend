@@ -12,7 +12,7 @@ import { GuestGuard } from './guards/guest.guard';
 import { IRoleType } from './interfaces';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { AuthCallbackComponent } from './pages/auth/auth-callback.component/auth-callback.component';
-import { RoleSelectionPopupComponent } from './pages/auth/auth-callback.component/role-selection-popup.component'; // ← RUTA CORREGIDA
+import { RoleSelectionPopupComponent } from './pages/auth/auth-callback.component/role-selection-popup.component';
 import { ForgotPasswordComponent } from './pages/auth/forgotpassword/forgot-password.component';
 import { SessionListComponent} from './pages/session-list/session-list.component';  
 import { LandingComponent } from './pages/landing/landing.component';
@@ -20,6 +20,7 @@ import { SkillOnboardingComponent } from './pages/skill-onboarding/skill-onboard
 import { VerifyEmailComponent } from './pages/verify-email/verify-email.component';
 import { LandingskillswapComponent } from './pages/landingskillswap/landingskillswap.component';
 import { CreateSessionComponent } from './pages/create-session/create-session.component';
+import { VideoCallComponent } from './components/video-call/video-call.component';
 
 export const routes: Routes = [
   {
@@ -110,20 +111,29 @@ export const routes: Routes = [
         }
       },
       {
-      path: 'sessions/:id',
-      component: SessionDetailComponent,
-      data: {
-        authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
-        name: 'Detalle de Sesión',
-        showInSidebar: false
+        path: 'sessions/:id',
+        component: SessionDetailComponent,
+        data: {
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+          name: 'Detalle de Sesión',
+          showInSidebar: false
+        },
       },
-       },
-        {
+      {
         path: 'create-session',
         component: CreateSessionComponent,
         data: {
           authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
           name: 'Crear Sesión',
+          showInSidebar: false
+        }
+      },
+      {
+        path: 'video-call/:sessionId',
+        component: VideoCallComponent,
+        data: {
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+          name: 'Videollamada',
           showInSidebar: false
         }
       },
