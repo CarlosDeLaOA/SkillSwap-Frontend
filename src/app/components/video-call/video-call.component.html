@@ -1,0 +1,108 @@
+<div class="video-call-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="loading-content">
+      <div class="spinner"></div>
+      <p>Conectando a la videollamada...</p>
+      <p *ngIf="retryCount > 0" class="retry-message">
+        Reintento {{ retryCount }}/{{ maxRetries }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!isLoading && errorMessage" class="error-container">
+    <div class="error-content">
+      <i class='bx bx-error-circle'></i>
+      <h2>Error de Conexión</h2>
+      <p>{{ errorMessage }}</p>
+      <button class="btn-primary" (click)="initializeVideoCall()">
+        Reintentar
+      </button>
+      <button class="btn-secondary" (click)="leaveCall()">
+        Volver al Dashboard
+      </button>
+    </div>
+  </div>
+
+  <!-- Video Call Active -->
+  <div *ngIf="isConnected && !errorMessage" class="video-call-active">
+    <!-- Jitsi Container -->
+    <div id="jitsi-container" class="jitsi-container"></div>
+
+    <!-- Custom Controls Overlay -->
+    <div class="controls-overlay" [class.hidden]="!showControls">
+      <div class="controls-container">
+        <!-- Camera Control -->
+        <button 
+          class="control-btn"
+          [class.active]="cameraEnabled"
+          (click)="toggleCamera()"
+          title="Cámara">
+          <i class='bx' [ngClass]="cameraEnabled ? 'bx-video' : 'bx-video-off'"></i>
+        </button>
+
+        <!-- Microphone Control -->
+        <button 
+          class="control-btn"
+          [class.active]="microphoneEnabled"
+          (click)="toggleMicrophone()"
+          title="Micrófono">
+          <i class='bx' [ngClass]="microphoneEnabled ? 'bx-microphone' : 'bx-microphone-off'"></i>
+        </button>
+
+        <!-- Screen Share Control (Only for Instructors) -->
+        <button 
+          *ngIf="canShareScreen"
+          class="control-btn screen-share"
+          [class.active]="isSharing"
+          (click)="toggleScreenShare()"
+          title="Compartir pantalla">
+          <i class='bx bx-desktop'></i>
+          <span *ngIf="isSharing" class="sharing-indicator">Compartiendo</span>
+        </button>
+
+        <!-- Leave Call -->
+        <button 
+          class="control-btn leave-btn"
+          (click)="leaveCall()"
+          title="Salir">
+          <i class='bx bx-phone-off'></i>
+        </button>
+
+        <!-- End Session (Only for Instructors) -->
+        <button 
+          *ngIf="videoCallData?.isModerator"
+          class="control-btn end-session-btn"
+          (click)="endSession()"
+          title="Finalizar sesión">
+          <i class='bx bx-stop-circle'></i>
+          Finalizar Sesión
+        </button>
+      </div>
+    </div>
+
+    <!-- Toggle Controls Button -->
+    <button 
+      class="toggle-controls-btn"
+      (click)="toggleControlsVisibility()"
+      title="Mostrar/Ocultar controles">
+      <i class='bx' [ngClass]="showControls ? 'bx-chevron-down' : 'bx-chevron-up'"></i>
+    </button>
+
+    <!-- Session Info Badge -->
+    <div class="session-info-badge">
+      <i class='bx bx-info-circle'></i>
+      <span>Sesión #{{ sessionId }}</span>
+      <span *ngIf="videoCallData?.isModerator" class="moderator-badge">
+        <i class='bx bx-star'></i> Instructor
+      </span>
+    </div>
+
+    <!-- Recording Notification -->
+    <div class="recording-notification">
+      <i class='bx bx-microphone'></i>
+      Esta sesión está siendo grabada (solo audio)
+    </div>
+  </div>
+</div>
