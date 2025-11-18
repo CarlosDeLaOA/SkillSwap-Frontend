@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
+import { SessionDetailComponent } from './pages/session-detail/session-detail.component';
 import { LoginComponent } from './pages/auth/login/login.component';
 import { AppLayoutComponent } from './components/app-layout/app-layout.component';
 import { SigUpComponent } from './pages/auth/sign-up/signup.component';
-import { RegisterComponent } from './pages/register/register.component'; // ← NUEVO
-import { UsersComponent } from './pages/users/users.component';
+import { RegisterComponent } from './pages/register/register.component';
 import { AuthGuard } from './guards/auth.guard';
 import { AccessDeniedComponent } from './pages/access-denied/access-denied.component';
 import { AdminRoleGuard } from './guards/admin-role.guard';
@@ -11,14 +11,16 @@ import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { GuestGuard } from './guards/guest.guard';
 import { IRoleType } from './interfaces';
 import { ProfileComponent } from './pages/profile/profile.component';
-import { GamesComponent } from './pages/games/games.component';
-import { OrdersComponent } from './pages/orders/orders.component';
-import { PreferenceListPageComponent } from './pages/preference-list/preference-list.component';
-import { SportTeamComponent } from './pages/sport-team/sport-team.component';
-import { CalculatorComponent } from './pages/calculator/calculator.component';
-import { GiftComponent } from './pages/gift/gift.component';
-import { GiftListGiftsComponent } from './pages/gift-list-gifts/gift-list-gifts.component';
-import { GiftsComponent } from './pages/gifts/gifts.component';
+import { AuthCallbackComponent } from './pages/auth/auth-callback.component/auth-callback.component';
+import { RoleSelectionPopupComponent } from './pages/auth/auth-callback.component/role-selection-popup.component'; // ← RUTA CORREGIDA
+import { ForgotPasswordComponent } from './pages/auth/forgotpassword/forgot-password.component';
+import { SessionListComponent} from './pages/session-list/session-list.component';  
+import { LandingComponent } from './pages/landing/landing.component';
+import { SkillOnboardingComponent } from './pages/skill-onboarding/skill-onboarding.component';
+import { VerifyEmailComponent } from './pages/verify-email/verify-email.component';
+import { LandingskillswapComponent } from './pages/landingskillswap/landingskillswap.component';
+import { CreateSessionComponent } from './pages/create-session/create-session.component';
+
 
 export const routes: Routes = [
   {
@@ -31,11 +33,32 @@ export const routes: Routes = [
     component: SigUpComponent,
     canActivate: [GuestGuard],
   },
-  
   {
-    path: 'register', 
+    path: 'auth/callback',
+    component: AuthCallbackComponent
+  },
+  { 
+    path: 'auth/role-selection', 
+    component: RoleSelectionPopupComponent 
+  },
+  {
+    path: 'forgot-password',
+    component: ForgotPasswordComponent,
+    canActivate: [GuestGuard],
+  },
+  {
+    path: 'register',
     component: RegisterComponent,
     canActivate: [GuestGuard],
+  },
+  {
+    path: 'onboarding/skills',
+    component: SkillOnboardingComponent
+  },
+  {
+    path: 'verify-email',
+    component: VerifyEmailComponent
+   
   },
   {
     path: 'access-denied',
@@ -43,9 +66,13 @@ export const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'login',
-    pathMatch: 'full',
+    component: LandingComponent,
   },
+  {
+    path: 'skillswap',
+    component: LandingskillswapComponent,
+  },
+
   {
     path: 'app',
     component: AppLayoutComponent,
@@ -57,27 +84,10 @@ export const routes: Routes = [
         pathMatch: 'full',
       },
       {
-        path: 'users',
-        component: UsersComponent,
-        canActivate: [AdminRoleGuard],
-        data: {
-          authorities: [
-            IRoleType.admin,
-            IRoleType.superAdmin
-          ],
-          name: 'Users',
-          showInSidebar: true
-        }
-      },
-      {
         path: 'dashboard',
         component: DashboardComponent,
         data: {
-          authorities: [
-            IRoleType.admin,
-            IRoleType.superAdmin,
-            IRoleType.user
-          ],
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
           name: 'Dashboard',
           showInSidebar: true
         }
@@ -86,93 +96,39 @@ export const routes: Routes = [
         path: 'profile',
         component: ProfileComponent,
         data: {
-          authorities: [
-            IRoleType.admin,
-            IRoleType.superAdmin,
-            IRoleType.user
-          ],
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
           name: 'profile',
           showInSidebar: false
         }
       },
       {
-        path: 'orders',
-        component: OrdersComponent,
+        path: 'sessions',
+        component: SessionListComponent,
         data: {
-          authorities: [
-            IRoleType.admin,
-            IRoleType.superAdmin,
-            IRoleType.user,
-          ],
-          name: 'orders',
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+          name: 'Sesiones',
           showInSidebar: true
         }
       },
       {
-        path: 'preference-list',
-        component: PreferenceListPageComponent,
+      path: 'sessions/:id',
+      component: SessionDetailComponent,
+      data: {
+        authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+        name: 'Detalle de Sesión',
+        showInSidebar: false
+      },
+       },
+        {
+        path: 'create-session',
+        component: CreateSessionComponent,
         data: {
-          authorities: [
-            IRoleType.admin,
-            IRoleType.superAdmin,
-            IRoleType.user,
-          ],
-          name: 'preference list',
-          showInSidebar: true
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+          name: 'Crear Sesión',
+          showInSidebar: false
         }
       },
-      {
-        path: 'sport-team',
-        component: SportTeamComponent,
-        data: {
-          authorities: [
-            IRoleType.admin,
-            IRoleType.superAdmin,
-            IRoleType.user,
-          ],
-          name: 'Sport Team',
-          showInSidebar: true
-        }
-      },
-      {
-        path: 'calculator',
-        component: CalculatorComponent,
-        data: {
-          authorities: [
-            IRoleType.admin,
-            IRoleType.superAdmin,
-            IRoleType.user,
-          ],
-          name: 'Calculator',
-          showInSidebar: true
-        }
-      },
-      {
-        path: 'gift-list',
-        component: GiftComponent,
-        data: {
-          authorities: [
-            IRoleType.admin,
-            IRoleType.superAdmin,
-            IRoleType.user,
-          ],
-          name: 'Gift Lists',
-          showInSidebar: true
-        }
-      },
-      {
-        path: 'gifts',
-        component: GiftsComponent,
-        data: {
-          authorities: [
-            IRoleType.admin,
-            IRoleType.superAdmin,
-            IRoleType.user,
-          ],
-          name: 'Gifts',
-          showInSidebar: true
-        }
-      }
     ],
   },
+  { path: '**', redirectTo: 'login' }
 ];

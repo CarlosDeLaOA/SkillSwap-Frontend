@@ -53,36 +53,46 @@
         </div>
 
         <!-- Campo Contraseña -->
-        <div class="form-group">
-          <input
-            #password="ngModel"
-            type="password"
-            class="form-control"
-            id="password"
-            name="password"
-            placeholder="Contraseña"
-            [(ngModel)]="loginForm.password"
-            (ngModelChange)="onPasswordChange()"
-            [ngClass]="{
-              'is-invalid': (password.invalid && password.touched) || passwordValidationError,
-              'is-valid': password.valid && password.touched && !passwordValidationError
-            }"
-            required
-            minlength="8"
-          />
-          
-          <!-- Error de validación básica -->
-          <div *ngIf="password.invalid && password.touched && !passwordValidationError" class="error-message">
-            <box-icon name='error-circle' size="16px" color="#ff4444"></box-icon>
-            <span>La contraseña es requerida</span>
-          </div>
+<!-- Campo Contraseña -->
+<div class="form-group">
+  <div class="password-input-wrapper">
+    <input
+      #password="ngModel"
+      [type]="showPassword ? 'text' : 'password'"
+      class="form-control"
+      id="password"
+      name="password"
+      placeholder="Contraseña"
+      [(ngModel)]="loginForm.password"
+      (ngModelChange)="onPasswordChange()"
+      [ngClass]="{
+        'is-invalid': (password.invalid && password.touched) || passwordValidationError,
+        'is-valid': password.valid && password.touched && !passwordValidationError
+      }"
+      required
+      minlength="8"
+    />
+    <button 
+      type="button" 
+      class="toggle-password"
+      (click)="togglePasswordVisibility()"
+      tabindex="-1">
+      <i [class]="showPassword ? 'bx bx-hide' : 'bx bx-show'"></i>
+    </button>
+  </div>
+  
+  <!-- Error de validación básica -->
+  <div *ngIf="password.invalid && password.touched && !passwordValidationError" class="error-message">
+    <box-icon name='error-circle' size="16px" color="#ff4444"></box-icon>
+    <span>La contraseña es requerida</span>
+  </div>
 
-          <!-- Error de validación personalizada -->
-          <div *ngIf="passwordValidationError && password.touched" class="error-message">
-            <box-icon name='error-circle' size="16px" color="#ff4444"></box-icon>
-            <span>{{ passwordValidationError }}</span>
-          </div>
-        </div>
+  <!-- Error de validación personalizada -->
+  <div *ngIf="passwordValidationError && password.touched" class="error-message">
+    <box-icon name='error-circle' size="16px" color="#ff4444"></box-icon>
+    <span>{{ passwordValidationError }}</span>
+  </div>
+</div>
 
         <!-- Mensaje de Error del Login -->
         <div *ngIf="loginError" class="alert-error">
@@ -117,9 +127,8 @@
 
         <!-- Enlaces -->
         <div class="form-links">
-          <a routerLink="/forgot-password" class="link-forgot">
-            Olvide mi contraseña
-          </a>
+          <a routerLink="/forgot-password" class="link-forgot">¿Olvidaste tu contraseña?</a>
+
           <p class="signup-text">
             ¿No estas registrado?
             <a routerLink="/register" class="link-signup">Regístrate</a>

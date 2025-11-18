@@ -1,0 +1,31 @@
+<div class="modal-overlay" *ngIf="isVisible">
+  <div class="modal-content">
+    
+    <!-- Success Icon -->
+    <div class="success-icon">
+      <i class='bx bx-check-circle'></i>
+    </div>
+
+    <!-- Header -->
+    <div class="modal-header">
+      <h2>Sesión cancelada exitosamente</h2>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body" *ngIf="cancellationInfo">
+      
+
+      <div class="notification-info" *ngIf="cancellationInfo.participantsNotified > 0">
+        <i class='bx bx-envelope'></i>
+        <p>Se ha notificado a {{ cancellationInfo.participantsNotified }} participante(s) inscritos.</p>
+      </div>
+
+      <div class="notification-info" *ngIf="cancellationInfo.participantsNotified === 0">
+        <i class='bx bx-info-circle'></i>
+        <p>La sesión ha sido cancelada correctamente.</p>
+      </div>
+
+    </div>
+
+  </div>
+</div>

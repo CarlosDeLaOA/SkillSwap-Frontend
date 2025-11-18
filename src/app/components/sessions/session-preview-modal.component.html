@@ -1,0 +1,158 @@
+<div class="modal-overlay" (click)="closeModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    
+ 
+    <div class="modal-header">
+      <button class="close-btn" (click)="closeModal()" type="button">
+        <i class='bx bx-x'></i>
+      </button>
+      <h1>Revisa tu sesión</h1>
+      <p class="subtitle">Resumen de la sesión</p>
+    </div>
+
+
+    <div *ngIf="showNotification" 
+         class="notification" 
+         [class.success]="notificationType === 'success'"
+         [class.error]="notificationType === 'error'"
+         [class.warning]="notificationType === 'warning'">
+      <div class="notification-content">
+        <i class='bx' [ngClass]="{
+          'bx-check-circle': notificationType === 'success',
+          'bx-error-circle': notificationType === 'error',
+          'bx-error': notificationType === 'warning'
+        }"></i>
+        <span>{{ notificationMessage }}</span>
+      </div>
+      <button class="notification-close-btn" (click)="closeNotification()">
+        <i class='bx bx-x'></i>
+      </button>
+    </div>
+
+ 
+    <div class="previewmodal-content">
+      
+   
+      <div class="content-left">
+        
+       
+        <div class="field-group">
+          <div *ngIf="!isEditing" class="field-display">
+            <label>Título:</label>
+            <span class="field-value">{{ editedTitle }}</span>
+          </div>
+          <div *ngIf="isEditing" class="field-edit">
+            <label>Título:</label>
+            <input 
+              type="text" 
+              [(ngModel)]="editedTitle"
+              [class.invalid]="titleError"
+              placeholder="Título de la sesión">
+            <span *ngIf="titleError" class="error-text">{{ titleError }}</span>
+          </div>
+        </div>
+
+      
+        <div class="field-group">
+          <div *ngIf="!isEditing" class="field-display">
+            <label>Descripción:</label>
+            <span class="field-value description">{{ editedDescription }}</span>
+          </div>
+          <div *ngIf="isEditing" class="field-edit">
+            <label>Descripción:</label>
+            <textarea 
+              [(ngModel)]="editedDescription"
+              [class.invalid]="descriptionError"
+              placeholder="Descripción de la sesión"
+              rows="4"></textarea>
+            <span *ngIf="descriptionError" class="error-text">{{ descriptionError }}</span>
+          </div>
+        </div>
+
+      
+        <div class="field-group">
+          <div class="field-display">
+            <label>Fecha y hora:</label>
+            <span class="field-value">{{ formatDatetime(session.scheduledDatetime) }}</span>
+          </div>
+        </div>
+
+   
+        <div class="field-group">
+          <div class="field-display">
+            <label>Duración:</label>
+            <span class="field-value">{{ session.durationMinutes }} minutos</span>
+          </div>
+        </div>
+      </div>
+
+     
+      <div class="content-right">
+        
+       
+        <div class="field-group">
+          <div class="field-display">
+            <label>Habilidad:</label>
+            <span class="field-value">{{ getSkillName() }}</span>
+          </div>
+        </div>
+
+    
+        <div class="field-group">
+          <div class="field-display">
+            <label>Categoría:</label>
+            <span class="field-value">{{ getKnowledgeAreaName() }}</span>
+          </div>
+        </div>
+
+     
+        <div class="field-group">
+          <div class="field-display">
+            <label>Idioma:</label>
+            <span class="field-value">{{ getLanguageName(session.language) }}</span>
+          </div>
+        </div>
+
+       
+        <div class="field-group">
+          <div class="field-display">
+            <label>Capacidad:</label>
+            <span class="field-value">{{ session.maxCapacity }} participantes</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+   
+    <div *ngIf="isEditing" class="edit-actions">
+      <button type="button" class="btn-cancel-edit" (click)="cancelEdit()">
+        Cancelar
+      </button>
+      <button type="button" class="btn-save-edit" (click)="saveEdits()">
+        Guardar cambios
+      </button>
+    </div>
+
+   
+    <div *ngIf="!isEditing" class="modal-actions">
+      <button type="button" class="btn-edit" (click)="enableEditMode()">
+        Editar
+      </button>
+      <button 
+        type="button" 
+        class="btn-publish" 
+        (click)="publishSession()"
+        [disabled]="isPublishing">
+        <span *ngIf="!isPublishing">Publicar</span>
+        <span *ngIf="isPublishing">Publicando...</span>
+      </button>
+    </div>
+
+    <!-- HELPER INFO (solo cuando NO está editando) 
+    <div *ngIf="!isEditing" class="helper-info">
+      <i class='bx bx-info-circle'></i>
+      <span>Solo puedes editar el título y la descripción. Los cambios no deben exceder el 50% de la longitud original.</span>
+    </div>-->
+
+  </div>
+</div>

@@ -1,0 +1,200 @@
+<div class="create-session-container">
+
+  <div *ngIf="isLoadingProfile" class="loading-overlay">
+    <div class="loading-content">
+      <div class="spinner"></div>
+      <p>Cargando tu perfil...</p>
+    </div>
+  </div>
+
+  <div class="header" *ngIf="!isLoadingProfile">
+    <h1>Crear una nueva sesión</h1>
+  </div>
+
+  <div *ngIf="showNotification" class="notification" 
+       [class.success]="notificationType === 'success'" 
+       [class.error]="notificationType === 'error'" 
+       [class.warning]="notificationType === 'warning'">
+    <div class="notification-content">
+      <i class='bx' [ngClass]="{
+        'bx-check-circle': notificationType === 'success',
+        'bx-error-circle': notificationType === 'error',
+        'bx-error': notificationType === 'warning'
+      }"></i>
+      <span>{{ notificationMessage }}</span>
+    </div>
+    <button class="close-btn" (click)="closeNotification()">
+      <i class='bx bx-x'></i>
+    </button>
+  </div>
+
+  <form class="session-form" (ngSubmit)="onSubmit()" *ngIf="!isLoadingProfile">
+    
+    <div class="form-wrapper">
+    
+      <div class="form-section">
+        <h2>Información general</h2>
+        
+        <div class="form-group full-width">
+          <label for="title">Título</label>
+          <input 
+            type="text" 
+            id="title" 
+            name="title"
+            [(ngModel)]="sessionData.title"
+            (blur)="validateTitle()"
+            [class.invalid]="!validation.title.isValid"
+            placeholder="Ej: Introducción a Angular 17"
+            maxlength="200">
+          <small *ngIf="!validation.title.isValid" class="error-text">
+            {{ validation.title.error }}
+          </small>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="description">Descripción</label>
+          <textarea 
+            id="description" 
+            name="description"
+            [(ngModel)]="sessionData.description"
+            (blur)="validateDescription()"
+            [class.invalid]="!validation.description.isValid"
+            placeholder="Describe de qué tratará la sesión, qué aprenderán los participantes..."
+            rows="3"></textarea>
+          <small *ngIf="!validation.description.isValid" class="error-text">
+            {{ validation.description.error }}
+          </small>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h2>Especificaciones de la sesión</h2>
+        
+       
+        <div class="form-row-two">
+          
+          <div class="form-group">
+            <label for="category">Categoría:</label>
+            <select 
+              id="category" 
+              name="category"
+              [(ngModel)]="selectedCategory"
+              (change)="onCategoryChange()">
+              <option [value]="0">Selecciona una categoría</option>
+              <option *ngFor="let category of categories" [value]="category.id">
+                {{ category.name }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="scheduledDate">Fecha</label>
+            <mat-form-field appearance="outline" class="custom-datepicker">
+              <input 
+                matInput 
+                [matDatepicker]="picker"
+                [formControl]="dateControl"
+                [min]="minDate"
+                (dateChange)="validateScheduledDatetime()"
+                placeholder="Selecciona una fecha"
+                readonly>
+              <mat-datepicker-toggle matIconSuffix [for]="picker">
+                <mat-icon matDatepickerToggleIcon>
+                  <i class='bx bx-calendar'></i>
+                </mat-icon>
+              </mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+            <small *ngIf="!validation.scheduledDatetime.isValid" class="error-text">
+              {{ validation.scheduledDatetime.error }}
+            </small>
+          </div>
+          
+        </div>
+       
+        <div class="form-row-skills-time">
+         
+          <div class="form-group">
+            <label for="skill">Habilidad:</label>
+            <select 
+              id="skill" 
+              name="skill"
+              [(ngModel)]="sessionData.skill.id"
+              (change)="validateSkill()"
+              [class.invalid]="!validation.skill.isValid">
+              <option [value]="0">Selecciona una habilidad</option>
+              <option *ngFor="let userSkill of filteredSkills" [value]="userSkill.skill.id">
+                {{ userSkill.skill.name }}
+              </option>
+            </select>
+            <small *ngIf="!validation.skill.isValid" class="error-text">
+              {{ validation.skill.error }}
+            </small>
+          </div>
+
+          <div class="form-group time-group">
+            <label for="sessionHour">Hora:</label>
+            <select
+              id="sessionHour" 
+              name="sessionHour"
+              [(ngModel)]="sessionHour"
+              (change)="updateSessionTime()">
+              <option *ngFor="let hour of hours" [value]="hour">{{ hour }}</option>
+            </select>
+          </div>
+
+          <div class="form-group time-group">
+            <label for="sessionMinute">&nbsp;</label>
+            <select
+              id="sessionMinute" 
+              name="sessionMinute"
+              [(ngModel)]="sessionMinute"
+              (change)="updateSessionTime()">
+              <option *ngFor="let minute of minutes" [value]="minute">{{ minute }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="durationMinutes">Duración:</label>
+            <select
+              id="durationMinutes" 
+              name="durationMinutes"
+              [(ngModel)]="sessionData.durationMinutes"
+              (change)="validateDuration()"
+              [class.invalid]="!validation.durationMinutes.isValid">
+              <option [value]="30">30 min</option>
+              <option [value]="45">45 min</option>
+              <option [value]="60" selected>60 min</option>
+              <option [value]="90">90 min</option>
+              <option [value]="120">120 min</option>
+              <option [value]="150">150 min</option>
+              <option [value]="180">180 min</option>
+            </select>
+            <small *ngIf="!validation.durationMinutes.isValid" class="error-text">
+              {{ validation.durationMinutes.error }}
+            </small>
+          </div>
+          
+        </div>
+     
+
+        <input type="hidden" [(ngModel)]="sessionData.language" name="language" value="es">
+        <input type="hidden" [(ngModel)]="sessionData.maxCapacity" name="maxCapacity" value="10">
+      </div>
+      
+      <div class="form-actions">
+        <button type="submit" class="btn-submit" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Vista Previa</span>
+          <span *ngIf="isLoading">Creando...</span>
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<app-session-preview-modal 
+  *ngIf="showPreviewModal && createdSession"
+  [session]="createdSession"
+  (closed)="onPreviewModalClosed()"
+  (published)="onSessionPublished($event)">
+</app-session-preview-modal>

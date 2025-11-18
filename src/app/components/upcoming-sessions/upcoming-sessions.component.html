@@ -1,0 +1,63 @@
+<div class="upcoming-sessions">
+  <h2 class="title">Próximas sesiones</h2>
+  
+  <div class="sessions-list" *ngIf="!isLoading && sessions.length > 0">
+    <div class="session-item" *ngFor="let session of sessions">
+      <div class="session-info">
+        <div class="session-name">{{ session.title }}</div>
+        <div class="session-datetime">{{ formatDateTime(session.scheduledDatetime) }}</div>
+      </div>
+      <div class="session-actions">
+        <button class="btn-edit" *ngIf="isInstructor()" (click)="onEdit(session)">
+          <i class='bx bx-edit'></i>
+        </button>
+        <button class="btn-cancel" (click)="openCancelModal(session)">
+          <i class='bx bx-x'></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="no-sessions" *ngIf="!isLoading && sessions.length === 0">
+    <p>No hay sesiones próximas</p>
+  </div>
+  
+  <div class="loading" *ngIf="isLoading">
+    <div class="spinner"></div>
+  </div>
+</div>
+
+<!-- Modal para INSTRUCTORES (cancelar sesión completa) -->
+<app-cancel-session-modal
+  [isVisible]="showCancelSessionModal" 
+  [sessionData]="{
+    id: selectedSession?.id || 0,
+    title: selectedSession?.title || '',
+    scheduledDatetime: selectedSession?.scheduledDatetime || '',
+    status: selectedSession?.status,
+    participants: selectedSession?.currentParticipants
+  }"
+  (onClose)="closeCancelSessionModal()"  
+  (onConfirm)="handleCancelSession($event)">
+</app-cancel-session-modal>
+
+<!-- Modal para LEARNERS (cancelar registro/booking) -->
+<app-cancel-booking-modal
+  [isVisible]="showCancelBookingModal"   
+  [bookingData]="{
+    id: selectedSession?.bookingId || 0,
+    sessionTitle: selectedSession?.title || '',
+    scheduledDatetime: selectedSession?.scheduledDatetime || '',
+    status: selectedSession?.status,
+    type: selectedSession?.bookingType
+  }"
+  (onClose)="closeCancelBookingModal()"   
+  (onConfirm)="handleCancelBooking($event)">
+</app-cancel-booking-modal>
+
+<!-- Modal de confirmación (para ambos roles) -->
+<app-cancel-confirmation-modal
+  [isVisible]="showConfirmationModal"
+  [cancellationInfo]="cancellationInfo"
+  (onClose)="closeConfirmationModal()">
+</app-cancel-confirmation-modal>

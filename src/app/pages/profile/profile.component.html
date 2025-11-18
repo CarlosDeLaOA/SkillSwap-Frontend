@@ -1,21 +1,77 @@
 <div class="profile-wrapper">
+  <!-- Notificación Toast (pop-up bonito) -->
+  <div class="toast-notification" 
+       [class.show]="showNotification" 
+       [class.success]="notificationType === 'success'"
+       [class.warning]="notificationType === 'warning'"
+       [class.error]="notificationType === 'error'"
+       [class.info]="notificationType === 'info'">
+    <div class="toast-icon">
+      <span *ngIf="notificationType === 'success'">✅</span>
+      <span *ngIf="notificationType === 'warning'">⚠️</span>
+      <span *ngIf="notificationType === 'error'">❌</span>
+      <span *ngIf="notificationType === 'info'">ℹ️</span>
+    </div>
+    <div class="toast-content">
+      <h4 class="toast-title">{{ notificationTitle }}</h4>
+      <p class="toast-message">{{ notificationMessage }}</p>
+    </div>
+    <button class="toast-close" (click)="closeNotification()">✕</button>
+  </div>
+
   <main class="profile-main">
     <!-- Primera fila: Avatar e Información Personal -->
     <div class="profile-grid-top">
       <!-- COLUMNA IZQUIERDA: Avatar -->
       <aside class="avatar-card">
-        <div class="avatar-circle">
-          <img 
-            *ngIf="profileService.person$().profilePhotoUrl; else initialsAvatar" 
-            [src]="profileService.person$().profilePhotoUrl" 
-            [alt]="profileService.person$().fullName"
-          />
-          <ng-template #initialsAvatar>
-            <div class="avatar-initials">
+        <div class="profile-photo-section">
+          <div class="photo-container">
+            <!-- Si hay foto, mostrarla -->
+            <img 
+              *ngIf="getProfilePhotoUrl()" 
+              [src]="getProfilePhotoUrl()!" 
+              [alt]="profileService.person$().fullName"
+              class="profile-photo"
+            />
+            
+            <!-- Si no hay foto, mostrar iniciales -->
+            <div 
+              *ngIf="!getProfilePhotoUrl()" 
+              class="avatar-initials"
+            >
               {{ getInitials(profileService.person$().fullName) }}
             </div>
-          </ng-template>
+            
+            <!-- Indicador de carga -->
+            <div *ngIf="isUploadingPhoto" class="upload-overlay">
+              <div class="spinner"></div>
+            </div>
+            
+            <!-- Botón para cambiar foto -->
+            <button 
+              type="button"
+              class="change-photo-btn"
+              (click)="triggerFileInput()"
+              [disabled]="isUploadingPhoto"
+              title="Cambiar foto de perfil"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
+            </button>
+          </div>
+          
+          <!-- Input oculto para seleccionar archivo -->
+          <input 
+            type="file" 
+            id="profilePhotoInput"
+            accept="image/*"
+            (change)="onFileSelected($event)"
+            style="display: none;"
+          />
         </div>
+        
         <h3 class="user-role">{{ profileService.getUserRole() }}</h3>
       </aside>
 
@@ -23,9 +79,7 @@
       <section class="info-card">
         <div class="card-header">
           <h3 class="section-title">Información personal</h3>
-          <button class="btn-check">
-            <box-icon name='check-circle' size="24px" color="#aae16b"></box-icon>
-          </button>
+          
         </div>
 
         <div class="form-grid">
@@ -58,26 +112,21 @@
               readonly
             />
           </div>
-
-          <div class="form-group">
-            <label>Contraseña</label>
-            <input 
-              type="password" 
-              value="••••••••" 
-              placeholder="Contraseña"
-              readonly
-            />
-          </div>
         </div>
       </section>
     </div>
 
-    <!-- Segunda fila: Habilidades a explorar (ancho completo) -->
+    <!-- Segunda fila: Habilidades a explorar -->
     <section class="info-card skills-card">
       <div class="card-header">
         <h3 class="section-title">Habilidades a explorar</h3>
-        <button class="btn-check">
-          <box-icon name='check-circle' size="24px" color="#504ab7"></box-icon>
+        
+        <button 
+          *ngIf="!isEditingSkills" 
+          (click)="enableSkillsEdit()"
+          class="btn-edit-skills"
+        >
+          Editar habilidades
         </button>
       </div>
 
@@ -85,109 +134,84 @@
         Ajusta tus habilidades a explorar para poder mostrarte contenido a tu medida.
       </p>
 
+      <!-- Grid dinámico con TODAS las knowledge areas -->
       <div class="skills-grid">
-        <!-- Tecnología -->
-        <div class="form-group">
-          <label>Tecnología</label>
-          <div class="select-wrapper">
-            <select>
-              <option value="" disabled selected>Selecciona opciones</option>
-              <option value="programming">Programación</option>
-              <option value="web-dev">Desarrollo Web</option>
-              <option value="mobile-dev">Desarrollo Móvil</option>
-              <option value="data-science">Ciencia de Datos</option>
-              <option value="ai-ml">Inteligencia Artificial</option>
-              <option value="cybersecurity">Ciberseguridad</option>
-              <option value="cloud">Computación en la Nube</option>
-              <option value="devops">DevOps</option>
-            </select>
+        <div class="form-group" *ngFor="let area of getAllKnowledgeAreas(); trackBy: trackByAreaId">
+          <label>{{ getAreaDisplayName(area.name) }}</label>
+          
+          <!-- MODO VISTA -->
+          <div class="select-with-tags" *ngIf="!isEditingSkills">
+            <div class="tags-container" *ngIf="getSkillsForArea(area.name).length > 0">
+              <span 
+                class="tag-pill" 
+                *ngFor="let userSkill of getSkillsForArea(area.name); trackBy: trackBySkillId"
+              >
+                {{ userSkill.skill?.name }}
+              </span>
+            </div>
+            <span class="select-placeholder" *ngIf="getSkillsForArea(area.name).length === 0">
+              Selecciona opciones
+            </span>
+            <box-icon name='chevron-down' size="20px" color="#aae16b" class="select-arrow"></box-icon>
+          </div>
+
+          <!-- MODO EDICIÓN -->
+          <div class="select-with-tags-editable" *ngIf="isEditingSkills">
+            <div class="tags-container-editable">
+              <span 
+                class="tag-pill-editable" 
+                *ngFor="let userSkill of getSkillsForArea(area.name); trackBy: trackBySkillId"
+              >
+                {{ userSkill.skill?.name }}
+                <button 
+                  (click)="removeSkill(userSkill)"
+                  class="tag-remove-btn"
+                  title="Eliminar skill"
+                >
+                  ✕
+                </button>
+              </span>
+              
+              <button 
+                (click)="openSkillDropdown(area)"
+                type="button"
+                class="btn-add-skill"
+              >
+                Agregar
+              </button>
+            </div>
+
+            <!-- Dropdown de skills disponibles -->
+            <div 
+              *ngIf="selectedArea?.id === area.id && showSkillDropdown"
+              class="skills-dropdown"
+            >
+              <div 
+                *ngFor="let skill of getAvailableSkillsForArea(area.name); trackBy: trackBySkillOptionId"
+                (click)="addSkillToArea(skill)"
+                class="skill-option"
+              >
+                {{ skill.name }}
+              </div>
+              <div 
+                *ngIf="getAvailableSkillsForArea(area.name).length === 0"
+                class="no-skills-message"
+              >
+                No hay más skills disponibles en esta categoría
+              </div>
+            </div>
           </div>
         </div>
+      </div>
 
-        <!-- Deportes -->
-        <div class="form-group">
-          <label>Deportes</label>
-          <div class="select-wrapper">
-            <select>
-              <option value="" disabled selected>Selecciona opciones</option>
-              <option value="soccer">Fútbol</option>
-              <option value="basketball">Baloncesto</option>
-              <option value="tennis">Tenis</option>
-              <option value="swimming">Natación</option>
-              <option value="running">Running</option>
-              <option value="yoga">Yoga</option>
-              <option value="gym">Gimnasio</option>
-              <option value="martial-arts">Artes Marciales</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Cocina -->
-        <div class="form-group">
-          <label>Cocina</label>
-          <div class="select-wrapper">
-            <select>
-              <option value="" disabled selected>Selecciona opciones</option>
-              <option value="italian">Cocina Italiana</option>
-              <option value="mexican">Cocina Mexicana</option>
-              <option value="asian">Cocina Asiática</option>
-              <option value="pastry">Repostería</option>
-              <option value="bakery">Panadería</option>
-              <option value="vegan">Cocina Vegana</option>
-              <option value="gourmet">Alta Cocina</option>
-              <option value="bbq">Barbacoa</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Arte -->
-        <div class="form-group">
-          <label>Arte</label>
-          <div class="select-wrapper">
-            <select>
-              <option value="" disabled selected>Selecciona opciones</option>
-              <option value="painting">Pintura</option>
-              <option value="drawing">Dibujo</option>
-              <option value="sculpture">Escultura</option>
-              <option value="photography">Fotografía</option>
-              <option value="digital-art">Arte Digital</option>
-              <option value="music">Música</option>
-              <option value="dance">Danza</option>
-              <option value="theater">Teatro</option>
-            </select>
-          </div>
-        </div>
-
-      <!-- Idioma preferido  -->
-<div class="form-group">
-  <label>Idioma preferido</label>
-  <div class="select-wrapper">
-    <select [value]="profileService.person$().preferredLanguage || ''" (change)="onLanguageChange($event)">
-      <option value="" disabled>Selecciona un idioma</option>
-      @for (lang of getLanguageOptions(); track lang.code) {
-        <option [value]="lang.code">{{ lang.name }}</option>
-      }
-    </select>
-  </div>
-</div>
-
-        <!-- Soft Skills -->
-        <div class="form-group">
-          <label>Soft Skills</label>
-          <div class="select-wrapper">
-            <select>
-              <option value="" disabled selected>Selecciona opciones</option>
-              <option value="leadership">Liderazgo</option>
-              <option value="communication">Comunicación</option>
-              <option value="teamwork">Trabajo en Equipo</option>
-              <option value="problem-solving">Resolución de Problemas</option>
-              <option value="creativity">Creatividad</option>
-              <option value="time-management">Gestión del Tiempo</option>
-              <option value="adaptability">Adaptabilidad</option>
-              <option value="critical-thinking">Pensamiento Crítico</option>
-            </select>
-          </div>
-        </div>
+      <!-- Botones de guardar/cancelar -->
+      <div *ngIf="isEditingSkills" class="actions-footer">
+        <button (click)="cancelSkillsEdit()" class="btn-cancel">
+          Cancelar
+        </button>
+        <button (click)="saveSkills()" class="btn-confirm">
+          Guardar cambios
+        </button>
       </div>
     </section>
   </main>

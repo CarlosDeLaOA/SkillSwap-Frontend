@@ -1,81 +1,95 @@
-:root {
-  --theme-default: #7366ff;
-  --theme-secondary: #f73164;
-  --light-background: rgba(242, 243, 247, 0.7);
-  --body-font-color: #2f2f3b;
-  --chart-border: #ecf3fa;
-  --recent-chart-bg: #fcfcfd;
-  --light-bg: #f6f7f9;
-  --white: #fff;
-  --light2: #f5f6f9;
-  --sidebar-border: rgba(0, 0, 0, 0.1);
-  --chart-text-color: rgba(82, 82, 108, 0.8);
-  --recent-dashed-border: rgba(82, 82, 108, 0.3);
-  --chart-dashed-border: rgba(82, 82, 108, 0.2);
-  --chart-progress-light: rgba(82, 82, 108, 0.1);
-  --recent-box-bg: #f2f4f7;
-  --recent-border: rgba(97, 101, 122, 0.25);
-  --course-light-btn: #f2f3f7;
-  --course-bg: #f7f7f7;
-  --balance-profie-bg: #e0dfef;
-  --view-grid-bg: #ecf3fa80;
-  --view-border-marker: #cfcdfc;
+@import url('https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;600;700&display=swap');
 
-  --fc-button-bg-color: var(--theme-default);
-  --fc-button-active-bg-color: var(--theme-default);
-  --fc-button-active-border-color: var(--theme-default);
-  --fc-button-border-color: var(--theme-default);
-  --fc-button-hover-bg-color: var(--theme-default);
-  --fc-button-hover-border-color: var(--theme-default);
+:root { 
+  --theme-primary: #504ab7; 
+  --theme-secondary: #aae16b; 
+  --background-dark: #141414; 
+  --surface-dark: #39434b; 
+  --text-color: #ffffff; 
+  --gradient-main: linear-gradient(135deg, #AAE16B 0%, #504AB7 100%);
+} 
+
+@import "./assets/utils/variables"; 
+@import "./assets/layout/layout.scss"; 
+
+html, body {  
+  height: 100%;  
+  margin: 0;
+  padding: 0;
+  background-color: #141414;
+} 
+
+body { 
+  font-family: 'Epilogue', sans-serif !important;
+  color: #ffffff;
+} 
+
+.page-wrapper {
+  background-color: #141414;
 }
 
-body[class="dark-only"] {
-  --light-background: rgba(31, 32, 40, 0.65);
-  --recent-chart-bg: #262932;
-  --light-bg: #1d1e26;
-  --white: #262932;
-  --sidebar-border: rgba(255, 255, 255, 0.1);
-  --light2: #1d1e26;
-  --chart-border: #374558;
-  --recent-box-bg: #1d1e26;
-  --recent-border: #374558;
-  --body-font-color: rgba(255, 255, 255, 0.6);
-  --course-light-btn: var(--light-bg);
-  --view-grid-bg: var(--light-bg);
-  --view-border-marker: #2c2c45d4;
-}
-// scss variables
-@import "./assets/utils/variables";
-//start template styles
-@import "./assets/layout/layout.scss";
-//end template styles
-
-html, body { 
-  height: 100%; 
-}
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
-
-.error-snackbar .mdc-snackbar__surface{
-  background-color: rgb(197, 49, 49) !important;
+.page-body-wrapper {
+  min-height: 100vh;
 }
 
-.success-snackbar .mdc-snackbar__surface{
-  background-color: rgb(54, 197, 49) !important;
+.sidebar-wrapper {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 70px;
+  height: 100vh;
+  background-color: #1A1A1A;
+  border-right: 1px solid #39434b;
+  z-index: 1000;
 }
 
-
-.page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content > li .sidebar-link {
-  text-decoration: none;
+.page-body {
+  margin-left: 70px;
+  min-height: calc(100vh - 60px);
+  background-color: #141414;
 }
 
+.footer {
+  margin-left: 70px;
+  background-color: #141414;
+  border-top: 1px solid #39434b;
+  
+  p {
+    color: #ffffff;
+  }
+}
 
-.page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links {
-  height: calc(93vh - 115px) !important;
-  left: -300px;
-  z-index: 99;
-  transition: color 1s ease;
-  /* overflow: auto; */
-  /* color: rgba(0, 0, 0, 0); */
-  margin-top: 20px;
-  margin-bottom: 30px;
+.error-snackbar .mdc-snackbar__surface { 
+  background-color: rgb(197, 49, 49) !important; 
+} 
+ 
+.success-snackbar .mdc-snackbar__surface { 
+  background-color: rgb(54, 197, 49) !important; 
+} 
+
+.card {
+  background-color: #39434b;
+  border: 1px solid #39434b;
+  color: #ffffff;
+}
+
+.btn-primary {
+  background-color: #504ab7;
+  border-color: #504ab7;
+  
+  &:hover {
+    background-color: #3d3789;
+    border-color: #3d3789;
+  }
+}
+
+.btn-secondary {
+  background-color: #aae16b;
+  border-color: #aae16b;
+  color: #141414;
+  
+  &:hover {
+    background-color: #8ec756;
+    border-color: #8ec756;
+  }
 }

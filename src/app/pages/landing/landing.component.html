@@ -1,0 +1,153 @@
+<header class="landing-nav" [class.scrolled]="isScrolled">
+  <div class="logo">Byte <span class="logo-accent">&</span> Bite</div>
+
+  <nav class="nav-links">
+    <a href="#inicio" class="nav-link active">Inicio</a>
+    <a href="#quienes-somos" class="nav-link">¿Quiénes somos?</a>
+    <a href="#mision-vision" class="nav-link">Misión y Visión</a>
+    <a href="#proyecto" class="nav-link">Proyecto</a>
+  </nav>
+</header>
+<main class="landing-page">
+
+<!-- HERO SECTION -->
+<section id="inicio" class="hero">
+ <div class="hero-wave-bottom">
+  <svg width="100%" height="100%" viewBox="0 0 1440 590" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <path d="M 0,600 L 0,225 C 156,157.26666666666665 312,89.53333333333333 492,119 C 672,148.46666666666667 876,275.1333333333333 1038,309 C 1200,342.8666666666667 1320,283.93333333333334 1440,225 L 1440,600 L 0,600 Z" 
+          stroke="none" 
+          stroke-width="0" 
+          fill="#0a0a0a" 
+          fill-opacity="1" 
+          >
+    </path>
+  </svg>
+</div>
+
+<div class="hero-neon-blocks">
+    <img src="assets/img/logo-mordisco.png" alt="Bloques neón">
+  </div>
+
+  <div class="hero-content container">
+    <div class="hero-text">
+      <h1><span class="text-gradient">Byte</span> and <span class="text-celeste">bite</span></h1>
+      <p class="hero-subtitle">Transforma ideas en soluciones inteligentes.</p>
+    </div>
+  </div>
+</section>
+
+  <!-- QUIÉNES SOMOS -->
+  <section id="quienes-somos" class="section about">
+  <div class="container">
+    <h2 class="section-title">¿Quiénes somos?</h2>
+    
+    <!-- Intro centrada -->
+    <p class="about-intro-center">
+      Somos Byte and Bite, un equipo apasionado por el desarrollo de software.
+    </p>
+    
+    <!-- Grid con texto e imagen -->
+    <div class="about-grid">
+      <div class="about-text">
+        <p class="about-details">
+          Nos dedicamos a diseñar y desarrollar soluciones digitales innovadoras que 
+          mejoran la experiencia de los usuarios y optimizan los procesos de las empresas. 
+          Nuestra pasión por la tecnología y la calidad impulsa cada proyecto que realizamos.
+        </p>
+      </div>
+
+      <div class="about-images">
+        <div class="about-img img-1">
+          <img src="assets/img/quienes-somos.jpg" alt="Equipo trabajando">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <!-- MISIÓN Y VISIÓN -->
+  <section id="mision-vision" class="section mission-vision">
+    <div class="container">
+      <div class="mv-grid">
+        
+        <!-- Card Misión -->
+        <div class="mv-card mission-card">
+        <div class="mv-icon mission-icon">
+          <img src="assets/icons/mision.png" alt="Icono Misión">
+        </div>
+        <h3 class="mv-title">Misión</h3>
+        <p class="mv-description">
+          Desarrollar soluciones de software innovadoras y eficientes que faciliten 
+          la vida de los usuarios.
+        </p>
+      </div>
+
+        <!-- Card Visión -->
+        <div class="mv-card vision-card">
+          <div class="mv-icon vision-icon">
+          <img src="assets/icons/vision.png" alt="Icono Visión">
+        </div>
+          <h3 class="mv-title">Visión</h3>
+          <p class="mv-description">
+            Ser reconocidos por nuestra capacidad de innovación, excelencia en la ejecución 
+            y compromiso con el impacto positivo en la sociedad.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROYECTO ESTRELLA -->
+<section id="proyecto" class="section project">
+  <div class="container">
+    <div class="project-card">
+      <h2 class="project-heading">Nuestro proyecto estrella</h2>
+
+      <div class="project-content">
+        <div class="project-logo-container">
+          <img src="assets/img/Logo.png" alt="SkillSwap Logo" class="skillswap-logo-full">
+        </div>
+
+        <div class="project-text">
+          <p class="project-description">
+            <strong>SkillSwap</strong> es una plataforma colaborativa que conecta personas
+            para compartir y adquirir habilidades mediante sesiones en línea.
+          </p>
+          <button class="btn-project" (click)="goToProject()">
+            Ver más del proyecto
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="landing-footer">
+  <svg
+    class="footer-wave-svg"
+    viewBox="0 0 1440 590"
+    xmlns="http://www.w3.org/2000/svg"
+    preserveAspectRatio="none"
+  >
+    <defs>
+      <linearGradient id="footer-gradient" x1="70%" y1="96%" x2="30%" y2="4%">
+        <stop offset="5%" stop-color="#fa9deb"></stop>
+        <stop offset="95%" stop-color="#a6e6fa"></stop>
+      </linearGradient>
+    </defs>
+    <path
+      d="M 0,600 L 0,225 C 190.53333333333336,241.13333333333333 381.0666666666667,257.26666666666665 556,232 C 730.9333333333333,206.73333333333332 890.2666666666667,140.06666666666666 1035,132 C 1179.7333333333333,123.93333333333334 1309.8666666666668,174.46666666666667 1440,225 L 1440,600 L 0,600 Z"
+      fill="url(#footer-gradient)"
+    />
+  </svg>
+
+  <div class="footer-inner">
+    <p class="footer-text">
+      © 2025 Byte and Bite. Todos los derechos reservados.
+    </p>
+  </div>
+</footer>
+
+

@@ -1,0 +1,46 @@
+<div class="reviews-section">
+  <h2 class="title">{{ getTitle() }}</h2>
+  
+  <div class="carousel-container" *ngIf="!isLoading && hasAchievements()">
+    <button class="carousel-btn prev" (click)="previousSlide()">
+      <i class='bx bx-chevron-left'></i>
+    </button>
+    
+    <div class="carousel-content">
+      <div class="feedback-card" 
+           *ngFor="let achievement of getVisibleAchievements()" 
+           [ngClass]="{'feedback': isFeedback(achievement), 'credential': isCredential(achievement)}">
+        
+        <div *ngIf="isFeedback(achievement)" class="feedback-content">
+          <div class="feedback-header">
+            <div class="logo-circle">
+              <img src="assets/img/logoblanco.png" alt="Logo" class="logo-image">
+            </div>
+            <div class="session-title">{{ asFeedback(achievement).sessionTitle }}</div>
+          </div>
+          <div class="feedback-comment">{{ asFeedback(achievement).comment }}</div>
+        </div>
+
+        <div *ngIf="isCredential(achievement)" class="credential-content">
+          <div class="credential-badge">
+            <img src="assets/img/logoblanco.png" alt="Logo" class="logo-image">
+          </div>
+          <div class="skill-name">{{ asCredential(achievement).skillName }}</div>
+          <div class="credential-label">Credencial</div>
+        </div>
+      </div>
+    </div>
+    
+    <button class="carousel-btn next" (click)="nextSlide()">
+      <i class='bx bx-chevron-right'></i>
+    </button>
+  </div>
+
+  <div class="no-achievements" *ngIf="!isLoading && !hasAchievements()">
+    <p>No hay {{ role === 'INSTRUCTOR' ? 'reseñas' : 'credenciales' }} disponibles</p>
+  </div>
+  
+  <div class="loading" *ngIf="isLoading">
+    <div class="spinner"></div>
+  </div>
+</div>
