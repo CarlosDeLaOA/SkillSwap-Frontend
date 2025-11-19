@@ -416,3 +416,90 @@
     display: none;
   }
 }
+
+/*** Permission Dialog ***/
+.permission-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  animation: fadeIn 0.3s ease;
+}
+
+.permission-dialog {
+  background: white;
+  color: #1a1a1a;
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  max-width: 450px;
+  animation: slideUp 0.4s ease;
+}
+
+.permission-dialog i.bx-video-recording {
+  font-size: 80px;
+  color: #667eea;
+  margin-bottom: 20px;
+}
+
+.permission-dialog h2 {
+  font-size: 28px;
+  margin-bottom: 15px;
+  color: #2c3e50;
+}
+
+.permission-dialog p {
+  font-size: 16px;
+  color: #7f8c8d;
+  margin-bottom: 20px;
+}
+
+.permission-dialog ul {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+
+.permission-dialog ul li {
+  font-size: 18px;
+  margin: 15px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #34495e;
+}
+
+.permission-dialog ul li i {
+  font-size: 24px;
+  color: #667eea;
+}
+
+.permission-dialog .note {
+  font-size: 14px;
+  font-style: italic;
+  color: #95a5a6;
+  margin-top: 20px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to { 
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

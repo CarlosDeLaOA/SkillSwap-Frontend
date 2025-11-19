@@ -106,3 +106,17 @@
     </div>
   </div>
 </div>
+
+
+<div *ngIf="showPermissionDialog" class="permission-dialog-overlay">
+  <div class="permission-dialog">
+    <i class='bx bx-video-recording'></i>
+    <h2>Permisos Necesarios</h2>
+    <p>Para unirte a la videollamada, necesitamos acceso a:</p>
+    <ul>
+      <li><i class='bx bx-camera'></i> Cámara</li>
+      <li><i class='bx bx-microphone'></i> Micrófono</li>
+    </ul>
+    <p class="note">El navegador te pedirá permiso en breve.</p>
+  </div>
+</div>

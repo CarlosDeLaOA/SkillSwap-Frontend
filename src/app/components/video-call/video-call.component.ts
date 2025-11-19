@@ -4,9 +4,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { VideoCallService } from '../../services/video-call.service';
 import { IVideoCallConfig, IVideoCallData, IScreenShareStatus } from '../../interfaces';
 
-/**
- * Componente para videollamadas con Jitsi Meet
- */
 @Component({
   selector: 'app-video-call',
   standalone: true,
@@ -22,49 +19,75 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   isLoading: boolean = true;
   errorMessage: string = '';
   isConnected: boolean = false;
-  cameraEnabled: boolean = false;
-  microphoneEnabled: boolean = false;
+  cameraEnabled: boolean = true; 
+  microphoneEnabled: boolean = true; 
   canShareScreen: boolean = false;
   isSharing: boolean = false;
   showControls: boolean = true;
   retryCount: number = 0;
   maxRetries: number = 3;
+  showPermissionDialog: boolean = true; 
   //#endregion
 
-  //#region Constructor
-  /**
-   * Crea una instancia de VideoCallComponent
-   * @param route ActivatedRoute para obtener parámetros de ruta
-   * @param router Router para navegación
-   * @param videoCallService Servicio de videollamadas
-   */
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private videoCallService: VideoCallService
   ) {}
-  //#endregion
 
   //#region Lifecycle Hooks
-  /**
-   * Inicializa el componente
-   */
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.sessionId = +params['sessionId'];
-      this.initializeVideoCall();
+    
+      this.requestMediaPermissions();
     });
   }
 
-  /**
-   * Limpia recursos al destruir el componente
-   */
   ngOnDestroy(): void {
     this.leaveCall();
   }
   //#endregion
 
-  //#region Public Methods
+  async requestMediaPermissions(): Promise<void> {
+    try {
+      this.isLoading = true;
+      this.errorMessage = '';
+
+      console.log('🎤 Solicitando permisos de cámara y micrófono...');
+
+      // Solicitar acceso a cámara y micrófono
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true
+      });
+
+      console.log(' Permisos concedidos');
+
+      
+      stream.getTracks().forEach(track => track.stop());
+
+      // Ocultar diálogo de permisos
+      this.showPermissionDialog = false;
+
+     
+      await this.initializeVideoCall();
+
+    } catch (error: any) {
+      console.error(' Error al solicitar permisos:', error);
+
+      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+        this.errorMessage = 'Debes permitir el acceso a la cámara y micrófono para unirte a la videollamada.';
+      } else if (error.name === 'NotFoundError') {
+        this.errorMessage = 'No se detectó cámara o micrófono en tu dispositivo.';
+      } else {
+        this.errorMessage = 'Error al acceder a los dispositivos de media: ' + error.message;
+      }
+
+      this.isLoading = false;
+    }
+  }
+
   /**
    * Inicializa la videollamada
    */
@@ -73,16 +96,16 @@ export class VideoCallComponent implements OnInit, OnDestroy {
       this.isLoading = true;
       this.errorMessage = '';
 
-      // Configurar videollamada directamente con el sessionId
-      // El backend generará el enlace automáticamente si no existe
+      console.log(' Iniciando videollamada para sesión:', this.sessionId);
+
+      //  CAMBIO: Usar los valores de permisos activados
       const config: IVideoCallConfig = {
         sessionId: this.sessionId,
-        joinLink: '', // String vacío - el backend lo ignorará y generará el enlace
+        joinLink: '',
         cameraEnabled: this.cameraEnabled,
         microphoneEnabled: this.microphoneEnabled
       };
 
-      // Unirse a la videollamada
       await this.joinVideoCall(config);
 
     } catch (error: any) {
@@ -90,25 +113,16 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Alterna el estado de la cámara
-   */
   toggleCamera(): void {
     this.cameraEnabled = !this.cameraEnabled;
     this.videoCallService.toggleCamera(this.cameraEnabled);
   }
 
-  /**
-   * Alterna el estado del micrófono
-   */
   toggleMicrophone(): void {
     this.microphoneEnabled = !this.microphoneEnabled;
     this.videoCallService.toggleMicrophone(this.microphoneEnabled);
   }
 
-  /**
-   * Inicia/detiene compartir pantalla
-   */
   toggleScreenShare(): void {
     if (!this.canShareScreen) {
       alert('No tienes permisos para compartir pantalla. Solo los instructores pueden hacerlo.');
@@ -122,9 +136,6 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Sale de la videollamada
-   */
   leaveCall(): void {
     if (this.videoCallService.isJitsiActive()) {
       this.videoCallService.leaveVideoCall();
@@ -132,9 +143,6 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     this.router.navigate(['/app/dashboard']);
   }
 
-  /**
-   * Finaliza la sesión (solo instructor)
-   */
   async endSession(): Promise<void> {
     if (!this.videoCallData?.isModerator) {
       alert('Solo el instructor puede finalizar la sesión');
@@ -153,22 +161,16 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Alterna la visibilidad de los controles
-   */
   toggleControlsVisibility(): void {
     this.showControls = !this.showControls;
   }
   //#endregion
 
   //#region Private Methods
-  /**
-   * Se une a la videollamada con reintentos
-   * @param config Configuración de videollamada
-   */
   private async joinVideoCall(config: IVideoCallConfig): Promise<void> {
     try {
-      // Llamar al backend para unirse
+      console.log('📡 Conectando al backend...');
+
       const response = await this.videoCallService.joinVideoCall(config).toPromise();
       
       if (!response) {
@@ -176,6 +178,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
       }
       
       this.videoCallData = response;
+      console.log(' Datos recibidos:', this.videoCallData);
 
       // Validar permisos de compartir pantalla
       if (this.videoCallData.isModerator) {
@@ -183,26 +186,29 @@ export class VideoCallComponent implements OnInit, OnDestroy {
         this.canShareScreen = shareStatus?.canShareScreen || false;
       }
 
-      // Marcar como conectado PRIMERO para que Angular renderice el contenedor
+      // Marcar como conectado PRIMERO
       this.isConnected = true;
       this.isLoading = false;
 
       // Esperar a que Angular renderice el DOM
       await this.delay(100);
 
-      // Ahora sí inicializar Jitsi
+      console.log(' Inicializando Jitsi...');
+
+      // Inicializar Jitsi
       const initialized = await this.videoCallService.initializeJitsi('jitsi-container', this.videoCallData);
 
       if (!initialized) {
         throw new Error('No se pudo inicializar Jitsi');
       }
 
+      console.log(' Jitsi inicializado correctamente');
       this.retryCount = 0;
 
     } catch (error: any) {
       if (this.retryCount < this.maxRetries) {
         this.retryCount++;
-        console.log(`Reintento ${this.retryCount}/${this.maxRetries}...`);
+        console.log(` Reintento ${this.retryCount}/${this.maxRetries}...`);
         await this.delay(2000);
         await this.joinVideoCall(config);
       } else {
@@ -211,9 +217,6 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Inicia compartir pantalla
-   */
   private startScreenShare(): void {
     try {
       this.videoCallService.startScreenShare();
@@ -224,26 +227,21 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Detiene compartir pantalla
-   */
   private stopScreenShare(): void {
     this.videoCallService.stopScreenShare();
     this.isSharing = false;
   }
 
-  /**
-   * Maneja errores de la videollamada
-   * @param error Error capturado
-   */
   private handleError(error: any): void {
-    console.error('Error en videollamada:', error);
+    console.error(' Error en videollamada:', error);
     
     if (error.status === 401) {
       this.errorMessage = 'Usuario no autenticado. Redirigiendo a login...';
       setTimeout(() => this.router.navigate(['/login']), 2000);
     } else if (error.status === 400) {
       this.errorMessage = 'Enlace no válido o sesión no disponible';
+    } else if (error.status === 403) {
+      this.errorMessage = 'La sesión aún no está disponible. Espera a que el instructor la active.';
     } else if (error.error?.message) {
       this.errorMessage = error.error.message;
     } else {
@@ -254,11 +252,6 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     this.isConnected = false;
   }
 
-  /**
-   * Crea un delay
-   * @param ms Milisegundos a esperar
-   * @returns Promise
-   */
   private delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
