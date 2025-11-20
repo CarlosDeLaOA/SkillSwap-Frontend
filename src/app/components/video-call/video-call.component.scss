@@ -5,9 +5,11 @@
   left: 0;
   width: 100%;
   height: 100vh;
-  background: #1a1a1a;
+  background: #000;
   z-index: 9999;
   overflow: hidden;
+  /* ⭐ Padding para crear separación */
+  padding: 20px;
 }
 
 /*** Loading Overlay ***/
@@ -128,143 +130,11 @@
 
 /*** Video Call Active ***/
 .video-call-active {
-  position: relative;
   width: 100%;
   height: 100%;
-}
-
-.jitsi-container {
-  width: 100%;
-  height: 100%;
-}
-
-/*** Controls Overlay ***/
-.controls-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 20px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
-  transition: transform 0.3s ease;
-  z-index: 100;
-}
-
-.controls-overlay.hidden {
-  transform: translateY(100%);
-}
-
-.controls-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
-  flex-wrap: wrap;
-}
-
-.control-btn {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  font-size: 24px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   position: relative;
-  backdrop-filter: blur(10px);
-}
-
-.control-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.1);
-}
-
-.control-btn.active {
-  background: #4CAF50;
-}
-
-.control-btn i {
-  font-size: 28px;
-}
-
-.screen-share {
-  position: relative;
-}
-
-.sharing-indicator {
-  position: absolute;
-  bottom: -25px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 12px;
-  background: #4CAF50;
-  padding: 4px 12px;
-  border-radius: 12px;
-  white-space: nowrap;
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
-
-.leave-btn {
-  background: #f44336;
-}
-
-.leave-btn:hover {
-  background: #d32f2f;
-}
-
-.end-session-btn {
-  width: auto;
-  padding: 0 25px;
-  border-radius: 30px;
-  font-size: 14px;
-  background: #ff9800;
-  font-weight: bold;
-  gap: 8px;
-}
-
-.end-session-btn:hover {
-  background: #f57c00;
-}
-
-.end-session-btn i {
-  font-size: 20px;
-}
-
-/*** Toggle Controls Button ***/
-.toggle-controls-btn {
-  position: absolute;
-  bottom: 120px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(0, 0, 0, 0.6);
-  color: white;
-  font-size: 24px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(10px);
-  z-index: 99;
-}
-
-.toggle-controls-btn:hover {
-  background: rgba(0, 0, 0, 0.8);
-  transform: translateX(-50%) scale(1.1);
+  border-radius: 20px;
+  overflow: hidden;
 }
 
 /*** Session Info Badge ***/
@@ -272,9 +142,9 @@
   position: absolute;
   top: 20px;
   left: 20px;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.8);
   color: white;
-  padding: 12px 20px;
+  padding: 10px 18px;
   border-radius: 25px;
   display: flex;
   align-items: center;
@@ -285,136 +155,345 @@
 }
 
 .session-info-badge i {
-  font-size: 20px;
+  font-size: 18px;
+}
+
+.timer {
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.divider {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.session-title {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
 }
 
 .moderator-badge {
   background: #ffd700;
   color: #1a1a1a;
-  padding: 4px 12px;
-  border-radius: 15px;
+  padding: 4px 10px;
+  border-radius: 12px;
   font-weight: bold;
   display: flex;
   align-items: center;
   gap: 5px;
-  margin-left: 10px;
+  font-size: 12px;
 }
 
 .moderator-badge i {
-  font-size: 16px;
+  font-size: 14px;
 }
 
-/*** Recording Notification ***/
-.recording-notification {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: rgba(244, 67, 54, 0.9);
-  color: white;
-  padding: 12px 20px;
-  border-radius: 25px;
+/*** ⭐ Main Content Wrapper ***/
+.content-wrapper {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 200px;
+  gap: 10px;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+/*** Left Section: Main Video ***/
+.left-section {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.main-video-container {
+  flex: 1;
+  width: 100%;
+  background: #1a1a1a;
+  position: relative;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.jitsi-container {
+  width: 100%;
+  height: 100%;
+}
+
+/*** ⭐ Right Sidebar: Participants (altura limitada) ***/
+.right-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: transparent;
+  /* ⭐ Altura limitada - termina donde empiezan los botones */
+  max-height: calc(100vh - 140px); /* 20px top + 100px bottom */
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+/* Ocultar scrollbar pero mantener funcionalidad */
+.right-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.right-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.right-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.right-sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.participant-tile {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 13px;
+  justify-content: center;
+  border-radius: 15px;
+  min-height: 150px;
+  transition: transform 0.2s ease;
+  overflow: hidden;
+  position: relative;
+}
+
+.participant-tile:hover {
+  transform: scale(1.02);
+}
+
+.participant-tile.participant-1 {
+  background: linear-gradient(135deg, #8b9eea 0%, #8b6bb8 100%);
+}
+
+.participant-tile.participant-2 {
+  background: linear-gradient(135deg, #ff9eb5 0%, #ff7a8c 100%);
+}
+
+.participant-tile.participant-3 {
+  background: linear-gradient(135deg, #7ed3ff 0%, #5bc8ff 100%);
+}
+
+.participant-tile.participant-4 {
+  background: linear-gradient(135deg, #a5886b 0%, #8b6f52 100%);
+}
+
+.participant-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+  z-index: 2;
+}
+
+.participant-initials {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: bold;
+  color: white;
+}
+
+.participant-label {
+  font-size: 12px;
+  color: white;
+  text-align: center;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 4px 10px;
+  border-radius: 10px;
+}
+
+.participant-content i {
+  font-size: 48px;
+  color: white;
+  opacity: 0.7;
+}
+
+/* ⭐ Video del participante (cuando enciende cámara) */
+.participant-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+/*** ⭐ Custom Action Buttons (Bottom Right) ***/
+.custom-action-buttons {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  display: flex;
+  gap: 15px;
+  z-index: 1000;
+}
+
+.action-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   backdrop-filter: blur(10px);
-  z-index: 100;
-  animation: recordingPulse 2s infinite;
 }
 
-@keyframes recordingPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
 }
 
-.recording-notification i {
-  font-size: 18px;
-  animation: recordingBlink 1s infinite;
+.action-btn i {
+  font-size: 24px;
 }
 
-@keyframes recordingBlink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+/*** Modal: End Session ***/
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  animation: fadeIn 0.3s ease;
 }
 
-/*** Responsive Design ***/
-@media (max-width: 768px) {
-  .controls-container {
-    gap: 10px;
-  }
-
-  .control-btn {
-    width: 50px;
-    height: 50px;
-    font-size: 20px;
-  }
-
-  .control-btn i {
-    font-size: 24px;
-  }
-
-  .end-session-btn {
-    width: 50px;
-    padding: 0;
-  }
-
-  .end-session-btn span {
-    display: none;
-  }
-
-  .session-info-badge,
-  .recording-notification {
-    font-size: 12px;
-    padding: 8px 15px;
-  }
-
-  .error-content {
-    padding: 20px;
-    max-width: 90%;
-  }
-
-  .error-content h2 {
-    font-size: 22px;
-  }
-
-  .error-content i {
-    font-size: 60px;
-  }
+.modal-content {
+  background: #2c2c2c;
+  border-radius: 20px;
+  padding: 0;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.4s ease;
 }
 
-@media (max-width: 480px) {
-  .controls-overlay {
-    padding: 15px;
-  }
+.modal-header {
+  padding: 25px 30px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-  .control-btn {
-    width: 45px;
-    height: 45px;
-  }
+.modal-header h2 {
+  margin: 0;
+  font-size: 24px;
+  color: white;
+}
 
-  .toggle-controls-btn {
-    width: 40px;
-    height: 40px;
-    bottom: 100px;
-  }
+.modal-close {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 32px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
 
-  .session-info-badge {
-    top: 10px;
-    left: 10px;
-    font-size: 11px;
-    padding: 8px 12px;
-  }
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(90deg);
+}
 
-  .recording-notification {
-    top: 10px;
-    right: 10px;
-    font-size: 11px;
-    padding: 8px 12px;
-  }
+.modal-body {
+  padding: 30px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+  text-align: center;
+}
 
-  .moderator-badge {
-    display: none;
-  }
+.modal-actions {
+  padding: 20px 30px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-btn {
+  padding: 15px 25px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.modal-btn i {
+  font-size: 20px;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #ff6b6b 0%, #c92a2a 100%);
+  color: white;
+}
+
+.btn-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+}
+
+.modal-btn.btn-secondary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+}
+
+.modal-btn.btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-cancel {
+  background: transparent;
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 /*** Permission Dialog ***/
@@ -486,6 +565,74 @@
   font-style: italic;
   color: #95a5a6;
   margin-top: 20px;
+}
+
+/*** Responsive Design ***/
+@media (max-width: 1200px) {
+  .content-wrapper {
+    grid-template-columns: 1fr 180px;
+  }
+
+  .participant-initials {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+  }
+
+  .participant-content i {
+    font-size: 40px;
+  }
+
+  .participant-tile {
+    min-height: 130px;
+  }
+}
+
+@media (max-width: 768px) {
+  .video-call-container {
+    padding: 10px;
+  }
+
+  .content-wrapper {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 120px;
+    gap: 10px;
+  }
+
+  .right-sidebar {
+    flex-direction: row;
+    gap: 10px;
+    max-height: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-right: 0;
+    padding-bottom: 5px;
+  }
+
+  .participant-tile {
+    min-width: 120px;
+    min-height: 100%;
+  }
+
+  .custom-action-buttons {
+    bottom: 20px;
+    right: 20px;
+    flex-direction: column;
+  }
+
+  .action-btn {
+    width: 48px;
+    height: 48px;
+  }
+
+  .session-info-badge {
+    font-size: 12px;
+    padding: 8px 15px;
+  }
+
+  .moderator-badge {
+    display: none;
+  }
 }
 
 @keyframes fadeIn {

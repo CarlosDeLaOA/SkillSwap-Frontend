@@ -9,7 +9,7 @@ import { IVideoCallConfig, IVideoCallData, IScreenShareStatus } from '../../inte
   standalone: true,
   imports: [CommonModule],
   templateUrl: './video-call.component.html',
-  styleUrls: ['./video-call.component.scss']
+  styleUrl: './video-call.component.scss'
 })
 export class VideoCallComponent implements OnInit, OnDestroy {
 
@@ -26,7 +26,8 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   showControls: boolean = true;
   retryCount: number = 0;
   maxRetries: number = 3;
-  showPermissionDialog: boolean = true; 
+  showPermissionDialog: boolean = true;
+  showEndSessionModal: boolean = false;
   //#endregion
 
   constructor(
@@ -39,9 +40,11 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.sessionId = +params['sessionId'];
-    
       this.requestMediaPermissions();
     });
+
+    // Interceptar evento de Jitsi "hangup" para mostrar modal en Instructor
+    this.setupHangupInterceptor();
   }
 
   ngOnDestroy(): void {
@@ -49,6 +52,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   }
   //#endregion
 
+  //#region Permissions
   async requestMediaPermissions(): Promise<void> {
     try {
       this.isLoading = true;
@@ -56,25 +60,19 @@ export class VideoCallComponent implements OnInit, OnDestroy {
 
       console.log('🎤 Solicitando permisos de cámara y micrófono...');
 
-      // Solicitar acceso a cámara y micrófono
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true
       });
 
-      console.log(' Permisos concedidos');
-
-      
+      console.log('✅ Permisos concedidos');
       stream.getTracks().forEach(track => track.stop());
 
-      // Ocultar diálogo de permisos
       this.showPermissionDialog = false;
-
-     
       await this.initializeVideoCall();
 
     } catch (error: any) {
-      console.error(' Error al solicitar permisos:', error);
+      console.error('❌ Error al solicitar permisos:', error);
 
       if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
         this.errorMessage = 'Debes permitir el acceso a la cámara y micrófono para unirte a la videollamada.';
@@ -87,18 +85,16 @@ export class VideoCallComponent implements OnInit, OnDestroy {
       this.isLoading = false;
     }
   }
+  //#endregion
 
-  /**
-   * Inicializa la videollamada
-   */
+  //#region Video Call Initialization
   async initializeVideoCall(): Promise<void> {
     try {
       this.isLoading = true;
       this.errorMessage = '';
 
-      console.log(' Iniciando videollamada para sesión:', this.sessionId);
+      console.log('🚀 Iniciando videollamada para sesión:', this.sessionId);
 
-      //  CAMBIO: Usar los valores de permisos activados
       const config: IVideoCallConfig = {
         sessionId: this.sessionId,
         joinLink: '',
@@ -113,60 +109,6 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     }
   }
 
-  toggleCamera(): void {
-    this.cameraEnabled = !this.cameraEnabled;
-    this.videoCallService.toggleCamera(this.cameraEnabled);
-  }
-
-  toggleMicrophone(): void {
-    this.microphoneEnabled = !this.microphoneEnabled;
-    this.videoCallService.toggleMicrophone(this.microphoneEnabled);
-  }
-
-  toggleScreenShare(): void {
-    if (!this.canShareScreen) {
-      alert('No tienes permisos para compartir pantalla. Solo los instructores pueden hacerlo.');
-      return;
-    }
-
-    if (!this.isSharing) {
-      this.startScreenShare();
-    } else {
-      this.stopScreenShare();
-    }
-  }
-
-  leaveCall(): void {
-    if (this.videoCallService.isJitsiActive()) {
-      this.videoCallService.leaveVideoCall();
-    }
-    this.router.navigate(['/app/dashboard']);
-  }
-
-  async endSession(): Promise<void> {
-    if (!this.videoCallData?.isModerator) {
-      alert('Solo el instructor puede finalizar la sesión');
-      return;
-    }
-
-    const confirm = window.confirm('¿Estás seguro de que deseas finalizar la sesión para todos?');
-    if (!confirm) return;
-
-    try {
-      await this.videoCallService.endVideoCall(this.sessionId).toPromise();
-      this.leaveCall();
-    } catch (error) {
-      console.error('Error al finalizar sesión:', error);
-      alert('Error al finalizar la sesión');
-    }
-  }
-
-  toggleControlsVisibility(): void {
-    this.showControls = !this.showControls;
-  }
-  //#endregion
-
-  //#region Private Methods
   private async joinVideoCall(config: IVideoCallConfig): Promise<void> {
     try {
       console.log('📡 Conectando al backend...');
@@ -178,37 +120,33 @@ export class VideoCallComponent implements OnInit, OnDestroy {
       }
       
       this.videoCallData = response;
-      console.log(' Datos recibidos:', this.videoCallData);
+      console.log('✅ Datos recibidos:', this.videoCallData);
 
-      // Validar permisos de compartir pantalla
       if (this.videoCallData.isModerator) {
         const shareStatus = await this.videoCallService.validateScreenShare(this.sessionId).toPromise();
         this.canShareScreen = shareStatus?.canShareScreen || false;
       }
 
-      // Marcar como conectado PRIMERO
       this.isConnected = true;
       this.isLoading = false;
 
-      // Esperar a que Angular renderice el DOM
       await this.delay(100);
 
-      console.log(' Inicializando Jitsi...');
+      console.log('🎬 Inicializando Jitsi...');
 
-      // Inicializar Jitsi
       const initialized = await this.videoCallService.initializeJitsi('jitsi-container', this.videoCallData);
 
       if (!initialized) {
         throw new Error('No se pudo inicializar Jitsi');
       }
 
-      console.log(' Jitsi inicializado correctamente');
+      console.log('✅ Jitsi inicializado correctamente');
       this.retryCount = 0;
 
     } catch (error: any) {
       if (this.retryCount < this.maxRetries) {
         this.retryCount++;
-        console.log(` Reintento ${this.retryCount}/${this.maxRetries}...`);
+        console.log(`🔄 Reintento ${this.retryCount}/${this.maxRetries}...`);
         await this.delay(2000);
         await this.joinVideoCall(config);
       } else {
@@ -216,24 +154,111 @@ export class VideoCallComponent implements OnInit, OnDestroy {
       }
     }
   }
+  //#endregion
 
-  private startScreenShare(): void {
-    try {
-      this.videoCallService.startScreenShare();
-      this.isSharing = true;
-    } catch (error) {
-      console.error('Error al compartir pantalla:', error);
-      alert('No se pudo iniciar compartir pantalla. Verifica los permisos del navegador.');
+  //#region Hangup Interceptor
+  private setupHangupInterceptor(): void {
+    // Escuchar el evento global de Jitsi para interceptar "hangup"
+    window.addEventListener('jitsi-hangup-clicked', (event: any) => {
+      if (this.videoCallData?.isModerator) {
+        event.preventDefault();
+        this.showEndSessionModal = true;
+      } else {
+        this.leaveCall();
+      }
+    });
+  }
+  //#endregion
+
+  //#region Custom Buttons Actions (Right Side)
+  /**
+   * Abre/cierra el panel de participantes de Jitsi
+   */
+  toggleParticipants(): void {
+    if (this.videoCallService.isJitsiActive()) {
+      try {
+        // Acceder a la API de Jitsi para ejecutar comando
+        const jitsiApi = (this.videoCallService as any).jitsiApi;
+        if (jitsiApi) {
+          jitsiApi.executeCommand('toggleParticipantsPane');
+          console.log('👥 Panel de participantes toggled');
+        }
+      } catch (error) {
+        console.error('Error al abrir participantes:', error);
+      }
     }
   }
 
-  private stopScreenShare(): void {
-    this.videoCallService.stopScreenShare();
-    this.isSharing = false;
+  /**
+   * Abre/cierra el chat de Jitsi
+   */
+  toggleChat(): void {
+    if (this.videoCallService.isJitsiActive()) {
+      try {
+        const jitsiApi = (this.videoCallService as any).jitsiApi;
+        if (jitsiApi) {
+          jitsiApi.executeCommand('toggleChat');
+          console.log('💬 Chat toggled');
+        }
+      } catch (error) {
+        console.error('Error al abrir chat:', error);
+      }
+    }
   }
 
+  /**
+   * Funcionalidad de documentos (por implementar)
+   * Tu compañera puede agregar aquí la lógica de subida de documentos
+   */
+  toggleDocuments(): void {
+    console.log('📄 Botón de documentos clickeado');
+    // Por ahora solo un mensaje, tu compañera puede implementar la funcionalidad
+    alert('Funcionalidad de subida de documentos - Por implementar');
+    
+    // Ejemplo de cómo podría funcionar:
+    // this.openDocumentUploadModal();
+    // O abrir etherpad de Jitsi:
+    // const jitsiApi = (this.videoCallService as any).jitsiApi;
+    // if (jitsiApi) {
+    //   jitsiApi.executeCommand('toggleEtherpad');
+    // }
+  }
+  //#endregion
+
+  //#region Modal Actions
+  closeEndSessionModal(): void {
+    this.showEndSessionModal = false;
+  }
+
+  async endSessionForEveryone(): Promise<void> {
+    try {
+      await this.videoCallService.endVideoCall(this.sessionId).toPromise();
+      this.showEndSessionModal = false;
+      this.leaveCall();
+    } catch (error) {
+      console.error('Error al finalizar sesión:', error);
+      alert('Error al finalizar la sesión');
+    }
+  }
+
+  leaveSessionOnly(): void {
+    this.showEndSessionModal = false;
+    this.leaveCall();
+  }
+  //#endregion
+
+  //#region Leave Call
+  leaveCall(): void {
+    if (this.videoCallService.isJitsiActive()) {
+      this.videoCallService.leaveVideoCall();
+    }
+    this.router.navigate(['/app/dashboard']);
+  }
+  //#endregion
+
+  //#region Error Handling
   private handleError(error: any): void {
-    console.error(' Error en videollamada:', error);
+    console.error('❌ Error en videollamada:', error);
     
     if (error.status === 401) {
       this.errorMessage = 'Usuario no autenticado. Redirigiendo a login...';
