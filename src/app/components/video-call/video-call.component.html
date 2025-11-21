@@ -31,7 +31,7 @@
     <!-- Session Info Badge -->
     <div class="session-info-badge">
       <i class='bx bx-time'></i>
-      <span class="timer">00:00</span>
+      <span class="timer">{{ sessionTimer }}</span>
       <span class="divider">|</span>
       <span class="session-title">Sesión #{{ sessionId }}</span>
       <span *ngIf="videoCallData?.isModerator" class="moderator-badge">
@@ -39,45 +39,43 @@
       </span>
     </div>
 
+    <!-- ⭐ Recording Indicator (Solo visible cuando está grabando) -->
+    <div *ngIf="isRecording" class="recording-indicator">
+      <div class="recording-dot"></div>
+      <span>GRABANDO {{ recordingDuration }}</span>
+    </div>
+
     <!-- Main Content Area -->
     <div class="content-wrapper">
       
-      <!-- Left: Main Video + Controls -->
+      <!-- Left: Main Video -->
       <div class="left-section">
-        
-        <!-- Main Video -->
         <div class="main-video-container">
           <div id="jitsi-container" class="jitsi-container"></div>
         </div>
-
-        <!-- Jitsi Controls (will appear here automatically) -->
-        
       </div>
 
-      <!-- Right: Participants Sidebar -->
-      <div class="right-sidebar">
-        <div class="participant-tile participant-1">
-          <div class="participant-content">
-            <span class="participant-initials">JM</span>
-            <span class="participant-label">Jose Mario Ar...</span>
-          </div>
-        </div>
-        <div class="participant-tile participant-2">
-          <div class="participant-content">
-            <i class='bx bx-user'></i>
-          </div>
-        </div>
-        <div class="participant-tile participant-3">
-          <div class="participant-content">
-            <i class='bx bx-user'></i>
-          </div>
-        </div>
-        <div class="participant-tile participant-4">
-          <div class="participant-content">
-            <i class='bx bx-user'></i>
-          </div>
-        </div>
-      </div>
+      <!-- Right: Participants Sidebar  -->
+<div class="right-sidebar">
+  <div 
+    *ngFor="let participant of jitsiParticipants; let i = index" 
+    class="participant-tile"
+    [style.background]="getParticipantColor(i)">
+    
+    <!-- ⭐ Contenedor para video del participante -->
+    <div 
+      [id]="'participant-video-' + participant.id" 
+      class="participant-video-container">
+      <!-- El video se insertará aquí dinámicamente -->
+    </div>
+
+    <!-- Avatar/Nombre -->
+    <div class="participant-content" [class.has-video]="participant.hasVideo">
+      <span class="participant-initials" *ngIf="!participant.hasVideo">{{ participant.initials }}</span>
+      <span class="participant-label">{{ participant.displayName }}</span>
+    </div>
+  </div>
+</div>
 
     </div>
 
@@ -92,13 +90,60 @@
       <button class="action-btn" title="Documentos" (click)="toggleDocuments()">
         <i class='bx bx-file'></i>
       </button>
+      
+      <!-- ⭐ Botón de GRABACIÓN (solo instructor, reemplaza el botón de upload) -->
+      <button 
+        *ngIf="videoCallData?.isModerator && hasGivenConsent" 
+        class="action-btn"
+        [class.recording-active]="isRecording"
+        [title]="isRecording ? 'Detener grabación' : 'Iniciar grabación de audio'" 
+        (click)="toggleRecording()">
+        <i class='bx' [class.bx-microphone]="!isRecording" [class.bx-stop]="isRecording"></i>
+      </button>
     </div>
 
   </div>
 </div>
 
+<!-- Consent Dialog (Consentimiento de Grabación) -->
+<div *ngIf="showConsentDialog" class="modal-overlay consent-overlay">
+  <div class="modal-content consent-modal">
+    <div class="modal-header">
+      <h2>
+        <i class='bx bx-shield-alt-2'></i>
+        Consentimiento de Grabación
+      </h2>
+    </div>
+    <div class="modal-body">
+      <p class="consent-text">
+        Al unirte a esta sesión, aceptas que el audio de la sesión puede ser grabado 
+        automáticamente para su posterior procesamiento mediante IA.
+      </p>
+      <ul class="consent-list">
+        <li><i class='bx bx-check'></i> Solo se graba audio, no video</li>
+        <li><i class='bx bx-check'></i> La grabación es iniciada únicamente por el instructor</li>
+        <li><i class='bx bx-check'></i> Los archivos son eliminados después del procesamiento IA</li>
+        <li><i class='bx bx-check'></i> Se garantiza la privacidad de tus datos</li>
+      </ul>
+      <p class="consent-warning">
+        <i class='bx bx-info-circle'></i>
+        Si no aceptas, no podrás unirte a la sesión y las funciones de IA estarán deshabilitadas.
+      </p>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn btn-primary-consent" (click)="acceptConsent()">
+        <i class='bx bx-check-circle'></i>
+        Acepto y Unirme
+      </button>
+      <button class="modal-btn btn-cancel" (click)="declineConsent()">
+        No Acepto
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- Permission Dialog -->
-<div *ngIf="showPermissionDialog" class="permission-dialog-overlay">
+<div *ngIf="showPermissionDialog && !showConsentDialog" class="permission-dialog-overlay">
   <div class="permission-dialog">
     <i class='bx bx-video-recording'></i>
     <h2>Permisos Necesarios</h2>
@@ -111,6 +156,22 @@
   </div>
 </div>
 
+<!-- Modal: Participantes -->
+<app-participants-modal
+  *ngIf="showParticipantsModal"
+  [participants]="jitsiParticipants"
+  (closeModal)="closeParticipantsModal()">
+</app-participants-modal>
+
+<!-- Modal: Documentos -->
+<app-documents-modal
+  *ngIf="showDocumentsModal"
+  [sessionId]="sessionId"
+  [isModerator]="videoCallData?.isModerator || false"
+  [currentUserId]="0"
+  (closeModal)="closeDocumentsModal()">
+</app-documents-modal>
+
 <!-- Modal: End Session Confirmation (Only for Instructor) -->
 <div *ngIf="showEndSessionModal" class="modal-overlay" (click)="closeEndSessionModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
@@ -122,6 +183,10 @@
     </div>
     <div class="modal-body">
       <p>¿Qué deseas hacer?</p>
+      <p *ngIf="isRecording" class="warning-text">
+        <i class='bx bx-error-circle'></i>
+        La grabación se detendrá automáticamente
+      </p>
     </div>
     <div class="modal-actions">
       <button class="modal-btn btn-danger" (click)="endSessionForEveryone()">
