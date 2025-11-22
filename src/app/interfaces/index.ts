@@ -308,6 +308,12 @@ export interface ILearningSession {
   currentBookings?: number;
   availableSpots?: number;
 }
+export interface ILearningSessionWithSuggestion extends ILearningSession {
+  isSuggested?: boolean;
+  matchScore?: number;
+  reason?: string;
+  suggestionId?: number;
+}
 
 export interface IKnowledgeArea {
   id: number;
@@ -330,7 +336,37 @@ export interface ISaveUserSkillsRequest {
   skillIds: number[];
 }
 
+// ========================================
+// INTERFACES DE SUGERENCIAS DE SESIONES
+// ========================================
 
+/**
+ * Interfaz para una sugerencia de sesión individual
+ */
+export interface ISessionSuggestion {
+  id: number;
+  person: IPerson;
+  learningSession: ILearningSession;
+  matchScore: number;
+  reason: string;
+  viewed: boolean;
+  createdAt: string;
+  viewedAt?: string;
+}
+
+/**
+ * Interfaz para la respuesta de sugerencias del backend
+ */
+export interface ISuggestionResponse {
+  success: boolean;
+  message: string;
+  count: number;
+  data: ISessionSuggestion[];
+}
+
+// ========================================
+// INTERFACES DE DASHBOARD EXPORT
+// ========================================
 export interface IDashboardExportData {
   balance: IBalanceData;
   learningHours: ILearningHoursData;
