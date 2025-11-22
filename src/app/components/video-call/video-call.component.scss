@@ -893,3 +893,119 @@
     color: #4CAF50;
   }
 }
+
+
+/* ========================================== */
+/* NOTAS COLABORATIVAS */
+/* ========================================== */
+
+.notes-panel-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10002;
+  animation: fadeIn 0.3s ease;
+}
+
+.notes-panel-container {
+  background: #1e1e1e;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 900px;
+  height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.4s ease;
+  overflow: hidden;
+}
+
+.notes-panel-header {
+  padding: 20px 30px;
+  background: #2a2a2a;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h3 {
+    margin: 0;
+    font-size: 22px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    i {
+      font-size: 26px;
+      color: #AAE16B;
+    }
+  }
+}
+
+.notes-close-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 107, 107, 0.2);
+    border-color: rgba(255, 107, 107, 0.5);
+    color: #ff6b6b;
+    transform: rotate(90deg);
+  }
+}
+
+.notes-panel-content {
+  flex: 1;
+  overflow: hidden;
+  background: #1e1e1e;
+}
+
+/* Botón activo */
+.action-btn.active {
+  background: rgba(170, 225, 107, 0.3) !important;
+  border: 2px solid rgba(170, 225, 107, 0.6);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .notes-panel-container {
+    width: 95%;
+    height: 90vh;
+    border-radius: 15px;
+  }
+
+  .notes-panel-header {
+    padding: 15px 20px;
+
+    h3 {
+      font-size: 18px;
+
+      i {
+        font-size: 22px;
+      }
+    }
+  }
+
+  .notes-close-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
+  }
+}

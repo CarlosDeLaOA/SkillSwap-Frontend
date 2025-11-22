@@ -1,0 +1,55 @@
+<div class="collaborative-document">
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando documento...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="errorMessage && !isLoading" class="error-container">
+    <i class='bx bx-error-circle'></i>
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <!-- Documento -->
+  <div *ngIf="!isLoading && !errorMessage" class="document-container">
+
+    <!-- Header -->
+    <div class="document-header">
+      <div class="header-left">
+        <i class='bx bx-note'></i>
+        <h3>Notas Colaborativas</h3>
+      </div>
+      <div class="header-right">
+        <button class="btn-export" (click)="exportDocument()" title="Exportar">
+          <i class='bx bx-download'></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="editor-wrapper">
+      <quill-editor (onEditorCreated)="onEditorCreated($event)" [modules]="quillConfig"
+        placeholder="Comienza a escribir tus notas aquí..." class="quill-editor">
+      </quill-editor>
+    </div>
+
+    <!-- Footer info -->
+    <div class="document-footer">
+      <span class="version-info">
+        <i class='bx bx-time-five'></i>
+        Versión: {{ version }}
+      </span>
+      <span class="auto-save" *ngIf="isSaving">
+        <i class='bx bx-loader-alt bx-spin'></i>
+        Guardando...
+      </span>
+      <span class="auto-save saved" *ngIf="!isSaving">
+        <i class='bx bx-check-circle'></i>
+        Guardado
+      </span>
+    </div>
+
+  </div>
+
+</div>
