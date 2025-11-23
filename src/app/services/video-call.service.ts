@@ -86,9 +86,7 @@ export class VideoCallService {
 
   //#region Native Browser Recording (MediaRecorder API)
   
-  /**
-   * ⭐ SOLUCIÓN FINAL: Captura audio directo de Jitsi + Micrófono del usuario
-   */
+  
   async startNativeAudioRecording(sessionId: number): Promise<boolean> {
     try {
       console.log('========================================');
@@ -96,10 +94,10 @@ export class VideoCallService {
       console.log('   Método: Audio directo de Jitsi + Micrófono');
       console.log('========================================');
 
-      // ⭐ PASO 1: Obtener audio de Jitsi (remoto)
+      
       const jitsiAudioTracks = await this.getJitsiAudioTracks();
       
-      // ⭐ PASO 2: Capturar micrófono del usuario (local)
+    
       this.userMicStream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: false,
@@ -110,10 +108,10 @@ export class VideoCallService {
         }
       });
 
-      console.log('✅ Micrófono del usuario capturado');
+      console.log(' Micrófono del usuario capturado');
       console.log('   Tracks:', this.userMicStream.getAudioTracks().length);
 
-      // ⭐ PASO 3: Combinar audio de Jitsi + Micrófono
+     
       this.audioContext = new AudioContext({ sampleRate: 48000 });
       const destination = this.audioContext.createMediaStreamDestination();
 
@@ -122,21 +120,21 @@ export class VideoCallService {
         const jitsiStream = new MediaStream(jitsiAudioTracks);
         const jitsiSource = this.audioContext.createMediaStreamSource(jitsiStream);
         jitsiSource.connect(destination);
-        console.log('✅ Audio remoto de Jitsi conectado');
+        console.log(' Audio remoto de Jitsi conectado');
       } else {
-        console.warn('⚠️ No se detectó audio remoto de Jitsi');
+        console.warn(' No se detectó audio remoto de Jitsi');
       }
 
-      // Añadir micrófono local
+     
       const micSource = this.audioContext.createMediaStreamSource(this.userMicStream);
       micSource.connect(destination);
-      console.log('✅ Micrófono local conectado');
+      console.log(' Micrófono local conectado');
 
-      // Stream combinado
+      
       this.recordingStream = destination.stream;
 
       const audioTracks = this.recordingStream.getAudioTracks();
-      console.log('📊 Stream final:');
+      console.log(' Stream final:');
       console.log('   Audio tracks:', audioTracks.length);
 
       if (audioTracks.length === 0) {
@@ -153,9 +151,9 @@ export class VideoCallService {
         });
       });
 
-      // ⭐ PASO 4: Configurar MediaRecorder
+      
       const mimeType = this.getBestAudioMimeType();
-      console.log('🎵 Configurando MediaRecorder');
+      console.log(' Configurando MediaRecorder');
       console.log('   MIME Type:', mimeType);
       console.log('   Bitrate: 128 kbps');
 
@@ -166,19 +164,18 @@ export class VideoCallService {
 
       this.audioChunks = [];
 
-      // ⭐ EVENTOS
       this.mediaRecorder.ondataavailable = (event) => {
         if (event.data && event.data.size > 0) {
           this.audioChunks.push(event.data);
-          console.log('📦 Chunk recibido:', this.formatBytes(event.data.size));
+          console.log(' Chunk recibido:', this.formatBytes(event.data.size));
         }
       };
 
       this.mediaRecorder.onstop = async () => {
-        console.log('⏹️ MediaRecorder detenido');
+        console.log(' MediaRecorder detenido');
         console.log('   Total chunks:', this.audioChunks.length);
         
-        // Detener todos los tracks
+      
         if (this.recordingStream) {
           this.recordingStream.getTracks().forEach(track => track.stop());
         }
@@ -195,55 +192,51 @@ export class VideoCallService {
       };
 
       this.mediaRecorder.onerror = (error) => {
-        console.error('❌ Error en MediaRecorder:', error);
+        console.error(' Error en MediaRecorder:', error);
       };
 
       this.mediaRecorder.onstart = () => {
-        console.log('▶️ MediaRecorder iniciado');
+        console.log('▶ MediaRecorder iniciado');
         console.log('   Estado:', this.mediaRecorder?.state);
       };
 
-      // ⭐ PASO 5: Iniciar grabación
-      this.mediaRecorder.start(1000); // Capturar cada segundo
+     
+      this.mediaRecorder.start(500); 
 
       console.log('========================================');
-      console.log('✅ GRABACIÓN INICIADA EXITOSAMENTE');
+      console.log(' GRABACIÓN INICIADA EXITOSAMENTE');
       console.log('   Estado:', this.mediaRecorder.state);
       console.log('========================================');
 
       return true;
 
     } catch (error: any) {
-      console.error('❌ ERROR AL INICIAR GRABACIÓN:', error);
+      console.error(' ERROR AL INICIAR GRABACIÓN:', error);
       
+     
       if (error.name === 'NotAllowedError') {
-        alert('❌ Permiso denegado.\n\nDebes permitir el uso del micrófono.');
+        console.error('   El usuario denegó el permiso del micrófono');
       } else if (error.name === 'NotFoundError') {
-        alert('❌ No se encontró dispositivo de audio.');
-      } else {
-        alert('❌ Error: ' + error.message);
+        console.error('   No se encontró dispositivo de audio');
       }
       
       return false;
     }
   }
 
-  /**
-   * ⭐ Obtiene los tracks de audio remotos de Jitsi
-   */
   private async getJitsiAudioTracks(): Promise<MediaStreamTrack[]> {
     try {
       const audioTracks: MediaStreamTrack[] = [];
       
       if (!this.jitsiApi) {
-        console.warn('⚠️ Jitsi API no disponible');
+        console.warn(' Jitsi API no disponible');
         return audioTracks;
       }
 
       // Obtener todos los participantes remotos
       const participants = await this.jitsiApi.getParticipantsInfo();
       
-      console.log('👥 Participantes en Jitsi:', participants.length);
+      console.log(' Participantes en Jitsi:', participants.length);
 
       // Obtener video containers de Jitsi
       const videoContainers = document.querySelectorAll('video');
@@ -256,7 +249,7 @@ export class VideoCallService {
           tracks.forEach(track => {
             if (!audioTracks.find(t => t.id === track.id)) {
               audioTracks.push(track);
-              console.log('🎤 Audio track encontrado:', track.label || track.id);
+              console.log(' Audio track encontrado:', track.label || track.id);
             }
           });
         }
@@ -265,14 +258,11 @@ export class VideoCallService {
       return audioTracks;
 
     } catch (error) {
-      console.error('⚠️ Error al obtener audio de Jitsi:', error);
+      console.error(' Error al obtener audio de Jitsi:', error);
       return [];
     }
   }
 
-  /**
-   * Obtiene el mejor MIME type para audio
-   */
   private getBestAudioMimeType(): string {
     const types = [
       'audio/webm;codecs=opus',
@@ -283,12 +273,12 @@ export class VideoCallService {
 
     for (const type of types) {
       if (MediaRecorder.isTypeSupported(type)) {
-        console.log('✅ MIME type soportado:', type);
+        console.log(' MIME type soportado:', type);
         return type;
       }
     }
 
-    console.warn('⚠️ Usando MIME type por defecto');
+    console.warn(' Usando MIME type por defecto');
     return 'audio/webm';
   }
 
@@ -298,14 +288,14 @@ export class VideoCallService {
   stopNativeAudioRecording(): void {
     if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
       console.log('========================================');
-      console.log('⏹️ DETENIENDO GRABACIÓN');
+      console.log(' DETENIENDO GRABACIÓN');
       console.log('   Estado actual:', this.mediaRecorder.state);
       console.log('   Chunks capturados:', this.audioChunks.length);
       console.log('========================================');
       
       this.mediaRecorder.stop();
     } else {
-      console.log('ℹ️ MediaRecorder ya está inactivo');
+      console.log(' MediaRecorder ya está inactivo');
     }
   }
 
@@ -315,27 +305,28 @@ export class VideoCallService {
   private async processRecordedAudio(sessionId: number): Promise<void> {
     try {
       console.log('========================================');
-      console.log('🔄 PROCESANDO AUDIO GRABADO');
+      console.log(' PROCESANDO AUDIO GRABADO');
       console.log('   Chunks totales:', this.audioChunks.length);
       
       if (this.audioChunks.length === 0) {
-        console.error('❌ No hay chunks de audio');
-        alert('❌ Error: No se capturó audio.\n\nAsegúrate de tener el micrófono encendido.');
+        console.error(' No hay chunks de audio');
+       
+        console.error(' Error: No se capturó audio. Asegúrate de tener el micrófono encendido.');
         return;
       }
 
       const totalSize = this.audioChunks.reduce((acc, chunk) => acc + chunk.size, 0);
-      console.log('📊 Tamaño total:', this.formatBytes(totalSize));
+      console.log(' Tamaño total:', this.formatBytes(totalSize));
 
       if (totalSize < 10240) {
-        console.error('⚠️ Archivo muy pequeño, probablemente no tiene audio');
-        alert('⚠️ Advertencia: El archivo es muy pequeño.\n\nPosiblemente no se capturó audio.');
+        console.error(' Archivo muy pequeño, probablemente no tiene audio');
+        console.warn(' Advertencia: El archivo es muy pequeño. Posiblemente no se capturó audio.');
       }
 
       const mimeType = this.mediaRecorder?.mimeType || 'audio/webm';
       const audioBlob = new Blob(this.audioChunks, { type: mimeType });
       
-      console.log('📦 Blob creado:');
+      console.log(' Blob creado:');
       console.log('   Tipo:', audioBlob.type);
       console.log('   Tamaño:', this.formatBytes(audioBlob.size));
 
@@ -343,12 +334,12 @@ export class VideoCallService {
       const fileName = `session_${sessionId}_${Date.now()}.${extension}`;
       const audioFile = new File([audioBlob], fileName, { type: mimeType });
 
-      console.log('📤 Subiendo al servidor...');
+      console.log(' Subiendo al servidor...');
       console.log('   Nombre:', fileName);
       
       await this.uploadRecordingToBackend(sessionId, audioFile);
 
-      console.log('✅ AUDIO PROCESADO Y SUBIDO');
+      console.log(' AUDIO PROCESADO Y SUBIDO');
       console.log('========================================');
 
       this.audioChunks = [];
@@ -358,8 +349,9 @@ export class VideoCallService {
       this.audioContext = null;
 
     } catch (error) {
-      console.error('❌ Error al procesar audio:', error);
-      alert('❌ Error al procesar la grabación: ' + error);
+      console.error(' Error al procesar audio:', error);
+   
+      console.error(' Error al procesar la grabación:', error);
     }
   }
 
@@ -368,12 +360,12 @@ export class VideoCallService {
    */
   private async uploadRecordingToBackend(sessionId: number, audioFile: File): Promise<void> {
     try {
-      console.log('📤 Preparando subida...');
+      console.log(' Preparando subida...');
       
       const formData = new FormData();
       formData.append('audio', audioFile);
 
-      console.log('🌐 Enviando al backend...');
+      console.log(' Enviando al backend...');
       console.log('   Endpoint: /recording/upload/' + sessionId);
       console.log('   Archivo:', audioFile.name);
       console.log('   Tamaño:', this.formatBytes(audioFile.size));
@@ -383,17 +375,17 @@ export class VideoCallService {
         formData
       ).toPromise();
 
-      console.log('✅ Respuesta del servidor:', response);
+      console.log(' Respuesta del servidor:', response);
       
       if (response.success) {
-        alert('✅ Grabación guardada exitosamente!\n\n' + 
-              'Se está convirtiendo a MP3...');
+    
+        console.log(' Grabación guardada exitosamente! Se está convirtiendo a MP3...');
       }
 
     } catch (error: any) {
-      console.error('❌ Error al subir:', error);
-      alert('❌ Error al subir la grabación:\n\n' + 
-            (error.error?.message || error.message));
+      console.error(' Error al subir:', error);
+  
+      console.error(' Error al subir la grabación:', error.error?.message || error.message);
       throw error;
     }
   }
@@ -410,13 +402,13 @@ export class VideoCallService {
 
       const container = document.getElementById(containerId);
       if (!container) {
-        console.error('❌ Contenedor no encontrado');
+        console.error(' Contenedor no encontrado');
         return false;
       }
 
       container.innerHTML = '';
 
-      console.log('🎬 Inicializando Jitsi Meet...');
+      console.log(' Inicializando Jitsi Meet...');
 
       const options = {
         roomName: videoCallData.roomName,
@@ -440,6 +432,11 @@ export class VideoCallService {
           enableClosePage: false,
           disable1On1Mode: true,
           
+          
+          subject: '',
+          hideConferenceSubject: true,
+          hideConferenceTimer: true,
+          
           filmstrip: {
             disabled: true
           },
@@ -460,6 +457,7 @@ export class VideoCallService {
           buttonsWithNotifyClick: ['chat', 'participants-pane']
         },
         
+        
         interfaceConfigOverwrite: {
           TOOLBAR_ALWAYS_VISIBLE: true,
           TOOLBAR_TIMEOUT: 4000,
@@ -477,6 +475,7 @@ export class VideoCallService {
           filmStripOnly: false,
           REMOTE_THUMBNAIL_RATIO: 0,
           LOCAL_THUMBNAIL_RATIO: 0
+
         }
       };
 
@@ -487,17 +486,17 @@ export class VideoCallService {
         this.injectFilmstripHideCSS();
       }, 500);
 
-      console.log('✅ Jitsi inicializado');
+      console.log(' Jitsi inicializado');
       return true;
 
     } catch (error) {
-      console.error('❌ Error al inicializar Jitsi:', error);
+      console.error(' Error al inicializar Jitsi:', error);
       return false;
     }
   }
 
   private injectFilmstripHideCSS(): void {
-    console.log('💉 Inyectando CSS para ocultar filmstrip...');
+    console.log(' Inyectando CSS para ocultar filmstrip...');
     
     const style = document.createElement('style');
     style.id = 'jitsi-filmstrip-hide';
@@ -544,7 +543,7 @@ export class VideoCallService {
     `;
     
     document.head.appendChild(style);
-    console.log('✅ CSS inyectado');
+    console.log(' CSS inyectado');
     
     this.forceHideFilmstripElements();
   }
@@ -562,7 +561,21 @@ export class VideoCallService {
         '#filmstripRemoteVideos',
         '.videocontainer',
         '[class*="filmstrip"]',
-        '[id*="filmstrip"]'
+        '[id*="filmstrip"]',
+       
+        '.subject',
+        '.subject-text',
+        '.subject-info-container',
+        '[class*="subject"]',
+        '[class*="Subject"]',
+        '.recording-label',
+        '.header-text',
+        '.headerTitle',
+        '.conference-timer',
+        'div[class*="subject"]',
+        'div[class*="conference"]',
+        'span[class*="subject"]',
+        'span[class*="conference"]'
       ];
 
       let hiddenCount = 0;
@@ -586,7 +599,7 @@ export class VideoCallService {
       });
       
       if (hiddenCount > 0) {
-        console.log(`🔒 ${hiddenCount} elementos de filmstrip ocultados`);
+        console.log(`🔒 ${hiddenCount} elementos ocultados (filmstrip + título)`);
       }
     };
 
