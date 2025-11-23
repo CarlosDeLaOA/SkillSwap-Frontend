@@ -27,7 +27,7 @@
 
   <!-- Video Call Active -->
   <div *ngIf="isConnected && !errorMessage" class="video-call-active">
-    
+
     <!-- Session Info Badge -->
     <div class="session-info-badge">
       <i class='bx bx-time'></i>
@@ -47,7 +47,7 @@
 
     <!-- Main Content Area -->
     <div class="content-wrapper">
-      
+
       <!-- Left: Main Video -->
       <div class="left-section">
         <div class="main-video-container">
@@ -56,26 +56,22 @@
       </div>
 
       <!-- Right: Participants Sidebar  -->
-<div class="right-sidebar">
-  <div 
-    *ngFor="let participant of jitsiParticipants; let i = index" 
-    class="participant-tile"
-    [style.background]="getParticipantColor(i)">
-    
-    <!-- ⭐ Contenedor para video del participante -->
-    <div 
-      [id]="'participant-video-' + participant.id" 
-      class="participant-video-container">
-      <!-- El video se insertará aquí dinámicamente -->
-    </div>
+      <div class="right-sidebar">
+        <div *ngFor="let participant of jitsiParticipants; let i = index" class="participant-tile"
+          [style.background]="getParticipantColor(i)">
 
-    <!-- Avatar/Nombre -->
-    <div class="participant-content" [class.has-video]="participant.hasVideo">
-      <span class="participant-initials" *ngIf="!participant.hasVideo">{{ participant.initials }}</span>
-      <span class="participant-label">{{ participant.displayName }}</span>
-    </div>
-  </div>
-</div>
+          <!-- ⭐ Contenedor para video del participante -->
+          <div [id]="'participant-video-' + participant.id" class="participant-video-container">
+            <!-- El video se insertará aquí dinámicamente -->
+          </div>
+
+          <!-- Avatar/Nombre -->
+          <div class="participant-content" [class.has-video]="participant.hasVideo">
+            <span class="participant-initials" *ngIf="!participant.hasVideo">{{ participant.initials }}</span>
+            <span class="participant-label">{{ participant.displayName }}</span>
+          </div>
+        </div>
+      </div>
 
     </div>
 
@@ -90,14 +86,14 @@
       <button class="action-btn" title="Documentos" (click)="toggleDocuments()">
         <i class='bx bx-file'></i>
       </button>
-      
+      <button class="action-btn" [class.active]="showNotesPanel" title="Notas Colaborativas" (click)="toggleNotes()">
+        <i class='bx bx-note'></i>
+      </button>
+
       <!-- ⭐ Botón de GRABACIÓN (solo instructor, reemplaza el botón de upload) -->
-      <button 
-        *ngIf="videoCallData?.isModerator && hasGivenConsent" 
-        class="action-btn"
+      <button *ngIf="videoCallData?.isModerator && hasGivenConsent" class="action-btn"
         [class.recording-active]="isRecording"
-        [title]="isRecording ? 'Detener grabación' : 'Iniciar grabación de audio'" 
-        (click)="toggleRecording()">
+        [title]="isRecording ? 'Detener grabación' : 'Iniciar grabación de audio'" (click)="toggleRecording()">
         <i class='bx' [class.bx-microphone]="!isRecording" [class.bx-stop]="isRecording"></i>
       </button>
     </div>
@@ -116,7 +112,7 @@
     </div>
     <div class="modal-body">
       <p class="consent-text">
-        Al unirte a esta sesión, aceptas que el audio de la sesión puede ser grabado 
+        Al unirte a esta sesión, aceptas que el audio de la sesión puede ser grabado
         automáticamente para su posterior procesamiento mediante IA.
       </p>
       <ul class="consent-list">
@@ -157,19 +153,13 @@
 </div>
 
 <!-- Modal: Participantes -->
-<app-participants-modal
-  *ngIf="showParticipantsModal"
-  [participants]="jitsiParticipants"
+<app-participants-modal *ngIf="showParticipantsModal" [participants]="jitsiParticipants"
   (closeModal)="closeParticipantsModal()">
 </app-participants-modal>
 
 <!-- Modal: Documentos -->
-<app-documents-modal
-  *ngIf="showDocumentsModal"
-  [sessionId]="sessionId"
-  [isModerator]="videoCallData?.isModerator || false"
-  [currentUserId]="0"
-  (closeModal)="closeDocumentsModal()">
+<app-documents-modal *ngIf="showDocumentsModal" [sessionId]="sessionId"
+  [isModerator]="videoCallData?.isModerator || false" [currentUserId]="0" (closeModal)="closeDocumentsModal()">
 </app-documents-modal>
 
 <!-- Modal: End Session Confirmation (Only for Instructor) -->
@@ -200,6 +190,24 @@
       <button class="modal-btn btn-cancel" (click)="closeEndSessionModal()">
         Cancelar
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- Panel de Notas Colaborativas -->
+<div *ngIf="showNotesPanel" class="notes-panel-overlay" (click)="closeNotes()">
+  <div class="notes-panel-container" (click)="$event.stopPropagation()">
+    <div class="notes-panel-header">
+      <h3>
+        <i class='bx bx-note'></i>
+        Notas Colaborativas
+      </h3>
+      <button class="notes-close-btn" (click)="closeNotes()">
+        <i class='bx bx-x'></i>
+      </button>
+    </div>
+    <div class="notes-panel-content">
+      <app-collaborative-document [sessionId]="sessionId"></app-collaborative-document>
     </div>
   </div>
 </div>

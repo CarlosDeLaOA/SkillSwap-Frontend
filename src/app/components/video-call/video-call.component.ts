@@ -5,7 +5,7 @@ import { VideoCallService } from '../../services/video-call.service';
 import { IVideoCallConfig, IVideoCallData, IScreenShareStatus } from '../../interfaces';
 import { ParticipantsModalComponent } from '../participants-modal/participants-modal.component';
 import { DocumentsModalComponent } from '../documents-modal/documents-modal.component';
-
+import { CollaborativeDocumentComponent } from '../collaborative-document/collaborative-document.component';
 interface JitsiParticipant {
   id: string;
   displayName: string;
@@ -17,7 +17,7 @@ interface JitsiParticipant {
 @Component({
   selector: 'app-video-call',
   standalone: true,
-  imports: [CommonModule, ParticipantsModalComponent, DocumentsModalComponent],
+  imports: [CommonModule, ParticipantsModalComponent, DocumentsModalComponent, CollaborativeDocumentComponent ],
   templateUrl: './video-call.component.html',
   styleUrl: './video-call.component.scss'
 })
@@ -43,6 +43,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   // Modales
   showParticipantsModal: boolean = false;
   showDocumentsModal: boolean = false;
+  showNotesPanel: boolean = false; 
   
   // Participantes conectados
   jitsiParticipants: JitsiParticipant[] = [];
@@ -52,7 +53,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   private timerInterval: any;
   private sessionStartTime: Date | null = null;
   
-  // ⭐ Grabación de audio
+  // Grabación de audio
   isRecording: boolean = false;
   recordingDuration: string = '00:00';
   private recordingStartTime: Date | null = null;
@@ -110,40 +111,44 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   }
   //#endregion
 
-  //#region Permissions
-  async requestMediaPermissions(): Promise<void> {
+//#region Permissions
+async requestMediaPermissions(): Promise<void> {
+  try {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    console.log('⚠️ MODO DESARROLLO: Iniciando sin verificar dispositivos...');
+
+    // Intentar obtener dispositivos, pero continuar aunque fallen
     try {
-      this.isLoading = true;
-      this.errorMessage = '';
-
-      console.log('🎤 Solicitando permisos de cámara y micrófono...');
-
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true
       });
-
-      console.log('✅ Permisos concedidos');
+      console.log('✅ Dispositivos disponibles');
       stream.getTracks().forEach(track => track.stop());
-
-      this.showPermissionDialog = false;
-      await this.initializeVideoCall();
-
+      this.cameraEnabled = true;
+      this.microphoneEnabled = true;
     } catch (error: any) {
-      console.error('❌ Error al solicitar permisos:', error);
-
-      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-        this.errorMessage = 'Debes permitir el acceso a la cámara y micrófono para unirte a la videollamada.';
-      } else if (error.name === 'NotFoundError') {
-        this.errorMessage = 'No se detectó cámara o micrófono en tu dispositivo.';
-      } else {
-        this.errorMessage = 'Error al acceder a los dispositivos de media: ' + error.message;
-      }
-
-      this.isLoading = false;
+      console.warn('⚠️ No hay dispositivos, continuando de todos modos...');
+      this.cameraEnabled = false;
+      this.microphoneEnabled = false;
     }
+
+    // Ocultar diálogo y continuar SIEMPRE
+    this.showPermissionDialog = false;
+    await this.initializeVideoCall();
+
+  } catch (error: any) {
+    console.error('❌ Error:', error);
+    // Incluso con error, intentar continuar
+    this.showPermissionDialog = false;
+    this.cameraEnabled = false;
+    this.microphoneEnabled = false;
+    await this.initializeVideoCall();
   }
-  //#endregion
+}
+//#endregion
 
   //#region Video Call Initialization
   async initializeVideoCall(): Promise<void> {
@@ -881,4 +886,14 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
   //#endregion
+
+  //#region Notes Management
+toggleNotes(): void {
+  this.showNotesPanel = !this.showNotesPanel;
+}
+
+closeNotes(): void {
+  this.showNotesPanel = false;
+}
+//#endregion
 }
