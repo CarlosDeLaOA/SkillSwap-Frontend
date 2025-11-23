@@ -21,8 +21,9 @@ import { VerifyEmailComponent } from './pages/verify-email/verify-email.componen
 import { LandingskillswapComponent } from './pages/landingskillswap/landingskillswap.component';
 import { CreateSessionComponent } from './pages/create-session/create-session.component';
 import { InstructorSessionsComponent } from './pages/instructor-sessions/instructor-sessions.component';
-
+import { CreateCommunityComponent } from './components/create-community/create-community.component';
 import { VideoCallComponent } from './components/video-call/video-call.component';
+import { AcceptInvitationComponent } from './components/accept-invitation/accept-invitation.component'; 
 
 export const routes: Routes = [
   {
@@ -60,7 +61,10 @@ export const routes: Routes = [
   {
     path: 'verify-email',
     component: VerifyEmailComponent
-   
+  },
+  {
+    path: 'accept-community-invitation',
+    component: AcceptInvitationComponent
   },
   {
     path: 'access-denied',
@@ -130,16 +134,24 @@ export const routes: Routes = [
           showInSidebar: false
         }
       },
-{
-  path: 'instructor/sessions', 
-  component: InstructorSessionsComponent,
-  data: {
-    authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
-    name: 'Mis Sesiones',
-    showInSidebar: false
-  }
-},
-
+      {
+        path: 'instructor/sessions', 
+        component: InstructorSessionsComponent,
+        data: {
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+          name: 'Mis Sesiones',
+          showInSidebar: false
+        }
+      },
+      {
+        path: 'create-community',
+        component: CreateCommunityComponent,
+        data: {
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+          name: 'Crear Comunidad',
+          showInSidebar: false
+        }
+      },
       {
         path: 'video-call/:sessionId',
         component: VideoCallComponent,

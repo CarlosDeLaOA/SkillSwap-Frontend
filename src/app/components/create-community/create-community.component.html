@@ -1,0 +1,192 @@
+<div class="create-community-page">
+  <header class="page-header">
+    <div class="header-content">
+      <h1 class="title">
+        <span class="title-crear">Crear </span>
+        <span class="title-comunidad">Comunidad</span>
+      </h1>
+    </div>
+  </header>
+
+  <!-- Success State -->
+  <div *ngIf="showSuccess" class="success-container">
+    <div class="success-content">
+      <div class="icon-wrapper success-icon">
+        <i class='bx bx-check-circle'></i>
+      </div>
+
+      <h2 class="success-title">¡Comunidad Creada!</h2>
+      <p class="success-message">{{ successMessage }}</p>
+
+      <div *ngIf="invitationsSummary" class="invitations-summary">
+        <div *ngIf="invitationsSummary.successful.length > 0" class="summary-section successful">
+          <h3><i class='bx bx-check'></i> Invitaciones Enviadas ({{ invitationsSummary.successful.length }})</h3>
+          <ul>
+            <li *ngFor="let email of invitationsSummary.successful">{{ email }}</li>
+          </ul>
+        </div>
+
+        <div *ngIf="invitationsSummary.failed.length > 0" class="summary-section failed">
+          <h3><i class='bx bx-x'></i> Invitaciones Fallidas ({{ invitationsSummary.failed.length }})</h3>
+          <ul>
+            <li *ngFor="let email of invitationsSummary.failed">{{ email }}</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="redirect-message">Serás redirigido al dashboard en unos segundos...</p>
+
+      <button class="action-btn primary-btn" (click)="goBack()">
+        <span>Ir al Dashboard</span>
+        <i class='bx bx-right-arrow-alt'></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Form State -->
+  <form *ngIf="!showSuccess" (ngSubmit)="onSubmit()" class="community-form">
+    
+    <!-- Error Alert -->
+    <div *ngIf="showError" class="alert error-alert">
+      <i class='bx bx-error-circle'></i>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <!-- Two Column Grid -->
+    <div class="form-grid">
+      
+      <!-- Left Column -->
+      <div class="form-column">
+        
+        <!-- Community Name -->
+        <div class="form-group">
+          <label for="name" class="form-label">
+            Nombre de la Comunidad <span class="required">*</span>
+          </label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            [(ngModel)]="name"
+            class="form-input"
+            [class.error]="!validation.name.isValid"
+            placeholder="Ej: Desarrolladores Frontend"
+            maxlength="150"
+            required
+          >
+          <span *ngIf="!validation.name.isValid" class="error-message">
+            <i class='bx bx-error'></i> {{ validation.name.error }}
+          </span>
+          <span class="char-counter">{{ name.length }}/150</span>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label for="description" class="form-label">
+            Descripción
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            [(ngModel)]="description"
+            class="form-textarea"
+            [class.error]="!validation.description.isValid"
+            placeholder="Describe el propósito de esta comunidad..."
+            rows="6"
+          ></textarea>
+          <span *ngIf="!validation.description.isValid" class="error-message">
+            <i class='bx bx-error'></i> {{ validation.description.error }}
+          </span>
+        </div>
+
+      </div>
+
+      <!-- Right Column -->
+      <div class="form-column">
+        
+        <!-- Member Emails -->
+        <div class="form-group full-height">
+          <label for="memberEmail" class="form-label">
+            Invitar Miembros <span class="required">*</span>
+          </label>
+          <div class="email-input-wrapper">
+            <input
+              type="email"
+              id="memberEmail"
+              name="memberEmail"
+              [(ngModel)]="memberEmailsInput"
+              (keypress)="onEmailKeyPress($event)"
+              class="form-input"
+              [class.error]="!validation.memberEmails.isValid"
+              placeholder="correo@ejemplo.com"
+            >
+            <button
+              type="button"
+              class="add-email-btn"
+              (click)="addEmail()"
+              [disabled]="!memberEmailsInput.trim()"
+            >
+              <i class='bx bx-plus'></i>
+              Agregar
+            </button>
+          </div>
+          <span *ngIf="!validation.memberEmails.isValid" class="error-message">
+            <i class='bx bx-error'></i> {{ validation.memberEmails.error }}
+          </span>
+          <span class="helper-text">
+            <i class='bx bx-info-circle'></i> Presiona Enter o haz clic en "Agregar"
+          </span>
+
+          <!-- Email List -->
+          <div class="email-list-container" *ngIf="memberEmails.length > 0">
+            <div class="email-list">
+              <div class="email-chip" *ngFor="let email of memberEmails; let i = index">
+                <i class='bx bx-user'></i>
+                <span>{{ email }}</span>
+                <button type="button" class="remove-email-btn" (click)="removeEmail(i)">
+                  <i class='bx bx-x'></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="member-counter">
+            <i class='bx bx-group'></i>
+            <span [class.warning]="memberEmails.length >= 9">
+              {{ memberEmails.length }}/9 miembros invitados
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Submit Buttons -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="action-btn secondary-btn"
+        (click)="goBack()"
+        [disabled]="isSubmitting"
+      >
+        <i class='bx bx-x'></i>
+        Cancelar
+      </button>
+      <button
+        type="submit"
+        class="action-btn primary-btn"
+        [disabled]="isSubmitting || memberEmails.length === 0"
+      >
+        <span *ngIf="!isSubmitting">
+          <i class='bx bx-check'></i>
+          Crear Comunidad
+        </span>
+        <span *ngIf="isSubmitting">
+          <i class='bx bx-loader-alt bx-spin'></i>
+          Creando...
+        </span>
+      </button>
+    </div>
+  </form>
+
+</div>

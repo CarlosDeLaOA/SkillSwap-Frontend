@@ -645,3 +645,76 @@ export interface IScreenShareStatus {
   isSharing: boolean;
   personId?: number;
 }
+// ========================================
+// INTERFACES DE INVITACIONES A COMUNIDADES
+// ========================================
+
+/**
+ * Request para crear una comunidad
+ */
+export interface ICreateCommunityRequest {
+  name: string;
+  description?: string;
+  creatorId: number;
+  memberEmails: string[];
+}
+
+/**
+ * Response al crear una comunidad
+ */
+export interface ICreateCommunityResponse {
+  success: boolean;
+  message: string;
+  communityId?: number;
+  invitationsSummary?: IInvitationsSummary;
+}
+
+/**
+ * Resumen de invitaciones enviadas
+ */
+export interface IInvitationsSummary {
+  successfulInvitations: string[];
+  failedInvitations: string[];
+}
+
+/**
+ * Response al aceptar una invitación
+ */
+export interface IAcceptInvitationResponse {
+  success: boolean;
+  message: string;
+  status: InvitationStatus;
+}
+
+/**
+ * Estados de invitación
+ */
+export enum InvitationStatus {
+  SUCCESS = 'SUCCESS',
+  INVALID_TOKEN = 'INVALID_TOKEN',
+  EXPIRED_TOKEN = 'EXPIRED_TOKEN',
+  ALREADY_ACCEPTED = 'ALREADY_ACCEPTED',
+  ALREADY_MEMBER = 'ALREADY_MEMBER',
+  COMMUNITY_FULL = 'COMMUNITY_FULL',
+  USER_NOT_FOUND = 'USER_NOT_FOUND',
+  EMAIL_MISMATCH = 'EMAIL_MISMATCH',
+  NOT_LEARNER = 'NOT_LEARNER'
+}
+
+/**
+ * Validación de formulario de comunidad
+ */
+export interface ICommunityValidation {
+  name: {
+    isValid: boolean;
+    error: string;
+  };
+  description: {
+    isValid: boolean;
+    error: string;
+  };
+  memberEmails: {
+    isValid: boolean;
+    error: string;
+  };
+}
