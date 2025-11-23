@@ -1,14 +1,4 @@
-<div class="session-card" [class.suggested]="isSuggested">
-  
-  <!-- ⭐ TAG DE RECOMENDACIÓN EN LA ESQUINA -->
-  <div *ngIf="isSuggested" class="suggested-tag">
-    <i class='bx bx-star'></i>
-    <span class="tag-text">Coincides un </span>
-    <span class="match-percentage" [class]="'score-' + getScoreColor()">
-      {{ getMatchScorePercent() }}%
-    </span>
-  </div>
-
+<div class="session-card">
   <div class="session-content">
     <div class="session-header">
       <h3 class="session-title clickable" (click)="onViewDetails()">
@@ -20,12 +10,6 @@
       </span>
     </div>
     <p class="session-description">{{ session.description }}</p>
-    
-    <!--  RAZÓN DE LA SUGERENCIA DENTRO DE LA TARJETA -->
-    <div *ngIf="isSuggested && reason" class="suggestion-reason">
-      <i class='bx bx-info-circle'></i>
-      <span>{{ reason }}</span>
-    </div>
     
     <div class="session-meta">
       <span class="meta-item" *ngIf="session.instructor?.person?.fullName">
