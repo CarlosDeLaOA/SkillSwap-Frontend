@@ -1,7 +1,4 @@
-// ========================================
-// forgot-password.component.ts
-// ========================================
-import { Component, signal, computed, ViewChild, ElementRef, OnDestroy, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, signal, computed, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -11,7 +8,6 @@ import { ForgotPasswordService } from '../../../services/forgot-password.service
   selector: 'app-forgot-password',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss']
 })
@@ -30,6 +26,7 @@ export class ForgotPasswordComponent implements OnDestroy {
   private cooldownTimerId: any = null;
   canResend = computed(() => this.cooldown() === 0 && !!this.submittedEmail() && !this.loading());
   
+  // Validación de contraseña
   passwordValidationError = signal<string>('');
   //#endregion
 
