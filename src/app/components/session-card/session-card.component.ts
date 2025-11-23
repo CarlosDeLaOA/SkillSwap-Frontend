@@ -5,6 +5,7 @@
 
   /**
    * Componente de tarjeta para mostrar información resumida de una sesión de aprendizaje
+   * * Con soporte para mostrar si es una sesión sugerida
    */
   @Component({
     selector: 'app-session-card',
@@ -14,9 +15,15 @@
     styleUrls: ['./session-card.component.scss']
   })
   export class SessionCardComponent {
-    
+
     //#region Input/Output Properties
     @Input() session!: ILearningSession;
+    // Input para indicar si la sesión es sugerida
+    @Input() isSuggested: boolean = false;
+    // Input para el score de match
+    @Input() matchScore: number = 0;
+    // Input para la razón de la sugerencia
+    @Input() reason: string = '';
     @Output() register = new EventEmitter<number>();
     @Output() viewDetails = new EventEmitter<ILearningSession>();
     //#endregion
@@ -91,5 +98,23 @@
     getAvailableSpots(): number {
       return this.session.maxCapacity - (this.session.bookings?.length || 0);
     }
+    // Método para obtener el match score como porcentaje
+  /**
+   * Obtiene el match score como porcentaje
+   * @returns Porcentaje del match score
+   */
+  getMatchScorePercent(): number {
+    return Math.round(this.matchScore * 100);
+  }
+
+  // Método para obtener el color del badge según el score
+  /**
+   * Obtiene el color del badge según el score
+   */
+  getScoreColor(): string {
+    if (this.matchScore >= 0.8) return 'success';
+    if (this.matchScore >= 0.6) return 'warning';
+    return 'info';
+  }
     //#endregion
   }
