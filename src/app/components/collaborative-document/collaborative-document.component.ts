@@ -2,6 +2,7 @@ import { Component, Input, OnInit, OnDestroy, ChangeDetectorRef } from '@angular
 import { CommonModule } from '@angular/common';
 import { QuillModule } from 'ngx-quill';
 import { CollaborativeDocumentService, DocumentMessage, DocumentResponse } from '../../services/collaborative-document.service';
+import { CollaborativeDocumentPdfService } from '../../services/collaborative-document-pdf.service'; // ← NUEVO
 import { Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -70,7 +71,8 @@ export class CollaborativeDocumentComponent implements OnInit, OnDestroy {
   constructor(
     private documentService: CollaborativeDocumentService,
     private cdr: ChangeDetectorRef,
-    private http: HttpClient
+    private http: HttpClient,
+    private pdfExportService: CollaborativeDocumentPdfService // ← NUEVO
   ) {}
 
   //#region Lifecycle Hooks
@@ -212,14 +214,38 @@ export class CollaborativeDocumentComponent implements OnInit, OnDestroy {
     });
   }
 
-  exportDocument(): void {
-    const blob = new Blob([this.content], { type: 'text/html' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `session-notes-${this.sessionId}.html`;
-    a.click();
-    window.URL.revokeObjectURL(url);
+  // ========== NUEVO MÉTODO DE EXPORTACIÓN ==========
+  async exportDocument(): Promise<void> {
+    try {
+      if (!this.quillInstance) {
+        alert('Editor no disponible');
+        return;
+      }
+
+      // Obtén el contenido con formato (Delta de Quill)
+      const delta = this.quillInstance.getContents();
+      
+      if (!delta || delta.ops.length === 0) {
+        alert('El documento está vacío');
+        return;
+      }
+
+      // Prepara los datos para exportar
+      const documentData = {
+        sessionId: this.sessionId,
+        content: delta,
+        generatedBy: this.currentUser.name
+      };
+
+      // Llama al servicio - ¡Una sola línea! 🎉
+      await this.pdfExportService.exportCollaborativeDocument(documentData);
+      
+      console.log('✅ PDF exportado correctamente');
+      
+    } catch (error) {
+      console.error('❌ Error al exportar PDF:', error);
+      alert('Error al exportar el documento. Por favor, inténtalo de nuevo.');
+    }
   }
   //#endregion
 
