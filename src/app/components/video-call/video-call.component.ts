@@ -6,6 +6,7 @@ import { IVideoCallConfig, IVideoCallData, IScreenShareStatus } from '../../inte
 import { ParticipantsModalComponent } from '../participants-modal/participants-modal.component';
 import { DocumentsModalComponent } from '../documents-modal/documents-modal.component';
 import { CollaborativeDocumentComponent } from '../collaborative-document/collaborative-document.component';
+
 interface JitsiParticipant {
   id: string;
   displayName: string;
@@ -17,7 +18,7 @@ interface JitsiParticipant {
 @Component({
   selector: 'app-video-call',
   standalone: true,
-  imports: [CommonModule, ParticipantsModalComponent, DocumentsModalComponent, CollaborativeDocumentComponent ],
+  imports: [CommonModule, ParticipantsModalComponent, DocumentsModalComponent, CollaborativeDocumentComponent],
   templateUrl: './video-call.component.html',
   styleUrl: './video-call.component.scss'
 })
@@ -38,7 +39,6 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   maxRetries: number = 3;
   showPermissionDialog: boolean = true;
   showEndSessionModal: boolean = false;
-  showConsentDialog: boolean = true; 
   
   // Modales
   showParticipantsModal: boolean = false;
@@ -58,7 +58,6 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   recordingDuration: string = '00:00';
   private recordingStartTime: Date | null = null;
   private recordingInterval: any;
-  hasGivenConsent: boolean = false;
   
   // Colores para participantes
   participantColors: string[] = [
@@ -68,6 +67,22 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     'linear-gradient(135deg, #a5886b 0%, #8b6f52 100%)',
     'linear-gradient(135deg, #7bdb8e 0%, #5bc96f 100%)',
   ];
+
+
+  showCustomAlert: boolean = false;
+  customAlertTitle: string = '';
+  customAlertMessage: string = '';
+  customAlertType: 'info' | 'success' | 'warning' | 'error' = 'info';
+  customAlertConfirmText: string = 'Aceptar';
+  customAlertCancelText: string = '';
+  customAlertOnConfirm: (() => void) | null = null;
+  customAlertOnCancel: (() => void) | null = null;
+
+  
+  showToast: boolean = false;
+  toastMessage: string = '';
+  toastType: 'success' | 'error' = 'success';
+  private toastTimeout: any;
   //#endregion
 
   constructor(
@@ -80,7 +95,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.sessionId = +params['sessionId'];
-      this.showConsentDialog = true;
+      this.requestMediaPermissions();
     });
 
     this.setupHangupInterceptor();
@@ -93,62 +108,131 @@ export class VideoCallComponent implements OnInit, OnDestroy {
       this.stopRecording();
     }
     this.leaveCall();
+    
+    // Limpiar toast timeout
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout);
+    }
   }
   //#endregion
 
-  //#region Consent Management
-  acceptConsent(): void {
-    this.hasGivenConsent = true;
-    this.showConsentDialog = false;
-    this.requestMediaPermissions();
-  }
-
-  declineConsent(): void {
-    this.hasGivenConsent = false;
-    this.showConsentDialog = false;
-    alert('Sin tu consentimiento, no podrás unirte a la sesión');
-    this.router.navigate(['/app/dashboard']);
-  }
-  //#endregion
-
-//#region Permissions
-async requestMediaPermissions(): Promise<void> {
-  try {
-    this.isLoading = true;
-    this.errorMessage = '';
-
-    console.log('⚠️ MODO DESARROLLO: Iniciando sin verificar dispositivos...');
-
-    // Intentar obtener dispositivos, pero continuar aunque fallen
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true
-      });
-      console.log('✅ Dispositivos disponibles');
-      stream.getTracks().forEach(track => track.stop());
-      this.cameraEnabled = true;
-      this.microphoneEnabled = true;
-    } catch (error: any) {
-      console.warn('⚠️ No hay dispositivos, continuando de todos modos...');
-      this.cameraEnabled = false;
-      this.microphoneEnabled = false;
+  
+  private displayToast(message: string, type: 'success' | 'error' = 'success'): void {
+    
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout);
     }
 
-    // Ocultar diálogo y continuar SIEMPRE
-    this.showPermissionDialog = false;
-    await this.initializeVideoCall();
+    this.toastMessage = message;
+    this.toastType = type;
+    this.showToast = true;
 
-  } catch (error: any) {
-    console.error('❌ Error:', error);
-    // Incluso con error, intentar continuar
-    this.showPermissionDialog = false;
-    this.cameraEnabled = false;
-    this.microphoneEnabled = false;
-    await this.initializeVideoCall();
+
+    this.toastTimeout = setTimeout(() => {
+      this.showToast = false;
+    }, 3000);
   }
-}
-//#endregion
+
+  closeToast(): void {
+    this.showToast = false;
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout);
+    }
+  }
+  //#endregion
+
+  //#region Custom Alert System (Para confirmaciones)
+  private showAlert(
+    title: string, 
+    message: string, 
+    type: 'info' | 'success' | 'warning' | 'error' = 'info',
+    confirmText: string = 'Aceptar',
+    cancelText: string = '',
+    onConfirm?: () => void,
+    onCancel?: () => void
+  ): void {
+    this.customAlertTitle = title;
+    this.customAlertMessage = message;
+    this.customAlertType = type;
+    this.customAlertConfirmText = confirmText;
+    this.customAlertCancelText = cancelText;
+    this.customAlertOnConfirm = onConfirm || null;
+    this.customAlertOnCancel = onCancel || null;
+    this.showCustomAlert = true;
+  }
+
+  confirmCustomAlert(): void {
+    this.showCustomAlert = false;
+    if (this.customAlertOnConfirm) {
+      this.customAlertOnConfirm();
+    }
+  }
+
+  cancelCustomAlert(): void {
+    this.showCustomAlert = false;
+    if (this.customAlertOnCancel) {
+      this.customAlertOnCancel();
+    }
+  }
+
+  getAlertIcon(): string {
+    switch (this.customAlertType) {
+      case 'success': return 'bx-check-circle';
+      case 'warning': return 'bx-error-circle';
+      case 'error': return 'bx-x-circle';
+      default: return 'bx-info-circle';
+    }
+  }
+
+  getAlertColor(): string {
+    switch (this.customAlertType) {
+      case 'success': return '#AAE16B';
+      case 'warning': return '#FF9800';
+      case 'error': return '#F44336';
+      default: return '#504AB7';
+    }
+  }
+
+  getFormattedMessage(): string {
+    return this.customAlertMessage.replace(/\n/g, '<br>');
+  }
+  //#endregion
+
+  //#region Permissions
+  async requestMediaPermissions(): Promise<void> {
+    try {
+      this.isLoading = true;
+      this.errorMessage = '';
+
+      console.log(' MODO DESARROLLO: Iniciando sin verificar dispositivos...');
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true
+        });
+        console.log(' Dispositivos disponibles');
+        stream.getTracks().forEach(track => track.stop());
+        this.cameraEnabled = true;
+        this.microphoneEnabled = true;
+      } catch (error: any) {
+        console.warn(' No hay dispositivos, continuando de todos modos...');
+        this.cameraEnabled = false;
+        this.microphoneEnabled = false;
+      }
+
+      this.showPermissionDialog = false;
+      await this.initializeVideoCall();
+
+    } catch (error: any) {
+      console.error(' Error:', error);
+      this.showPermissionDialog = false;
+      this.cameraEnabled = false;
+      this.microphoneEnabled = false;
+      await this.initializeVideoCall();
+    }
+  }
+  //#endregion
 
   //#region Video Call Initialization
   async initializeVideoCall(): Promise<void> {
@@ -156,7 +240,7 @@ async requestMediaPermissions(): Promise<void> {
       this.isLoading = true;
       this.errorMessage = '';
 
-      console.log('🚀 Iniciando videollamada para sesión:', this.sessionId);
+      console.log(' Iniciando videollamada para sesión:', this.sessionId);
 
       const config: IVideoCallConfig = {
         sessionId: this.sessionId,
@@ -183,7 +267,7 @@ async requestMediaPermissions(): Promise<void> {
       }
       
       this.videoCallData = response;
-      console.log('✅ Datos recibidos:', this.videoCallData);
+      console.log(' Datos recibidos:', this.videoCallData);
 
       if (this.videoCallData.isModerator) {
         const shareStatus = await this.videoCallService.validateScreenShare(this.sessionId).toPromise();
@@ -203,7 +287,7 @@ async requestMediaPermissions(): Promise<void> {
         throw new Error('No se pudo inicializar Jitsi');
       }
 
-      console.log('✅ Jitsi inicializado correctamente');
+      console.log(' Jitsi inicializado correctamente');
       
       this.setupJitsiParticipantListeners();
       this.startTimer();
@@ -230,58 +314,49 @@ async requestMediaPermissions(): Promise<void> {
 
     console.log('👂 Configurando listeners de participantes...');
 
-    // ⭐ Evento cuando el usuario local se une
     jitsiApi.addEventListener('videoConferenceJoined', async (participant: any) => {
-      console.log('✅ Usuario local unido:', participant);
+      console.log(' Usuario local unido:', participant);
       this.addLocalParticipant(participant);
       
-      // ⭐ Forzar ocultación del filmstrip
       setTimeout(() => {
         this.forceHideJitsiFilmstrip();
       }, 500);
       
-      // Capturar video local después de unirse
       setTimeout(async () => {
         const isVideoMuted = await jitsiApi.isVideoMuted();
         if (!isVideoMuted) {
           await this.attachLocalVideoToSidebar();
         } else {
-          console.log('📹 Cámara apagada al unirse, esperando que se encienda...');
+          console.log(' Cámara apagada al unirse, esperando que se encienda...');
         }
       }, 1500);
     });
 
-    // Evento cuando un participante remoto se une
     jitsiApi.addEventListener('participantJoined', (participant: any) => {
-      console.log('👤 Participante se unió:', participant);
+      console.log(' Participante se unió:', participant);
       this.addRemoteParticipant(participant);
     });
 
-    // Evento cuando un participante se va
     jitsiApi.addEventListener('participantLeft', (participant: any) => {
-      console.log('👋 Participante salió:', participant);
+      console.log(' Participante salió:', participant);
       this.removeParticipant(participant.id);
     });
 
-    // ⭐ Evento cuando cambia el estado del video
     jitsiApi.addEventListener('videoMuteStatusChanged', async (data: any) => {
-      console.log('📹 Estado de video cambió:', data);
+      console.log(' Estado de video cambió:', data);
       
-      // Si es el usuario local, actualizar el video en el sidebar
       if (data.id === undefined || data.id === jitsiApi.getMyUserId()) {
         this.updateParticipantVideoStatus('local', !data.muted);
         
-        // Re-capturar video cuando se enciende la cámara
         if (!data.muted) {
           setTimeout(async () => {
             await this.attachLocalVideoToSidebar();
           }, 500);
         } else {
-          // Si se apaga la cámara, limpiar el video del sidebar
           const localParticipantContainer = document.getElementById('participant-video-local');
           if (localParticipantContainer) {
             localParticipantContainer.innerHTML = '';
-            console.log('📹 Video removido del sidebar (cámara apagada)');
+            console.log(' Video removido del sidebar (cámara apagada)');
           }
         }
       } else {
@@ -289,9 +364,8 @@ async requestMediaPermissions(): Promise<void> {
       }
     });
 
-    // Evento cuando cambia el estado del audio
     jitsiApi.addEventListener('audioMuteStatusChanged', (data: any) => {
-      console.log('🎤 Estado de audio cambió:', data);
+      console.log(' Estado de audio cambió:', data);
       
       if (data.id === undefined || data.id === jitsiApi.getMyUserId()) {
         this.updateParticipantAudioStatus('local', !data.muted);
@@ -300,17 +374,12 @@ async requestMediaPermissions(): Promise<void> {
       }
     });
 
-    // ⭐ Forzar ocultación del filmstrip
     this.forceHideJitsiFilmstrip();
   }
 
-  /**
-   * ⭐ Forzar ocultación del filmstrip de Jitsi
-   */
   private forceHideJitsiFilmstrip(): void {
-    const hideFilmstrip = () => {
-      // Seleccionar todos los posibles elementos del filmstrip
-      const selectors = [
+    const removeElements = () => {
+      const filmstripSelectors = [
         '.filmstrip',
         '.vertical-filmstrip',
         '.horizontal-filmstrip',
@@ -323,132 +392,187 @@ async requestMediaPermissions(): Promise<void> {
         '[id*="filmstrip"]'
       ];
 
-      selectors.forEach(selector => {
+      let removedCount = 0;
+      filmstripSelectors.forEach(selector => {
         const elements = document.querySelectorAll(selector);
         elements.forEach((el: Element) => {
-          const htmlEl = el as HTMLElement;
-          htmlEl.style.display = 'none';
-          htmlEl.style.visibility = 'hidden';
-          htmlEl.style.opacity = '0';
-          htmlEl.style.height = '0';
-          htmlEl.style.width = '0';
-          htmlEl.style.overflow = 'hidden';
-          htmlEl.style.pointerEvents = 'none';
+          el.remove();
+          removedCount++;
         });
       });
 
-      // También ocultar cualquier video container que no sea el principal
-      const videoContainers = document.querySelectorAll('.videocontainer');
-      videoContainers.forEach((container: Element) => {
-        const htmlContainer = container as HTMLElement;
-        // Solo ocultar si NO es el contenedor del video principal
-        if (!htmlContainer.classList.contains('videocontainer__video')) {
-          htmlContainer.style.display = 'none';
+      const titleSelectors = [
+        '.subject',
+        '.subject-text',
+        '.subject-info-container',
+        '.subject-text-container',
+        '[class*="subject"]',
+        '[class*="Subject"]',
+        '[class*="conference"]',
+        '[class*="Conference"]',
+        '.recording-label',
+        '.header-text',
+        '.headerTitle',
+        'div[role="heading"]',
+        '[aria-label*="Conference"]',
+        '[aria-label*="Session"]',
+        '.labels-container',
+        '[data-testid*="subject"]',
+        '[data-testid*="conference"]'
+      ];
+
+      titleSelectors.forEach(selector => {
+        const elements = document.querySelectorAll(`#jitsi-container ${selector}`);
+        elements.forEach((el: Element) => {
+          el.remove();
+          removedCount++;
+        });
+      });
+
+      const allTextElements = document.querySelectorAll(
+        '#jitsi-container div, #jitsi-container span, #jitsi-container p, #jitsi-container h1, #jitsi-container h2, #jitsi-container h3'
+      );
+
+      allTextElements.forEach((el: Element) => {
+        const htmlEl = el as HTMLElement;
+        const text = htmlEl.textContent?.trim() || '';
+
+        if (text.includes('Skillswap') ||
+            text.includes('Session') ||
+            /^\d{4}$/.test(text) ||
+            text.match(/Session\s+\d+/i)) {
+
+          let current: HTMLElement | null = htmlEl;
+          const toRemove: HTMLElement[] = [];
+          
+          for (let i = 0; i < 5 && current; i++) {
+            toRemove.push(current);
+            current = current.parentElement;
+          }
+          
+          toRemove.forEach(elem => {
+            if (elem && elem.parentNode) {
+              elem.remove();
+              removedCount++;
+            }
+          });
+          
+          console.log(' Eliminados elementos con texto:', text);
         }
       });
+
+      if (removedCount > 0) {
+        console.log(` ${removedCount} elementos eliminados del DOM`);
+      }
     };
 
-    // Ejecutar inmediatamente
-    hideFilmstrip();
+    removeElements();
+    setTimeout(removeElements, 100);
+    setTimeout(removeElements, 300);
+    setTimeout(removeElements, 500);
+    setTimeout(removeElements, 1000);
+    setTimeout(removeElements, 2000);
 
-    // Ejecutar después de 1 segundo (cuando Jitsi haya renderizado)
-    setTimeout(hideFilmstrip, 1000);
+    setInterval(removeElements, 500);
 
-    // Ejecutar después de 2 segundos (por si acaso)
-    setTimeout(hideFilmstrip, 2000);
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === 1) {
+            const element = node as HTMLElement;
+            const text = element.textContent?.trim() || '';
 
-    // Observar cambios en el DOM y ocultar si aparece de nuevo
-    const observer = new MutationObserver(hideFilmstrip);
-    
+            if (text.includes('Skillswap') ||
+                text.includes('Session') ||
+                /^\d{4}$/.test(text) ||
+                element.className.includes('subject') ||
+                element.className.includes('conference') ||
+                element.className.includes('filmstrip')) {
+              console.log('🗑️ Eliminando elemento nuevo:', text || element.className);
+              element.remove();
+            }
+          }
+        });
+      });
+    });
+
     const jitsiContainer = document.getElementById('jitsi-container');
     if (jitsiContainer) {
       observer.observe(jitsiContainer, {
         childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['class', 'style']
+        subtree: true
       });
+      console.log(' MutationObserver activo - eliminará títulos automáticamente');
     }
   }
 
-  /**
-   * ⭐ SOLUCIÓN: Obtener video local directamente de la API de Jitsi
-   */
   private async attachLocalVideoToSidebar(): Promise<void> {
     try {
       console.log('========================================');
-      console.log('🎥 INICIANDO CAPTURA DE VIDEO LOCAL');
+      console.log(' INICIANDO CAPTURA DE VIDEO LOCAL');
       console.log('========================================');
       
       const jitsiApi = this.videoCallService.jitsiApi;
       if (!jitsiApi) {
-        console.warn('⚠ Jitsi API no disponible');
+        console.warn(' Jitsi API no disponible');
         return;
       }
 
-      // Verificar que el participante local existe en el array
       const localParticipant = this.jitsiParticipants.find(p => p.id === 'local');
-      console.log('👤 Participante local en array:', localParticipant ? 'SÍ' : 'NO');
+      console.log(' Participante local en array:', localParticipant ? 'SÍ' : 'NO');
       
       if (!localParticipant) {
-        console.error('❌ Participante local no existe en el array');
+        console.error(' Participante local no existe en el array');
         return;
       }
 
-      // Verificar si la cámara está encendida
       const isVideoMuted = await jitsiApi.isVideoMuted();
-      console.log('📹 Estado de video:', isVideoMuted ? 'APAGADO' : 'ENCENDIDO');
+      console.log(' Estado de video:', isVideoMuted ? 'APAGADO' : 'ENCENDIDO');
 
       if (isVideoMuted) {
-        console.warn('⚠ La cámara está apagada, no hay video para capturar');
+        console.warn(' La cámara está apagada, no hay video para capturar');
         localParticipant.hasVideo = false;
         return;
       }
 
-      // ⭐ SOLUCIÓN: Obtener el stream directamente del navegador
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ 
           video: true, 
           audio: false 
         });
 
-        console.log('✅ Stream de video obtenido');
+        console.log(' Stream de video obtenido');
         console.log('   Tracks de video:', stream.getVideoTracks().length);
 
         if (stream.getVideoTracks().length === 0) {
-          console.error('❌ No hay tracks de video en el stream');
+          console.error(' No hay tracks de video en el stream');
           return;
         }
 
-        // Contenedor del participante local en el sidebar
         const containerId = 'participant-video-local';
         const localParticipantContainer = document.getElementById(containerId);
         
-        console.log('📦 Buscando contenedor:', containerId);
+        console.log(' Buscando contenedor:', containerId);
         console.log('   Encontrado:', localParticipantContainer ? 'SÍ' : 'NO');
 
         if (!localParticipantContainer) {
-          console.error('❌ Contenedor del participante local no encontrado');
+          console.error(' Contenedor del participante local no encontrado');
           
-          // Buscar todos los contenedores posibles
           const allContainers = document.querySelectorAll('[id^="participant-video-"]');
           console.log('   Contenedores en DOM:', allContainers.length);
           allContainers.forEach(container => {
             console.log('      -', container.id);
           });
           
-          // Detener el stream si no encontramos el contenedor
           stream.getTracks().forEach(track => track.stop());
           return;
         }
 
-        console.log('✅ Contenedor encontrado:', localParticipantContainer.id);
+        console.log(' Contenedor encontrado:', localParticipantContainer.id);
 
-        // Limpiar contenedor anterior
         localParticipantContainer.innerHTML = '';
-        console.log('🧹 Contenedor limpiado');
+        console.log(' Contenedor limpiado');
 
-        // Crear nuevo elemento de video
         const sidebarVideo = document.createElement('video');
         sidebarVideo.srcObject = stream;
         sidebarVideo.autoplay = true;
@@ -461,22 +585,20 @@ async requestMediaPermissions(): Promise<void> {
 
         localParticipantContainer.appendChild(sidebarVideo);
 
-        console.log('✅ Video agregado al contenedor');
+        console.log(' Video agregado al contenedor');
 
-        // Forzar reproducción
         await sidebarVideo.play();
-        console.log('▶ Video reproduciéndose en sidebar');
+        console.log(' Video reproduciéndose en sidebar');
 
-        // Actualizar estado del participante
         localParticipant.hasVideo = true;
-        console.log('✅ Estado del participante actualizado - hasVideo: true');
+        console.log(' Estado del participante actualizado - hasVideo: true');
 
         console.log('========================================');
-        console.log('✅ CAPTURA COMPLETADA EXITOSAMENTE');
+        console.log(' CAPTURA COMPLETADA EXITOSAMENTE');
         console.log('========================================');
 
       } catch (mediaError: any) {
-        console.error('❌ Error al obtener stream de video:', mediaError);
+        console.error(' Error al obtener stream de video:', mediaError);
         
         if (mediaError.name === 'NotAllowedError') {
           console.error('   El usuario denegó el permiso de la cámara');
@@ -487,7 +609,7 @@ async requestMediaPermissions(): Promise<void> {
 
     } catch (error) {
       console.error('========================================');
-      console.error('❌ ERROR AL CAPTURAR VIDEO LOCAL');
+      console.error(' ERROR AL CAPTURAR VIDEO LOCAL');
       console.error('   Error:', error);
       console.error('========================================');
     }
@@ -508,7 +630,7 @@ async requestMediaPermissions(): Promise<void> {
     const exists = this.jitsiParticipants.find(p => p.id === 'local');
     if (!exists) {
       this.jitsiParticipants.unshift(localParticipant);
-      console.log('✅ Participante local agregado');
+      console.log(' Participante local agregado');
     }
   }
 
@@ -527,7 +649,7 @@ async requestMediaPermissions(): Promise<void> {
     const exists = this.jitsiParticipants.find(p => p.id === data.id);
     if (!exists) {
       this.jitsiParticipants.push(remoteParticipant);
-      console.log('✅ Participante remoto agregado:', displayName);
+      console.log(' Participante remoto agregado:', displayName);
     }
   }
 
@@ -539,21 +661,21 @@ async requestMediaPermissions(): Promise<void> {
     }
   }
 
- private updateParticipantVideoStatus(participantId: string, hasVideo: boolean): void {
-  const participant = this.jitsiParticipants.find(p => p.id === participantId);
-  if (participant) {
-    participant.hasVideo = hasVideo;
-    console.log(`📹 ${participant.displayName} - Video: ${hasVideo ? 'ON' : 'OFF'}`);
+  private updateParticipantVideoStatus(participantId: string, hasVideo: boolean): void {
+    const participant = this.jitsiParticipants.find(p => p.id === participantId);
+    if (participant) {
+      participant.hasVideo = hasVideo;
+      console.log(`📹 ${participant.displayName} - Video: ${hasVideo ? 'ON' : 'OFF'}`);
+    }
   }
-}
 
   private updateParticipantAudioStatus(participantId: string, hasAudio: boolean): void {
-  const participant = this.jitsiParticipants.find(p => p.id === participantId);
-  if (participant) {
-    participant.hasAudio = hasAudio;
-    console.log(`🎤 ${participant.displayName} - Audio: ${hasAudio ? 'ON' : 'OFF'}`);
+    const participant = this.jitsiParticipants.find(p => p.id === participantId);
+    if (participant) {
+      participant.hasAudio = hasAudio;
+      console.log(`🎤 ${participant.displayName} - Audio: ${hasAudio ? 'ON' : 'OFF'}`);
+    }
   }
-}
 
   private getInitials(name: string): string {
     if (!name || name.trim() === '') return '??';
@@ -572,122 +694,132 @@ async requestMediaPermissions(): Promise<void> {
   }
   //#endregion
 
-  //#region ⭐ Recording Management
+  //#region  Recording Management
   async startRecording(): Promise<void> {
-    if (!this.hasGivenConsent) {
-      alert('No se puede grabar sin el consentimiento de grabación.');
-      return;
-    }
-
     if (!this.videoCallData?.isModerator) {
-      alert('Solo el instructor puede iniciar la grabación.');
+      this.showAlert(
+        'Permiso Denegado',
+        'Solo el instructor puede iniciar la grabación de la sesión.',
+        'warning'
+      );
       return;
     }
 
-    const confirmed = confirm(
-      '🎙 GRABACIÓN DE AUDIO DE SESIÓN\n\n' +
-      '📋 Se grabará:\n' +
-      '  ✅ Tu micrófono (lo que tú hablas)\n' +
-      '  ✅ Audio de otros participantes\n' +
-      '  ✅ Todo el audio de la videollamada\n\n' +
-      '⚠ Asegúrate de:\n' +
-      '  • Tener el micrófono encendido\n' +
-      '  • Hablar durante la grabación para prueba\n\n' +
-      '¿Iniciar grabación?'
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      console.log('🎙 Iniciando proceso de grabación...');
-      
-      // Limpiar grabaciones previas
-      try {
-        await this.videoCallService.clearRecording(this.sessionId).toPromise();
-        console.log('🧹 Grabaciones previas limpiadas');
-      } catch (error) {
-        console.log('⚠ No había grabaciones previas');
-      }
-      
-      // Notificar al backend
-      const response = await this.videoCallService.startRecording(this.sessionId).toPromise();
-      
-      if (response && response.success) {
-        console.log('✅ Backend notificado:', response.data);
-        
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Iniciar grabación nativa
-        const started = await this.videoCallService.startNativeAudioRecording(this.sessionId);
-        
-        if (started) {
-          this.isRecording = true;
-          this.recordingStartTime = new Date();
-          this.startRecordingTimer();
+    this.showAlert(
+      'Iniciar Grabación',
+      '¿Deseas comenzar a grabar el audio de esta sesión?\n\n' +
+      'Se capturará:\n' +
+      '• Tu micrófono\n' +
+      '• Audio de todos los participantes\n' +
+      '• Todo el contenido de audio de la videollamada\n\n' +
+      'Asegúrate de tener el micrófono encendido durante la grabación.',
+      'info',
+      'Iniciar Grabación',
+      'Cancelar',
+      async () => {
+        try {
+          console.log(' Iniciando proceso de grabación...');
           
-          console.log('✅ Grabación iniciada exitosamente');
+          try {
+            await this.videoCallService.clearRecording(this.sessionId).toPromise();
+            console.log(' Grabaciones previas limpiadas');
+          } catch (error) {
+            console.log(' No había grabaciones previas');
+          }
           
-          alert('✅ Grabación iniciada.\n\n' +
-                '🎤 Habla ahora para verificar que funciona.\n' +
-                '⏺ El indicador REC aparecerá arriba.');
-        } else {
-          await this.videoCallService.stopRecording(this.sessionId).toPromise();
-          alert('❌ No se pudo iniciar la grabación.');
+          const response = await this.videoCallService.startRecording(this.sessionId).toPromise();
+          
+          if (response && response.success) {
+            console.log(' Backend notificado:', response.data);
+            
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            const started = await this.videoCallService.startNativeAudioRecording(this.sessionId);
+            
+            if (started) {
+              this.isRecording = true;
+              this.recordingStartTime = new Date();
+              this.startRecordingTimer();
+              
+              console.log(' Grabación iniciada exitosamente');
+              
+              // ⭐ Toast pequeño en lugar de modal grande
+              this.displayToast('Grabación iniciada', 'success');
+            } else {
+              await this.videoCallService.stopRecording(this.sessionId).toPromise();
+              this.showAlert(
+                'Error al Iniciar',
+                'No se pudo iniciar la grabación. Por favor, intenta nuevamente.',
+                'error'
+              );
+            }
+          }
+        } catch (error) {
+          console.error(' Error:', error);
+          this.showAlert(
+            'Error de Grabación',
+            'Ocurrió un error al iniciar la grabación. Por favor, intenta de nuevo.',
+            'error'
+          );
         }
       }
-    } catch (error) {
-      console.error('❌ Error:', error);
-      alert('Error al iniciar la grabación.');
-    }
+    );
   }
 
   async stopRecording(): Promise<void> {
-    if (!this.isRecording) return;
+    if (!this.isRecording) {
+      console.log(' stopRecording llamado pero NO está grabando, ignorando');
+      return;
+    }
+
+    console.log('========================================');
+    console.log('⏹ DETENIENDO GRABACIÓN - INICIO');
+    console.log('========================================');
+
+    this.isRecording = false;
+    this.stopRecordingTimer();
+    this.recordingStartTime = null;
 
     try {
-      console.log('⏹ Deteniendo grabación...');
+      console.log(' Deteniendo grabación...');
       
-      // Detener grabación del navegador
       this.videoCallService.stopNativeAudioRecording();
       
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Notificar al backend
       const response = await this.videoCallService.stopRecording(this.sessionId).toPromise();
       
       if (response && response.success) {
-        this.isRecording = false;
-        this.stopRecordingTimer();
-        this.recordingStartTime = null;
-        
-        console.log('✅ Grabación detenida');
+        console.log(' Grabación detenida');
         console.log('   Duración:', response.data.durationSeconds, 'segundos');
         
-        alert('✅ Grabación detenida exitosamente.\n\n' +
-              '⏱ Duración: ' + response.data.durationSeconds + ' segundos\n' +
-              '📁 Archivo: ' + response.data.fileName + '\n\n' +
-              '🔄 El audio se está procesando y convirtiendo a MP3.\n' +
-              '⏳ Estará listo para transcripción en unos momentos.\n\n' +
-              '💡 Revisa la consola del backend para ver el progreso detallado.');
+    
+        this.displayToast('Grabación finalizada', 'success');
+        
+        console.log('========================================');
+        console.log(' GRABACIÓN DETENIDA - FIN');
+        console.log('========================================');
       }
     } catch (error) {
-      console.error('❌ Error al detener grabación:', error);
+      console.error(' Error al detener grabación:', error);
       
-      this.isRecording = false;
-      this.stopRecordingTimer();
-      this.recordingStartTime = null;
       
-      alert('Grabación detenida. El audio se está procesando.');
+      this.displayToast('Error al detener la grabación', 'error');
     }
   }
 
   toggleRecording(): void {
     if (this.isRecording) {
-      if (confirm('¿Detener la grabación de audio?')) {
-        this.stopRecording();
-      }
+      this.showAlert(
+        'Detener Grabación',
+        '¿Estás seguro de que deseas detener la grabación de audio?',
+        'warning',
+        'Detener',
+        'Cancelar',
+        () => {
+          this.stopRecording();
+        }
+      );
     } else {
       this.startRecording();
     }
@@ -708,21 +840,21 @@ async requestMediaPermissions(): Promise<void> {
   }
 
   private updateRecordingTimer(): void {
-  if (!this.recordingStartTime) return;
+    if (!this.recordingStartTime) return;
 
-  const now = new Date();
-  const diff = now.getTime() - this.recordingStartTime.getTime();
-  
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    const now = new Date();
+    const diff = now.getTime() - this.recordingStartTime.getTime();
+    
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-  if (hours > 0) {
-    this.recordingDuration = `${this.pad(hours)}:${this.pad(minutes)}:${this.pad(seconds)}`;
-  } else {
-    this.recordingDuration = `${this.pad(minutes)}:${this.pad(seconds)}`;
+    if (hours > 0) {
+      this.recordingDuration = `${this.pad(hours)}:${this.pad(minutes)}:${this.pad(seconds)}`;
+    } else {
+      this.recordingDuration = `${this.pad(minutes)}:${this.pad(seconds)}`;
+    }
   }
-}
   //#endregion
 
   //#region Session Timer
@@ -741,21 +873,21 @@ async requestMediaPermissions(): Promise<void> {
   }
 
   private updateTimer(): void {
-  if (!this.sessionStartTime) return;
+    if (!this.sessionStartTime) return;
 
-  const now = new Date();
-  const diff = now.getTime() - this.sessionStartTime.getTime();
-  
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    const now = new Date();
+    const diff = now.getTime() - this.sessionStartTime.getTime();
+    
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-  if (hours > 0) {
-    this.sessionTimer = `${this.pad(hours)}:${this.pad(minutes)}:${this.pad(seconds)}`;
-  } else {
-    this.sessionTimer = `${this.pad(minutes)}:${this.pad(seconds)}`;
+    if (hours > 0) {
+      this.sessionTimer = `${this.pad(hours)}:${this.pad(minutes)}:${this.pad(seconds)}`;
+    } else {
+      this.sessionTimer = `${this.pad(minutes)}:${this.pad(seconds)}`;
+    }
   }
-}
 
   private pad(num: number): string {
     return num.toString().padStart(2, '0');
@@ -804,7 +936,7 @@ async requestMediaPermissions(): Promise<void> {
         const jitsiApi = this.videoCallService.jitsiApi;
         if (jitsiApi) {
           jitsiApi.executeCommand('toggleChat');
-          console.log('💬 Chat toggled');
+          console.log(' Chat toggled');
         }
       } catch (error) {
         console.error('Error al abrir chat:', error);
@@ -824,7 +956,6 @@ async requestMediaPermissions(): Promise<void> {
 
   async endSessionForEveryone(): Promise<void> {
     try {
-      // Detener grabación si está activa
       if (this.isRecording) {
         await this.stopRecording();
       }
@@ -834,7 +965,11 @@ async requestMediaPermissions(): Promise<void> {
       this.leaveCall();
     } catch (error) {
       console.error('Error al finalizar sesión:', error);
-      alert('Error al finalizar la sesión');
+      this.showAlert(
+        'Error al Finalizar',
+        'Ocurrió un error al finalizar la sesión. Por favor, intenta de nuevo.',
+        'error'
+      );
     }
   }
 
@@ -863,7 +998,7 @@ async requestMediaPermissions(): Promise<void> {
 
   //#region Error Handling
   private handleError(error: any): void {
-    console.error('❌ Error en videollamada:', error);
+    console.error(' Error en videollamada:', error);
     
     if (error.status === 401) {
       this.errorMessage = 'Usuario no autenticado. Redirigiendo a login...';
@@ -888,12 +1023,12 @@ async requestMediaPermissions(): Promise<void> {
   //#endregion
 
   //#region Notes Management
-toggleNotes(): void {
-  this.showNotesPanel = !this.showNotesPanel;
-}
+  toggleNotes(): void {
+    this.showNotesPanel = !this.showNotesPanel;
+  }
 
-closeNotes(): void {
-  this.showNotesPanel = false;
-}
-//#endregion
+  closeNotes(): void {
+    this.showNotesPanel = false;
+  }
+  //#endregion
 }
