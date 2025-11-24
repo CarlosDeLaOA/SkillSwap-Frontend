@@ -56,13 +56,13 @@
       </div>
     </div>
     
-    <button 
-      class="btn btn-register" 
+    <button
+      class="btn btn-register"
       (click)="onRegister()"
       [disabled]="getAvailableSpots() === 0">
       <i class='bx bx-check-circle me-1' *ngIf="getAvailableSpots() > 0"></i>
       <i class='bx bx-x-circle me-1' *ngIf="getAvailableSpots() === 0"></i>
-      {{ getAvailableSpots() === 0 ? 'Lleno' : 'Registrarme' }}
+      Registrarme
     </button>
   </div>
 </div>

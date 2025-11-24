@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, ViewChild, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { FormsModule, NgModel } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { GoogleAuthService } from '../../../services/google-auth.service';
 
@@ -43,7 +43,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private router: Router,
     private authService: AuthService,
-    private googleAuthService: GoogleAuthService
+    private googleAuthService: GoogleAuthService,
+    private route: ActivatedRoute
   ) { }
  
   ngOnInit(): void {
@@ -53,16 +54,28 @@ export class LoginComponent implements OnInit {
 
   private checkExistingAuth(): void {
     const token = this.authService.getToken();
-    
+
     if (token) {
       const user = this.authService.getUser();
-      
-      
+
       if (user && user.email) {
-        console.log('Usuario ya autenticado, redirigiendo...');
+        console.log('Usuario ya autenticado');
+
+        // Verificar si hay una invitación pendiente
+        const pendingToken = sessionStorage.getItem('pendingInvitationToken');
+        if (pendingToken) {
+          console.log('🎫 Procesando invitación pendiente...');
+          sessionStorage.removeItem('pendingInvitationToken');
+          this.router.navigate(['/accept-community-invitation'], {
+            queryParams: { token: pendingToken }
+          });
+          return;
+        }
+
+        // Si no hay invitación pendiente, redirigir al dashboard
+        console.log('Redirigiendo al dashboard...');
         this.router.navigate(['/app/dashboard']);
       } else {
-        
         console.warn('Token existe pero usuario inválido, limpiando...');
         this.authService.clearAuth();
       }
@@ -166,8 +179,34 @@ export class LoginComponent implements OnInit {
   if (this.emailModel.valid && this.passwordModel.valid && isPasswordValid) {
     this.authService.login(this.loginForm).subscribe({
       next: () => {
-        console.log('Login  exitoso');
-        this.router.navigateByUrl('/app/dashboard');
+        console.log('✅ Login exitoso');
+
+        // El AuthService ya guardó el token y usuario automáticamente
+
+        // Verificar si hay una invitación pendiente
+        const pendingInvitationToken = sessionStorage.getItem('pendingInvitationToken');
+
+        if (pendingInvitationToken) {
+          console.log('🎫 Hay una invitación pendiente, redirigiendo...');
+          sessionStorage.removeItem('pendingInvitationToken');
+          this.router.navigate(['/accept-community-invitation'], {
+            queryParams: { token: pendingInvitationToken }
+          });
+          return;
+        }
+
+        // Verificar si hay un returnUrl
+        this.route.queryParams.subscribe(params => {
+          const returnUrl = params['returnUrl'];
+          if (returnUrl) {
+            console.log('🔄 Redirigiendo a returnUrl:', returnUrl);
+            this.router.navigateByUrl(returnUrl);
+          } else {
+            // Redirección normal al dashboard
+            console.log('🏠 Redirigiendo al dashboard');
+            this.router.navigate(['/app/dashboard']);
+          }
+        });
       },
       error: (err: any) => {
         console.error('Login error:', err);

@@ -1,0 +1,136 @@
+<div class="accept-invitation-page">
+  <div class="invitation-card" [ngClass]="getStatusClass()">
+    
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="status-content">
+      <div class="spinner">
+        <i class='bx bx-loader-alt bx-spin'></i>
+      </div>
+      <h1 class="title">Procesando tu invitación...</h1>
+      <p class="message">Por favor espera un momento</p>
+    </div>
+
+    <!-- Success State -->
+    <div *ngIf="!isLoading && acceptSuccess" class="status-content">
+      <div class="icon-wrapper success-icon">
+        <i class='bx bx-check-circle'></i>
+      </div>
+
+      <h1 class="title success-title">¡Te has unido a la comunidad!</h1>
+      <p class="message">{{ acceptMessage }}</p>
+
+      <div class="countdown-wrapper">
+        <p class="countdown-text">
+          Serás redirigido al dashboard en <strong>{{ countdown }}</strong> segundos
+        </p>
+      </div>
+
+      <button class="action-btn primary-btn" (click)="navigateToDashboard()">
+        <span>Ir al Dashboard</span>
+        <i class='bx bx-right-arrow-alt'></i>
+      </button>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="!isLoading && !acceptSuccess" class="status-content">
+      <div class="icon-wrapper error-icon">
+        <i class='bx bx-error-circle'></i>
+      </div>
+
+      <h1 class="title error-title">Error con la Invitación</h1>
+      <p class="message">{{ acceptMessage }}</p>
+
+      <div class="error-details" [ngSwitch]="invitationStatus">
+        <div *ngSwitchCase="'EXPIRED_TOKEN'" class="error-info">
+          <p class="error-subtitle">La invitación ha expirado</p>
+          <p class="error-description">
+            Las invitaciones son válidas por 48 horas.
+            Solicita al administrador de la comunidad que te envíe una nueva invitación.
+          </p>
+        </div>
+
+        <div *ngSwitchCase="'ALREADY_ACCEPTED'" class="error-info">
+          <p class="error-subtitle">Esta invitación ya fue aceptada</p>
+          <p class="error-description">
+            Ya procesaste esta invitación anteriormente.
+            Puedes ver tus comunidades en el dashboard.
+          </p>
+        </div>
+
+        <div *ngSwitchCase="'ALREADY_MEMBER'" class="error-info">
+          <p class="error-subtitle">Ya eres miembro de esta comunidad</p>
+          <p class="error-description">
+            Ya formas parte de esta comunidad.
+            Puedes acceder a ella desde el dashboard.
+          </p>
+        </div>
+
+        <div *ngSwitchCase="'ALREADY_IN_COMMUNITY'" class="error-info">
+          <p class="error-subtitle">Ya eres miembro de otra comunidad</p>
+          <p class="error-description">
+            Solo puedes estar en una comunidad a la vez.
+            Sal de tu comunidad actual antes de unirte a una nueva.
+          </p>
+        </div>
+
+        <div *ngSwitchCase="'COMMUNITY_FULL'" class="error-info">
+          <p class="error-subtitle">La comunidad está llena</p>
+          <p class="error-description">
+            Esta comunidad ha alcanzado el límite de 10 miembros.
+            Contacta al administrador para más información.
+          </p>
+        </div>
+
+        <div *ngSwitchCase="'INVALID_TOKEN'" class="error-info">
+          <p class="error-subtitle">Invitación inválida</p>
+          <p class="error-description">
+            El enlace de invitación no es válido.
+            Verifica que hayas copiado el enlace completo del correo.
+          </p>
+        </div>
+
+        <div *ngSwitchCase="'EMAIL_MISMATCH'" class="error-info">
+          <p class="error-subtitle">Email no coincide</p>
+          <p class="error-description">
+            Esta invitación fue enviada a otro correo electrónico.
+            Asegúrate de iniciar sesión con el correo correcto.
+          </p>
+        </div>
+
+        <div *ngSwitchCase="'NOT_LEARNER'" class="error-info">
+          <p class="error-subtitle">Perfil no compatible</p>
+          <p class="error-description">
+            Solo los aprendices (Learners) pueden unirse a comunidades.
+            Verifica tu perfil en la configuración.
+          </p>
+        </div>
+
+        <div *ngSwitchCase="'NETWORK_ERROR'" class="error-info">
+          <p class="error-subtitle">Error de conexión</p>
+          <p class="error-description">
+            No se pudo conectar con el servidor.
+            Verifica que el backend esté corriendo en http://localhost:8080
+          </p>
+        </div>
+
+        <div *ngSwitchDefault class="error-info">
+          <p class="error-subtitle">Ha ocurrido un error</p>
+          <p class="error-description">
+            Por favor intenta nuevamente o contacta al administrador de la comunidad.
+          </p>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="action-btn secondary-btn" (click)="navigateToLogin()">
+          <span>Iniciar Sesión</span>
+        </button>
+        <button class="action-btn primary-btn" (click)="navigateToDashboard()">
+          <span>Ir al Dashboard</span>
+          <i class='bx bx-right-arrow-alt'></i>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

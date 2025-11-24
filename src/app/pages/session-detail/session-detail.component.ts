@@ -137,8 +137,8 @@ export class SessionDetailComponent implements OnInit {
   loadCommunities(): void {
     this.isLoadingCommunities = true;
     this.registrationError = '';
-    
-    const token = localStorage.getItem('access_token');
+
+    const token = localStorage.getItem('authToken');
     console.log('🔑 Verificando token:', token ? 'Existe' : 'No existe');
     
     if (!token) {

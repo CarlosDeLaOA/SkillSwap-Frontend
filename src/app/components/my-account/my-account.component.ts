@@ -15,10 +15,10 @@ export class MyAccountComponent implements OnInit {
   private service = inject(AuthService);
 
   constructor(public router: Router) {
-    let user = localStorage.getItem('auth_user');
+    let user = localStorage.getItem('authPerson');
     if(user) {
-      this.userName = JSON.parse(user)?.name;
-    } 
+      this.userName = JSON.parse(user)?.fullName || JSON.parse(user)?.email;
+    }
   }
 
   ngOnInit() {}
