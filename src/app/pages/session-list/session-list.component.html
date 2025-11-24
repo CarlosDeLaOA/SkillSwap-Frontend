@@ -8,12 +8,6 @@
     </h1>
     <p class="header-subtitle">que están disponibles para ti</p>
     
-    <!--  Mostrar contador de sugerencias -->
-    <div class="suggestions-badge" *ngIf="suggestedSessions.length > 0 && !isSuggestionsLoading">
-      <i class='bx bx-star'></i>
-      <span>⭐ {{ suggestedSessions.length }} sesiones recomendadas para ti</span>
-    </div>
-    
     <!-- Barra de búsqueda y filtro -->
     <div class="search-container">
       <div class="search-wrapper">
@@ -49,28 +43,15 @@
 
   <!-- Lista de sesiones -->
   <div *ngIf="!isLoading && !errorMessage" class="sessions-container">
-    
-    <!-- Sección de sugerencias con título -->
-    <div *ngIf="suggestedSessions.length > 0 && !isSuggestionsLoading" class="suggestions-section-title">
-      <h2><i class='bx bx-star'></i> Recomendadas para ti</h2>
-    </div>
-
     <div class="sessions-list">
       <!-- Cuando hay sesiones -->
       <ng-container *ngIf="paginatedSessions && paginatedSessions.length > 0">
-        <!-- Cada sesión con su información dentro de la tarjeta -->
-        <div *ngFor="let session of paginatedSessions; let i = index" class="session-item-wrapper">
-          
-          <!-- Tarjeta con todo incluido -->
-          <app-session-card 
-            [session]="session"
-            [isSuggested]="isSuggested(session)"
-            [matchScore]="session.matchScore || 0"
-            [reason]="session.reason || ''"
-            (register)="onRegister($event)"
-            (viewDetails)="onViewDetails($event)">
-          </app-session-card>
-        </div>
+        <app-session-card 
+          *ngFor="let session of paginatedSessions"
+          [session]="session"
+          (register)="onRegister($event)"
+          (viewDetails)="onViewDetails($event)">
+        </app-session-card>
       </ng-container>
 
       <!-- Cuando no hay sesiones -->

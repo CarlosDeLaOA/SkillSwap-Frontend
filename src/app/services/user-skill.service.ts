@@ -41,9 +41,9 @@ export class UserSkillService {
     const body = { skillIds };
     console.log('[UserSkillService] Body completo:', JSON.stringify(body));
     console.log('[UserSkillService] URL:', `${this.apiUrl}/user-skills`);
-    
-   
-    const token = localStorage.getItem('access_token');
+
+
+    const token = localStorage.getItem('authToken');
     console.log('[UserSkillService] Token (primeros 20 chars):', token?.substring(0, 20));
     
     const headers = new HttpHeaders({

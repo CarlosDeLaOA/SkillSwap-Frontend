@@ -308,12 +308,6 @@ export interface ILearningSession {
   currentBookings?: number;
   availableSpots?: number;
 }
-export interface ILearningSessionWithSuggestion extends ILearningSession {
-  isSuggested?: boolean;
-  matchScore?: number;
-  reason?: string;
-  suggestionId?: number;
-}
 
 export interface IKnowledgeArea {
   id: number;
@@ -336,37 +330,7 @@ export interface ISaveUserSkillsRequest {
   skillIds: number[];
 }
 
-// ========================================
-// INTERFACES DE SUGERENCIAS DE SESIONES
-// ========================================
 
-/**
- * Interfaz para una sugerencia de sesión individual
- */
-export interface ISessionSuggestion {
-  id: number;
-  person: IPerson;
-  learningSession: ILearningSession;
-  matchScore: number;
-  reason: string;
-  viewed: boolean;
-  createdAt: string;
-  viewedAt?: string;
-}
-
-/**
- * Interfaz para la respuesta de sugerencias del backend
- */
-export interface ISuggestionResponse {
-  success: boolean;
-  message: string;
-  count: number;
-  data: ISessionSuggestion[];
-}
-
-// ========================================
-// INTERFACES DE DASHBOARD EXPORT
-// ========================================
 export interface IDashboardExportData {
   balance: IBalanceData;
   learningHours: ILearningHoursData;
@@ -680,4 +644,141 @@ export interface IScreenShareStatus {
   canShareScreen: boolean;
   isSharing: boolean;
   personId?: number;
+}
+// ========================================
+// INTERFACES DE INVITACIONES A COMUNIDADES
+// ========================================
+
+/**
+ * Request para crear una comunidad
+ */
+export interface ICreateCommunityRequest {
+  name: string;
+  description?: string;
+  creatorId: number;
+  memberEmails: string[];
+}
+
+/**
+ * Response al crear una comunidad
+ */
+export interface ICreateCommunityResponse {
+  success: boolean;
+  message: string;
+  communityId?: number;
+  invitationsSummary?: IInvitationsSummary;
+}
+
+/**
+ * Resumen de invitaciones enviadas
+ */
+export interface IInvitationsSummary {
+  successfulInvitations: string[];
+  failedInvitations: string[];
+}
+
+/**
+ * Response al aceptar una invitación
+ */
+export interface IAcceptInvitationResponse {
+  success: boolean;
+  message: string;
+  status: InvitationStatus;
+}
+
+/**
+ * Estados de invitación
+ */
+export enum InvitationStatus {
+  SUCCESS = 'SUCCESS',
+  INVALID_TOKEN = 'INVALID_TOKEN',
+  EXPIRED_TOKEN = 'EXPIRED_TOKEN',
+  ALREADY_ACCEPTED = 'ALREADY_ACCEPTED',
+  ALREADY_MEMBER = 'ALREADY_MEMBER',
+  COMMUNITY_FULL = 'COMMUNITY_FULL',
+  USER_NOT_FOUND = 'USER_NOT_FOUND',
+  EMAIL_MISMATCH = 'EMAIL_MISMATCH',
+  NOT_LEARNER = 'NOT_LEARNER'
+}
+
+/**
+ * Validación de formulario de comunidad
+ */
+export interface ICommunityValidation {
+  name: {
+    isValid: boolean;
+    error: string;
+  };
+  description: {
+    isValid: boolean;
+    error: string;
+  };
+  memberEmails: {
+    isValid: boolean;
+    error: string;
+  };
+}
+
+// ========================================
+// INTERFACES DE MENSAJES DE COMUNIDAD
+// ========================================
+
+/**
+ * Entidad CommunityMessage para mensajes del chat
+ */
+export interface ICommunityMessage {
+  id: number;
+  content: string;
+  sentDate: string;
+  edited: boolean;
+  sender: ICommunityParticipant;
+}
+
+/**
+ * Participante de una comunidad
+ */
+export interface ICommunityParticipant {
+  id: number;
+  fullName: string;
+  profilePhotoUrl?: string;
+  email: string;
+  role: 'CREATOR' | 'MEMBER';
+}
+
+/**
+ * Response al obtener mensajes
+ */
+export interface ICommunityMessagesResponse {
+  success: boolean;
+  data: ICommunityMessage[];
+  count: number;
+}
+
+/**
+ * Response al obtener participantes
+ */
+export interface ICommunityParticipantsResponse {
+  success: boolean;
+  data: ICommunityParticipant[];
+  count: number;
+}
+
+/**
+ * Request para enviar un mensaje
+ */
+export interface ISendMessageRequest {
+  senderId: number;
+  content: string;
+}
+
+/**
+ * Mensaje WebSocket recibido
+ */
+export interface IWebSocketMessage {
+  id?: number;
+  content: string;
+  sentDate: string;
+  edited?: boolean;
+  sender: ICommunityParticipant;
+  success: boolean;
 }
