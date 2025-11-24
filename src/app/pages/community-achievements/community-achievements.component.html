@@ -1,0 +1,171 @@
+<!-- Contenedor principal -->
+<div class="achievements-page">
+  
+  <!-- Header con botón de regreso -->
+  <div class="page-header">
+    <button class="back-btn" (click)="goBack()">
+      <i class='bx bx-arrow-back'></i>
+      <span>Volver</span>
+    </button>
+    <h1>🏆 Logros de la Comunidad</h1>
+    <p class="subtitle">Credenciales obtenidas por los miembros</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando logros...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-state">
+    <i class='bx bx-error-circle'></i>
+    <p>No se pudieron cargar los logros</p>
+    <button class="retry-btn" (click)="loadCredentials()">
+      <i class='bx bx-refresh'></i>
+      Reintentar
+    </button>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && !error && credentials.length === 0" class="empty-state">
+    <i class='bx bx-trophy'></i>
+    <h3>Aún no hay logros</h3>
+    <p>Los miembros de esta comunidad aún no han obtenido credenciales</p>
+  </div>
+
+  <!-- Grid de Credenciales -->
+  <div *ngIf="!loading && !error && credentials.length > 0" class="credentials-grid">
+    
+    <!-- Credential Card -->
+    <div 
+      *ngFor="let credential of credentials" 
+      class="credential-card"
+      (click)="openCredentialDetail(credential)">
+      
+      <!-- Badge -->
+      <div class="badge-container">
+        <img 
+          [src]="credential.badgeUrl" 
+          [alt]="'Badge de ' + credential.skill.name"
+          class="badge-image"
+          (error)="$any($event.target).src='assets/default-badge.png'">
+      </div>
+
+      <!-- Content -->
+      <div class="card-content">
+        <h3 class="skill-name">{{ credential.skill.name }}</h3>
+        <p class="learner-name">
+          <i class='bx bx-user'></i>
+          {{ credential.learner.person.fullName }}
+        </p>
+        
+        <!-- Percentage Badge -->
+        <div class="percentage-badge" 
+             [class.high]="credential.percentageAchieved >= 90"
+             [class.medium]="credential.percentageAchieved >= 70 && credential.percentageAchieved < 90"
+             [class.low]="credential.percentageAchieved < 70">
+          <i class='bx bx-medal'></i>
+          {{ credential.percentageAchieved }}%
+        </div>
+
+        <!-- Knowledge Area -->
+        <div class="knowledge-area">
+          <img 
+            [src]="credential.skill.knowledgeArea.iconUrl" 
+            [alt]="credential.skill.knowledgeArea.name"
+            class="area-icon"
+            (error)="$any($event.target).style.display='none'">
+          <span>{{ credential.skill.knowledgeArea.name }}</span>
+        </div>
+
+        <!-- Date -->
+        <div class="date-info">
+          <i class='bx bx-calendar'></i>
+          <span>{{ formatDate(credential.obtainedDate) }}</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal de Detalles -->
+  <div *ngIf="showModal && selectedCredential" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      
+      <!-- Close Button -->
+      <button class="close-btn" (click)="closeModal()">
+        <i class='bx bx-x'></i>
+      </button>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        
+        <!-- Badge Grande -->
+        <div class="modal-badge-container">
+          <img 
+            [src]="selectedCredential.badgeUrl" 
+            alt="Badge"
+            class="modal-badge"
+            (error)="$any($event.target).src='assets/default-badge.png'">
+        </div>
+
+        <!-- Título -->
+        <h2 class="modal-title">{{ selectedCredential.skill.name }}</h2>
+        
+        <!-- Learner -->
+        <p class="modal-learner">
+          <i class='bx bx-user-circle'></i>
+          Obtenido por: <strong>{{ selectedCredential.learner.person.fullName }}</strong>
+        </p>
+
+        <!-- Divider -->
+        <div class="divider"></div>
+
+        <!-- Details Grid -->
+        <div class="details-grid">
+          
+          <div class="detail-item">
+            <i class='bx bx-medal'></i>
+            <div class="detail-content">
+              <span class="detail-label">Puntuación</span>
+              <span class="detail-value">{{ selectedCredential.percentageAchieved }}%</span>
+            </div>
+          </div>
+
+          <div class="detail-item">
+            <i class='bx bx-category'></i>
+            <div class="detail-content">
+              <span class="detail-label">Área de conocimiento</span>
+              <span class="detail-value">{{ selectedCredential.skill.knowledgeArea.name }}</span>
+            </div>
+          </div>
+
+          <div class="detail-item">
+            <i class='bx bx-calendar'></i>
+            <div class="detail-content">
+              <span class="detail-label">Fecha de obtención</span>
+              <span class="detail-value">{{ formatDate(selectedCredential.obtainedDate) }}</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Description -->
+        <div class="description-box">
+          <h4><i class='bx bx-info-circle'></i> Descripción</h4>
+          <p>{{ selectedCredential.skill.description }}</p>
+        </div>
+
+        <!-- Footer del Modal -->
+        <div class="modal-footer">
+          <button class="close-modal-btn" (click)="closeModal()">
+            Cerrar
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
