@@ -718,3 +718,67 @@ export interface ICommunityValidation {
     error: string;
   };
 }
+
+// ========================================
+// INTERFACES DE MENSAJES DE COMUNIDAD
+// ========================================
+
+/**
+ * Entidad CommunityMessage para mensajes del chat
+ */
+export interface ICommunityMessage {
+  id: number;
+  content: string;
+  sentDate: string;
+  edited: boolean;
+  sender: ICommunityParticipant;
+}
+
+/**
+ * Participante de una comunidad
+ */
+export interface ICommunityParticipant {
+  id: number;
+  fullName: string;
+  profilePhotoUrl?: string;
+  email: string;
+  role: 'CREATOR' | 'MEMBER';
+}
+
+/**
+ * Response al obtener mensajes
+ */
+export interface ICommunityMessagesResponse {
+  success: boolean;
+  data: ICommunityMessage[];
+  count: number;
+}
+
+/**
+ * Response al obtener participantes
+ */
+export interface ICommunityParticipantsResponse {
+  success: boolean;
+  data: ICommunityParticipant[];
+  count: number;
+}
+
+/**
+ * Request para enviar un mensaje
+ */
+export interface ISendMessageRequest {
+  senderId: number;
+  content: string;
+}
+
+/**
+ * Mensaje WebSocket recibido
+ */
+export interface IWebSocketMessage {
+  id?: number;
+  content: string;
+  sentDate: string;
+  edited?: boolean;
+  sender: ICommunityParticipant;
+  success: boolean;
+}

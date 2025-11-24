@@ -5,26 +5,37 @@ import { tap, catchError } from 'rxjs/operators';
 import { ICommunitiesResponse } from '../interfaces';
 import { ICreateCommunityRequest, ICreateCommunityResponse, IAcceptInvitationResponse } from '../interfaces';
 
-
+/**
+ * Servicio para gestionar comunidades de aprendizaje
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class CommunityService {
+
+  //#region Fields
   private apiUrl = '/communities';
+  //#endregion
 
+  //#region Constructor
   constructor(private http: HttpClient) {}
+  //#endregion
 
+  //#region Public Methods
   /**
    * Obtiene todas las comunidades del usuario autenticado
+   * @returns Observable con las comunidades
    */
-  getMyCommunities(): Observable<ICommunitiesResponse> {
+  public getMyCommunities(): Observable<ICommunitiesResponse> {
     return this.http.get<ICommunitiesResponse>(`${this.apiUrl}/my-communities`);
   }
 
   /**
    * Obtiene comunidades con máximo N miembros activos
+   * @param maxMembers Número máximo de miembros
+   * @returns Observable con las comunidades
    */
-  getMyCommunitiesWithMaxMembers(maxMembers: number): Observable<ICommunitiesResponse> {
+  public getMyCommunitiesWithMaxMembers(maxMembers: number): Observable<ICommunitiesResponse> {
     return this.http.get<ICommunitiesResponse>(
       `${this.apiUrl}/my-communities?maxMembers=${maxMembers}`
     );
@@ -35,7 +46,7 @@ export class CommunityService {
    * @param request Datos de la comunidad a crear
    * @returns Observable con la respuesta
    */
-  createCommunity(request: ICreateCommunityRequest): Observable<ICreateCommunityResponse> {
+  public createCommunity(request: ICreateCommunityRequest): Observable<ICreateCommunityResponse> {
     return this.http.post<ICreateCommunityResponse>(`${this.apiUrl}/create`, request);
   }
 
@@ -44,10 +55,9 @@ export class CommunityService {
    * @param token Token de invitación
    * @returns Observable con la respuesta
    */
-  acceptInvitation(token: string): Observable<IAcceptInvitationResponse> {
+  public acceptInvitation(token: string): Observable<IAcceptInvitationResponse> {
     console.log('🔵 CommunityService.acceptInvitation - Token:', token);
     
-    // Verificar que el token de autenticación esté presente
     const authToken = localStorage.getItem('authToken');
     console.log('🔑 Auth Token presente:', !!authToken);
     
@@ -57,7 +67,6 @@ export class CommunityService {
 
     const params = new HttpParams().set('token', token);
     
-    // Los headers ya deberían ser agregados por el interceptor, pero los agregamos explícitamente
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${authToken}`
@@ -76,4 +85,28 @@ export class CommunityService {
       })
     );
   }
+
+  /**
+   * Invita nuevos miembros a una comunidad existente
+   * @param communityId ID de la comunidad
+   * @param memberEmails Lista de emails a invitar
+   * @returns Observable con la respuesta
+   */
+  public inviteNewMembers(communityId: number, memberEmails: string[]): Observable<any> {
+    console.log('🔵 CommunityService.inviteNewMembers - Community:', communityId, 'Emails:', memberEmails);
+    
+    return this.http.post<any>(
+      `${this.apiUrl}/${communityId}/invite`,
+      { memberEmails }
+    ).pipe(
+      tap(response => {
+        console.log('Invite response:', response);
+      }),
+      catchError(error => {
+        console.error('Error inviting members:', error);
+        throw error;
+      })
+    );
+  }
+  //#endregion
 }

@@ -14,7 +14,7 @@ import { ProfileComponent } from './pages/profile/profile.component';
 import { AuthCallbackComponent } from './pages/auth/auth-callback.component/auth-callback.component';
 import { RoleSelectionPopupComponent } from './pages/auth/auth-callback.component/role-selection-popup.component';
 import { ForgotPasswordComponent } from './pages/auth/forgotpassword/forgot-password.component';
-import { SessionListComponent} from './pages/session-list/session-list.component';  
+import { SessionListComponent } from './pages/session-list/session-list.component';
 import { LandingComponent } from './pages/landing/landing.component';
 import { SkillOnboardingComponent } from './pages/skill-onboarding/skill-onboarding.component';
 import { VerifyEmailComponent } from './pages/verify-email/verify-email.component';
@@ -23,7 +23,8 @@ import { CreateSessionComponent } from './pages/create-session/create-session.co
 import { InstructorSessionsComponent } from './pages/instructor-sessions/instructor-sessions.component';
 import { CreateCommunityComponent } from './components/create-community/create-community.component';
 import { VideoCallComponent } from './components/video-call/video-call.component';
-import { AcceptInvitationComponent } from './components/accept-invitation/accept-invitation.component'; 
+import { AcceptInvitationComponent } from './components/accept-invitation/accept-invitation.component';
+import { CommunityMainComponent } from './pages/community-main/community-main.component';
 
 export const routes: Routes = [
   {
@@ -40,9 +41,9 @@ export const routes: Routes = [
     path: 'auth/callback',
     component: AuthCallbackComponent
   },
-  { 
-    path: 'auth/role-selection', 
-    component: RoleSelectionPopupComponent 
+  {
+    path: 'auth/role-selection',
+    component: RoleSelectionPopupComponent
   },
   {
     path: 'forgot-password',
@@ -135,7 +136,7 @@ export const routes: Routes = [
         }
       },
       {
-        path: 'instructor/sessions', 
+        path: 'instructor/sessions',
         component: InstructorSessionsComponent,
         data: {
           authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
@@ -158,6 +159,15 @@ export const routes: Routes = [
         data: {
           authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
           name: 'Videollamada',
+          showInSidebar: false
+        }
+      },
+      {
+        path: 'community/:id',
+        component: CommunityMainComponent,
+        data: {
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+          name: 'Comunidad',
           showInSidebar: false
         }
       },
