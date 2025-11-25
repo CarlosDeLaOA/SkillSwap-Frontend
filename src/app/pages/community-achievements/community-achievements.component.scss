@@ -271,7 +271,7 @@ $transition: all 0.3s ease;
   position: relative;
 
   .badge-icon {
-    font-size: 120px;
+    font-size: 100px;
     color: $secondary-color;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
     transition: $transition;
@@ -493,7 +493,7 @@ $transition: all 0.3s ease;
   margin-bottom: 1rem;
 
   .modal-badge-icon {
-    font-size: 180px;
+    font-size: 120px;
     color: $secondary-color;
     filter: drop-shadow(0 8px 16px rgba($primary-color, 0.4));
     animation: float 3s ease-in-out infinite;
