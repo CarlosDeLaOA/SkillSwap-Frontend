@@ -782,3 +782,66 @@ export interface IWebSocketMessage {
   sender: ICommunityParticipant;
   success: boolean;
 }
+
+// ========================================
+// INTERFACES DE CREDENCIALES DE COMUNIDAD
+// ========================================
+
+/**
+ * Representa un área de conocimiento
+ */
+export interface IKnowledgeAreaCredential {
+  id: number;
+  name: string;
+  description: string;
+  iconUrl: string;
+  active: boolean;
+}
+
+/**
+ * Representa una habilidad para credenciales
+ */
+export interface ISkillCredential {
+  id: number;
+  name: string;
+  description: string;
+  knowledgeArea: IKnowledgeAreaCredential;
+  active: boolean;
+}
+
+/**
+ * Representa una persona para credenciales
+ */
+export interface IPersonCredential {
+  id: number;
+  fullName: string;
+}
+
+/**
+ * Representa un estudiante (Learner) para credenciales
+ */
+export interface ILearnerCredential {
+  id: number;
+  person: IPersonCredential;
+}
+
+/**
+ * Representa una credencial obtenida por un miembro de la comunidad
+ */
+export interface ICommunityCredential {
+  id: number;
+  learner: ILearnerCredential;
+  skill: ISkillCredential;
+  percentageAchieved: number;
+  badgeUrl: string;
+  obtainedDate: string; // ISO 8601 format
+}
+
+/**
+ * Response al obtener credenciales de la comunidad
+ */
+export interface ICommunityCredentialsResponse {
+  success: boolean;
+  data: ICommunityCredential[];
+  count: number;
+}

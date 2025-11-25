@@ -25,6 +25,7 @@ import { CreateCommunityComponent } from './components/create-community/create-c
 import { VideoCallComponent } from './components/video-call/video-call.component';
 import { AcceptInvitationComponent } from './components/accept-invitation/accept-invitation.component';
 import { CommunityMainComponent } from './pages/community-main/community-main.component';
+import { CommunityAchievementsComponent } from './pages/community-achievements/community-achievements';
 
 export const routes: Routes = [
   {
@@ -171,6 +172,15 @@ export const routes: Routes = [
           showInSidebar: false
         }
       },
+      {
+      path: 'community/:id/achievements',
+      component: CommunityAchievementsComponent,
+      data: {
+        authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+        name: 'Logros de la Comunidad',
+        showInSidebar: false
+      }
+    },
     ],
   },
   { path: '**', redirectTo: 'login' }
