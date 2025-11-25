@@ -7,15 +7,99 @@
   align-items: center;
   gap: 2rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
+  transition: border-color 200ms ease, box-shadow 200ms ease, transform 150ms ease;
+  position: relative;
+  z-index: 0;
   
+  /* hover neon effect: only the hovered card will get the glow (no breathing animation) ***
+     For suggested cards we keep a golden border in normal state; hover will override with neon glow. */
   &:hover {
-    border-color: #AAE16B;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    transform: translateY(-4px);
+  }
+
+  /* general neon for non-suggested cards on hover (greenish) *** */
+  &:hover {
+    border-color: #7be28b;
+    box-shadow:
+      0 0 8px rgba(123, 226, 139, 0.25),
+      0 0 20px rgba(123, 226, 139, 0.12),
+      0 8px 30px rgba(0, 0, 0, 0.45);
+  }
+
+  /* stronger neon for suggested cards on hover (gold) *** */
+  &.suggested:hover {
+    border-color: #ffd666;
+    box-shadow:
+      0 0 10px rgba(212, 175, 55, 0.35),
+      0 0 26px rgba(212, 175, 55, 0.18),
+      0 12px 36px rgba(0, 0, 0, 0.5);
   }
 }
 
+/* Tag de sugerencia: ahora en la esquina superior derecha (en lugar de la izquierda) ***
+   se ajustó contraste y borde dorado suave.
+*/
+.suggested-tag {
+  position: absolute;
+  top: 12px;
+  right: 12px; /* moved to top-right *** */
+  left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(26, 26, 26, 0.6);
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(212, 175, 55, 0.16); /* dorado suave */
+  z-index: 6;
+
+  .tag-text {
+    font-weight: 700;
+    color: #F9F6EE;
+    font-size: 13px;
+  }
+
+  /* Reemplazamos el porcentaje por una estrellita animada *** */
+  .match-percentage {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: transparent;
+    color: #FFD666;
+    font-weight: 800;
+  }
+
+  /* star icon styling (spin) *** */
+  .star-icon {
+    font-size: 16px;
+    color: #FFD666;
+    display: inline-block;
+    line-height: 1;
+    animation: spinStar 1.6s linear infinite;
+    transform-origin: 50% 50%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+}
+
+/* remove previous breathing/goldenPulse animations entirely (we want hover neon only) */
+
+/* Star spin keyframes for the little star in the tag *** */
+@keyframes spinStar {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Keep the suggested card with a thin gold border in normal state (no animation) *** */
+.session-card.suggested {
+  border: 2px solid #D4AF37;
+  box-shadow: 0 6px 18px rgba(212, 175, 55, 0.08);
+}
+
+/* rest of existing styles (unchanged) */
 .session-content {
   flex: 1;
 }
@@ -65,6 +149,15 @@
   color: rgba(255, 255, 255, 0.7);
   line-height: 1.6;
   margin: 0 0 1rem 0;
+}
+
+.suggestion-reason {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.03);
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
 }
 
 .session-meta {

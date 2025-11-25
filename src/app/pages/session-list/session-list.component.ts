@@ -6,8 +6,14 @@ import { FilterModalComponent } from '../../components/filter-modal/filter-modal
 import { SessionCardComponent } from '../../components/session-card/session-card.component';
 import { SessionDetailModalComponent } from '../../components/session-detail-modal/session-detail-modal.component';
 import { LearningSessionService } from '../../services/learning-session.service';
+import { SuggestionService } from '../../services/suggestion.service';
 import { KnowledgeAreaService } from '../../services/knowledge-area.service';
-import { ILearningSession, IKnowledgeArea, IResponse } from '../../interfaces';
+import {
+  ILearningSession,
+  ILearningSessionWithSuggestion,
+  IKnowledgeArea,
+  ISessionSuggestion
+} from '../../interfaces';
 
 /**
  * Componente para listar y filtrar sesiones de aprendizaje disponibles
@@ -28,10 +34,14 @@ export class SessionListComponent implements OnInit {
   //#region Properties
   searchTerm: string = '';
   sessions: ILearningSession[] = [];
-  filteredSessions: ILearningSession[] = [];
-  paginatedSessions: ILearningSession[] = [];
+  // ahora usamos la versión con metadata para mantener sugeridas + normales
+  filteredSessions: ILearningSessionWithSuggestion[] = [];
+  paginatedSessions: ILearningSessionWithSuggestion[] = [];
   knowledgeAreas: IKnowledgeArea[] = [];
   availableLanguages: string[] = [];
+  
+  // sugerencias cargadas desde el backend ***
+  suggestedSessions: ISessionSuggestion[] = []; // ***
   
   activeFilters = {
     categoryIds: [] as number[],
@@ -39,11 +49,15 @@ export class SessionListComponent implements OnInit {
   };
   
   currentPage: number = 1;
-  itemsPerPage: number = 6;
+  // aumentar a 15 para mostrar 5 recomendadas + resto en la misma página inicial ***
+  itemsPerPage: number = 15; // ***
   totalPages: number = 0;
   
   isLoading: boolean = false;
+  // flag para la carga de sugerencias ***
+  isSuggestionsLoading: boolean = false; // ***
   errorMessage: string = '';
+  suggestionsError: string = ''; // ***
   
   Math = Math;
   //#endregion
@@ -52,7 +66,8 @@ export class SessionListComponent implements OnInit {
   constructor(
     private modalService: NgbModal,
     private learningSessionService: LearningSessionService,
-    private knowledgeAreaService: KnowledgeAreaService
+    private knowledgeAreaService: KnowledgeAreaService,
+    private suggestionService: SuggestionService // inyectar servicio de sugerencias ***
   ) {}
   //#endregion
 
@@ -60,6 +75,8 @@ export class SessionListComponent implements OnInit {
   ngOnInit(): void {
     this.loadKnowledgeAreas();
     this.loadSessions();
+    // cargar sugerencias después de las sesiones para asegurar data disponible ***
+    setTimeout(() => this.loadSuggestions(), 500); // ***
   }
   //#endregion
 
@@ -111,8 +128,8 @@ export class SessionListComponent implements OnInit {
         }
         
         this.extractAvailableLanguages();
-        this.filteredSessions = [...this.sessions];
-        this.updatePagination();
+        // reorganiza teniendo en cuenta posibles sugerencias ya cargadas
+        this.organizeSessions();
         this.isLoading = false;
         
         console.log('Loaded sessions:', this.sessions);
@@ -131,6 +148,45 @@ export class SessionListComponent implements OnInit {
   }
   
   /**
+   * Carga las sugerencias personalizadas para el usuario actual desde el backend
+   */
+  loadSuggestions(): void {
+    this.isSuggestionsLoading = true;
+    this.suggestionsError = '';
+    
+    this.suggestionService.getSuggestions().subscribe({
+      next: (response: any) => {
+        console.log('Suggestions Response:', response);
+        
+        if (response && response.data) {
+          this.suggestedSessions = Array.isArray(response.data) ? response.data : [];
+        } else if (Array.isArray(response)) {
+          this.suggestedSessions = response;
+        } else {
+          this.suggestedSessions = [];
+        }
+        
+        this.isSuggestionsLoading = false;
+        // reorganizar sesiones para insertar las sugeridas al principio
+        this.organizeSessions();
+      },
+      error: (error: any) => {
+        console.error('Error loading suggestions:', error);
+        if (error && error.status === 401) {
+          this.suggestionsError = 'Debes iniciar sesión para ver sugerencias';
+        } else if (error && error.status === 500) {
+          this.suggestionsError = 'Error del servidor al cargar sugerencias (500)';
+        } else {
+          this.suggestionsError = 'No se pudieron cargar las sugerencias personalizadas';
+        }
+        this.isSuggestionsLoading = false;
+        this.suggestedSessions = [];
+        this.organizeSessions();
+      }
+    });
+  }
+
+  /**
    * Extrae los idiomas únicos disponibles de las sesiones cargadas
    */
   extractAvailableLanguages(): void {
@@ -143,6 +199,48 @@ export class SessionListComponent implements OnInit {
     });
     
     this.availableLanguages = Array.from(languagesSet).sort();
+  }
+
+  /**
+   * Organiza las sesiones: coloca las sugeridas al principio y elimina duplicados
+   */
+  private organizeSessions(): void {
+    // Asegurar que sessions está definido
+    if (!Array.isArray(this.sessions)) {
+      this.filteredSessions = [];
+      this.updatePagination();
+      return;
+    }
+
+    // Construir set de IDs de sesiones sugeridas
+    const suggestedSessionIds = new Set<number>();
+    if (Array.isArray(this.suggestedSessions) && this.suggestedSessions.length > 0) {
+      this.suggestedSessions.forEach(s => {
+        if (s && s.learningSession && typeof s.learningSession.id === 'number') {
+          suggestedSessionIds.add(s.learningSession.id);
+        }
+      });
+    }
+
+    // Convertir sugerencias a ILearningSessionWithSuggestion con metadata
+    const suggestedWithInfo: ILearningSessionWithSuggestion[] = (this.suggestedSessions || []).map(s => ({
+      ...s.learningSession,
+      matchScore: s.matchScore,
+      reason: s.reason,
+      isSuggested: true,
+      suggestionId: s.id
+    })); // ***
+
+    // Tomar las sesiones no sugeridas (evitar duplicados)
+    const notSuggested: ILearningSessionWithSuggestion[] = (this.sessions || [])
+      .filter(s => !suggestedSessionIds.has(s.id))
+      .map(s => ({ ...s, isSuggested: false }));
+
+    // Combinar: sugeridas primero, luego el resto
+    this.filteredSessions = [...suggestedWithInfo, ...notSuggested];
+
+    // Actualizar paginación
+    this.updatePagination();
   }
   //#endregion
 
@@ -185,14 +283,12 @@ export class SessionListComponent implements OnInit {
    * Aplica los filtros de búsqueda y categoría/idioma
    */
   applyFilters(): void {
-    if (!Array.isArray(this.sessions)) {
-      console.error('Sessions is not an array:', this.sessions);
-      this.filteredSessions = [];
-      this.updatePagination();
-      return;
+    if (!Array.isArray(this.filteredSessions) || this.filteredSessions.length === 0) {
+      // si no hay sesiones organizadas aun, intentamos construir desde sessions + suggested
+      this.organizeSessions();
     }
 
-    this.filteredSessions = this.sessions.filter(session => {
+    let result = this.filteredSessions.filter(session => {
       const matchesSearch = !this.searchTerm || 
         session.title?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         session.description?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
@@ -209,6 +305,11 @@ export class SessionListComponent implements OnInit {
       return matchesSearch && matchesCategory && matchesLanguage;
     });
 
+    // Mantener sugerencias al principio después de filtrar
+    const suggested = result.filter(s => s.isSuggested);
+    const notSuggested = result.filter(s => !s.isSuggested);
+    this.filteredSessions = [...suggested, ...notSuggested];
+
     console.log('Filtered sessions:', this.filteredSessions.length);
     this.updatePagination();
   }
@@ -219,7 +320,7 @@ export class SessionListComponent implements OnInit {
    * Actualiza la paginación basada en las sesiones filtradas
    */
   updatePagination(): void {
-    this.totalPages = Math.ceil(this.filteredSessions.length / this.itemsPerPage);
+    this.totalPages = Math.ceil(this.filteredSessions.length / this.itemsPerPage) || 1;
     
     if (this.currentPage > this.totalPages && this.totalPages > 0) {
       this.currentPage = this.totalPages;
@@ -238,6 +339,8 @@ export class SessionListComponent implements OnInit {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
     this.paginatedSessions = this.filteredSessions.slice(startIndex, endIndex);
+    
+    console.log(`Página ${this.currentPage}: mostrando ${this.paginatedSessions.length} sesiones`);
   }
 
   /**
@@ -308,6 +411,22 @@ export class SessionListComponent implements OnInit {
    */
   onRegister(sessionId: number): void {
     console.log('Registrarse en sesión:', sessionId);
+    const session = this.paginatedSessions.find(s => s.id === sessionId);
+    if (session && session.isSuggested && session.suggestionId) {
+      this.suggestionService.markSuggestionAsViewed(session.suggestionId).subscribe({
+        next: () => {
+          // actualizar estado local para remover sugerencia si lo deseas ***
+          const idx = this.suggestedSessions.findIndex(s => s.id === session.suggestionId);
+          if (idx !== -1) {
+            this.suggestedSessions.splice(idx, 1);
+            this.organizeSessions();
+          }
+        },
+        error: (err) => {
+          console.error('Error marking suggestion viewed:', err);
+        }
+      });
+    }
   }
 
   /**
@@ -332,6 +451,16 @@ export class SessionListComponent implements OnInit {
       () => {
       }
     );
+  }
+  //#endregion
+
+  //#region Helpers
+  /**
+   * Indica si una sesión está marcada como sugerida.
+   * Método agregado para que el template pueda consultar el estado. ***
+   */
+  isSuggested(session: any): boolean {
+    return session?.isSuggested === true;
   }
   //#endregion
 }

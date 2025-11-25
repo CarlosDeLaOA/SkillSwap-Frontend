@@ -47,10 +47,14 @@
       <!-- Cuando hay sesiones -->
       <ng-container *ngIf="paginatedSessions && paginatedSessions.length > 0">
         <app-session-card 
-          *ngFor="let session of paginatedSessions"
+          *ngFor="let session of paginatedSessions; let i = index"
           [session]="session"
+          [isSuggested]="isSuggested(session)"
+          [matchScore]="session.matchScore"
+          [reason]="session.reason"
           (register)="onRegister($event)"
-          (viewDetails)="onViewDetails($event)">
+          (viewDetails)="onViewDetails($event)"
+          [ngClass]="{'recommended': session.isSuggested && i < 5}">
         </app-session-card>
       </ng-container>
 
