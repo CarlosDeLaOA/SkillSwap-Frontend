@@ -91,6 +91,11 @@
         [title]="isRecording ? 'Detener grabación' : 'Iniciar grabación de sesión'" (click)="toggleRecording()">
         <i class='bx bxs-circle'></i>
       </button>
+
+      <button *ngIf="videoCallData?.isModerator" class="action-btn download-transcription-btn"
+        title="Descargar transcripción" (click)="downloadTranscription()"> <i class='bx bx-download'></i>
+      </button>
+
     </div>
 
   </div>

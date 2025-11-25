@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { VideoCallService } from '../../services/video-call.service';
+import { TranscriptionService } from '../../services/transcription.service';
 import { IVideoCallConfig, IVideoCallData, IScreenShareStatus } from '../../interfaces';
 import { ParticipantsModalComponent } from '../participants-modal/participants-modal.component';
 import { DocumentsModalComponent } from '../documents-modal/documents-modal.component';
@@ -88,7 +89,8 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private videoCallService: VideoCallService
+    private videoCallService: VideoCallService,
+    private transcriptionService: TranscriptionService
   ) {}
 
   //#region Lifecycle Hooks
@@ -1031,4 +1033,84 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     this.showNotesPanel = false;
   }
   //#endregion
+
+  //#region Transcription Management
+/**
+ * 📥 Descarga la transcripción como archivo .txt
+ */
+downloadTranscription(): void {
+  if (!this.videoCallData?.isModerator) {
+    this.displayToast('Solo el instructor puede descargar', 'error');
+    return;
+  }
+
+  this.showAlert(
+    'Descargar Transcripción',
+    '¿Deseas descargar la transcripción de esta sesión?\n\n' +
+    'Se descargará un archivo .txt con el contenido completo.',
+    'info',
+    'Descargar',
+    'Cancelar',
+    () => {
+      console.log('📥 Solicitando transcripción...');
+      
+      this.transcriptionService.getTranscription(this.sessionId).subscribe({
+        next: (response: any) => {
+          if (response && response.data && response.data.transcription) {
+            const transcription = response.data.transcription;
+            const wordCount = response.data.wordCount || 0;
+            const duration = response.data.durationSeconds || 0;
+            
+            console.log('✅ Transcripción obtenida');
+            console.log('   Palabras:', wordCount);
+            console.log('   Duración:', duration, 'segundos');
+            
+            // Crear contenido con metadata
+            const metadata = `===========================================
+TRANSCRIPCIÓN DE SESIÓN - SKILLSWAP
+===========================================
+Sesión: #${this.sessionId}
+Palabras: ${wordCount}
+Duración: ${Math.floor(duration / 60)} minutos ${duration % 60} segundos
+Fecha: ${new Date().toLocaleString('es-ES')}
+===========================================
+
+`;
+            
+            const fullContent = metadata + transcription;
+            const fileName = `transcripcion_sesion_${this.sessionId}_${new Date().getTime()}.txt`;
+            
+            // Crear blob y descargar
+            const blob = new Blob([fullContent], { type: 'text/plain;charset=utf-8' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+            
+            console.log('✅ Archivo descargado:', fileName);
+            this.displayToast('Transcripción descargada exitosamente', 'success');
+            
+          } else {
+            console.warn('⚠️ No hay transcripción disponible');
+            this.displayToast('No hay transcripción disponible para esta sesión', 'error');
+          }
+        },
+        error: (error: any) => {
+          console.error('❌ Error al descargar transcripción:', error);
+          
+          if (error.status === 404) {
+            this.displayToast('No hay transcripción disponible aún', 'error');
+          } else {
+            this.displayToast('Error al descargar transcripción', 'error');
+          }
+        }
+      });
+    }
+  );
+}
+//#endregion
 }
