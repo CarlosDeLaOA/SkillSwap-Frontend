@@ -1124,3 +1124,59 @@
     opacity: 1;
   }
 }
+
+.download-transcription-btn {
+  background: linear-gradient(135deg, #AAE16B 0%, #8ec756 100%);
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(170, 225, 107, 0.4);
+    
+    &::before {
+      width: 300px;
+      height: 300px;
+    }
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  i {
+    position: relative;
+    z-index: 1;
+    font-size: 20px;
+  }
+}
+
+/* Animación cuando se descarga */
+@keyframes download-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(170, 225, 107, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(170, 225, 107, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(170, 225, 107, 0);
+  }
+}
+
+.download-transcription-btn.downloading {
+  animation: download-pulse 1.5s infinite;
+}
