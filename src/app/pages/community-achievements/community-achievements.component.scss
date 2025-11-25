@@ -266,23 +266,15 @@ $transition: all 0.3s ease;
 .badge-container {
   display: flex;
   justify-content: center;
+  align-items: center;
   margin-bottom: 1.5rem;
   position: relative;
 
-  .badge-image {
-    width: 120px;
-    height: 120px;
-    object-fit: contain;
-    transition: $transition;
+  .badge-icon {
+    font-size: 120px;
+    color: $secondary-color;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
-  }
-
-  .fallback-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 120px;
-    height: 120px;
+    transition: $transition;
     animation: fadeInBounce 0.5s ease;
   }
 }
@@ -498,25 +490,24 @@ $transition: all 0.3s ease;
   }
 
   .modal-badge-container {
-    margin-bottom: 1rem;
+  margin-bottom: 1rem;
 
-    .modal-badge {
-      width: 180px;
-      height: 180px;
-      object-fit: contain;
-      filter: drop-shadow(0 8px 16px rgba($primary-color, 0.4));
-      animation: float 3s ease-in-out infinite;
+  .modal-badge-icon {
+    font-size: 180px;
+    color: $secondary-color;
+    filter: drop-shadow(0 8px 16px rgba($primary-color, 0.4));
+    animation: float 3s ease-in-out infinite;
+  }
 
-      @keyframes float {
-        0%, 100% {
-          transform: translateY(0);
-        }
-        50% {
-          transform: translateY(-10px);
-        }
-      }
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
     }
   }
+}
 
   .modal-title {
     font-size: 2rem;

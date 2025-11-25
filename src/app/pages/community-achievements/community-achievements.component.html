@@ -44,13 +44,9 @@
       (click)="openCredentialDetail(credential)">
       
       <!-- Badge -->
-      <div class="badge-container">
-        <img 
-          [src]="credential.badgeUrl" 
-          [alt]="'Badge de ' + credential.skill.name"
-          class="badge-image"
-          (error)="onBadgeError($event)">
-      </div>
+        <div class="badge-container">
+        <i class='bx bxs-badge-check badge-icon'></i>
+        </div>
 
       <!-- Content -->
       <div class="card-content">
@@ -101,13 +97,9 @@
       <!-- Modal Body -->
       <div class="modal-body">
         
-        <!-- Badge Grande -->
+       <!-- Badge Grande -->
         <div class="modal-badge-container">
-          <img 
-            [src]="selectedCredential.badgeUrl" 
-            alt="Badge"
-            class="modal-badge"
-            (error)="onBadgeError($event)">
+        <i class='bx bxs-badge-check modal-badge-icon'></i>
         </div>
 
         <!-- Título -->
