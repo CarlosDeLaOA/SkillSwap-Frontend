@@ -263,19 +263,31 @@ $transition: all 0.3s ease;
     }
   }
 
-  .badge-container {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1.5rem;
+.badge-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  position: relative;
 
-    .badge-image {
-      width: 120px;
-      height: 120px;
-      object-fit: contain;
-      transition: $transition;
-      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
-    }
+  .badge-image {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    transition: $transition;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
   }
+
+  .fallback-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 120px;
+    height: 120px;
+    animation: fadeInBounce 0.5s ease;
+  }
+}
+
+  
 
   .card-content {
     display: flex;
@@ -652,4 +664,22 @@ $transition: all 0.3s ease;
       }
     }
   }
+
+  // ========================================
+// FALLBACK ICON ANIMATION
+// ========================================
+
+@keyframes fadeInBounce {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
 }
