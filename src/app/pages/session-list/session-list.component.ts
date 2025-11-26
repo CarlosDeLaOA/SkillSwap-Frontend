@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Router } from '@angular/router'; // *** NUEVA IMPORTACIÓN para navegar
 import { FilterModalComponent } from '../../components/filter-modal/filter-modal.component';
 import { SessionCardComponent } from '../../components/session-card/session-card.component';
 import { SessionDetailModalComponent } from '../../components/session-detail-modal/session-detail-modal.component';
@@ -63,11 +64,20 @@ export class SessionListComponent implements OnInit {
   //#endregion
 
   //#region Constructor
+  /**
+   * Creates an instance of SessionListComponent
+   * @param modalService Modal service
+   * @param learningSessionService Service for session operations
+   * @param knowledgeAreaService Service for knowledge areas
+   * @param suggestionService Service for suggestions *** 
+   * @param router *** NUEVO: Router para navegación a session-detail ***
+   */
   constructor(
     private modalService: NgbModal,
     private learningSessionService: LearningSessionService,
     private knowledgeAreaService: KnowledgeAreaService,
-    private suggestionService: SuggestionService // inyectar servicio de sugerencias ***
+    private suggestionService: SuggestionService, // inyectar servicio de sugerencias ***
+    private router: Router // *** NUEVO: Inyectar router para navegar a detalle ***
   ) {}
   //#endregion
 
@@ -114,14 +124,14 @@ export class SessionListComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
     
-    this.learningSessionService.getAvailableSessions().subscribe({
+    this.learningSessionService. getAvailableSessions(). subscribe({
       next: (response: any) => {
         console.log('Sessions Response:', response);
         
         if (response && response.data) {
           this.sessions = Array.isArray(response.data) ? response.data : [];
         } else if (Array.isArray(response)) {
-          this.sessions = response;
+          this. sessions = response;
         } else {
           console.error('Unexpected sessions response format:', response);
           this.sessions = [];
@@ -171,7 +181,7 @@ export class SessionListComponent implements OnInit {
         this.organizeSessions();
       },
       error: (error: any) => {
-        console.error('Error loading suggestions:', error);
+        console. error('Error loading suggestions:', error);
         if (error && error.status === 401) {
           this.suggestionsError = 'Debes iniciar sesión para ver sugerencias';
         } else if (error && error.status === 500) {
@@ -194,11 +204,11 @@ export class SessionListComponent implements OnInit {
     
     this.sessions.forEach(session => {
       if (session.language) {
-        languagesSet.add(session.language);
+        languagesSet. add(session.language);
       }
     });
     
-    this.availableLanguages = Array.from(languagesSet).sort();
+    this.availableLanguages = Array.from(languagesSet). sort();
   }
 
   /**
@@ -233,11 +243,11 @@ export class SessionListComponent implements OnInit {
 
     // Tomar las sesiones no sugeridas (evitar duplicados)
     const notSuggested: ILearningSessionWithSuggestion[] = (this.sessions || [])
-      .filter(s => !suggestedSessionIds.has(s.id))
+      .filter(s => !suggestedSessionIds. has(s.id))
       .map(s => ({ ...s, isSuggested: false }));
 
     // Combinar: sugeridas primero, luego el resto
-    this.filteredSessions = [...suggestedWithInfo, ...notSuggested];
+    this.filteredSessions = [... suggestedWithInfo, ...notSuggested];
 
     // Actualizar paginación
     this.updatePagination();
@@ -257,7 +267,7 @@ export class SessionListComponent implements OnInit {
    * Abre el modal de filtros
    */
   openFilterModal(): void {
-    const modalRef = this.modalService.open(FilterModalComponent, {
+    const modalRef = this.modalService. open(FilterModalComponent, {
       size: 'md',
       centered: true,
       backdrop: 'static'
@@ -270,7 +280,7 @@ export class SessionListComponent implements OnInit {
     modalRef.result.then(
       (filters) => {
         console.log('Filters received from modal:', filters);
-        this.activeFilters = filters;
+        this. activeFilters = filters;
         this.currentPage = 1;
         this.applyFilters();
       },
@@ -283,23 +293,23 @@ export class SessionListComponent implements OnInit {
    * Aplica los filtros de búsqueda y categoría/idioma
    */
   applyFilters(): void {
-    if (!Array.isArray(this.filteredSessions) || this.filteredSessions.length === 0) {
+    if (!Array.isArray(this.filteredSessions) || this.filteredSessions. length === 0) {
       // si no hay sesiones organizadas aun, intentamos construir desde sessions + suggested
       this.organizeSessions();
     }
 
-    let result = this.filteredSessions.filter(session => {
+    let result = this.filteredSessions. filter(session => {
       const matchesSearch = !this.searchTerm || 
-        session.title?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        session.title?. toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         session.description?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         session.skill?.name?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        session.skill?.knowledgeArea?.name?.toLowerCase().includes(this.searchTerm.toLowerCase());
+        session.skill?.knowledgeArea?.name?.toLowerCase(). includes(this.searchTerm. toLowerCase());
       
-      const matchesCategory = this.activeFilters.categoryIds.length === 0 ||
+      const matchesCategory = this.activeFilters.categoryIds. length === 0 ||
         (session.skill?.knowledgeArea?.id && 
-         this.activeFilters.categoryIds.includes(session.skill.knowledgeArea.id));
+         this.activeFilters. categoryIds.includes(session.skill.knowledgeArea.id));
       
-      const matchesLanguage = this.activeFilters.languages.length === 0 ||
+      const matchesLanguage = this.activeFilters. languages.length === 0 ||
         this.activeFilters.languages.includes(session.language);
       
       return matchesSearch && matchesCategory && matchesLanguage;
@@ -307,7 +317,7 @@ export class SessionListComponent implements OnInit {
 
     // Mantener sugerencias al principio después de filtrar
     const suggested = result.filter(s => s.isSuggested);
-    const notSuggested = result.filter(s => !s.isSuggested);
+    const notSuggested = result. filter(s => !s.isSuggested);
     this.filteredSessions = [...suggested, ...notSuggested];
 
     console.log('Filtered sessions:', this.filteredSessions.length);
@@ -320,7 +330,7 @@ export class SessionListComponent implements OnInit {
    * Actualiza la paginación basada en las sesiones filtradas
    */
   updatePagination(): void {
-    this.totalPages = Math.ceil(this.filteredSessions.length / this.itemsPerPage) || 1;
+    this.totalPages = Math.ceil(this. filteredSessions.length / this.itemsPerPage) || 1;
     
     if (this.currentPage > this.totalPages && this.totalPages > 0) {
       this.currentPage = this.totalPages;
@@ -336,7 +346,7 @@ export class SessionListComponent implements OnInit {
    * Actualiza las sesiones a mostrar en la página actual
    */
   updatePaginatedSessions(): void {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const startIndex = (this. currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
     this.paginatedSessions = this.filteredSessions.slice(startIndex, endIndex);
     
@@ -348,8 +358,8 @@ export class SessionListComponent implements OnInit {
    * @param page Número de página
    */
   goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
+    if (page >= 1 && page <= this. totalPages) {
+      this. currentPage = page;
       this.updatePaginatedSessions();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -359,7 +369,7 @@ export class SessionListComponent implements OnInit {
    * Navega a la página siguiente
    */
   nextPage(): void {
-    if (this.currentPage < this.totalPages) {
+    if (this.currentPage < this. totalPages) {
       this.goToPage(this.currentPage + 1);
     }
   }
@@ -392,7 +402,7 @@ export class SessionListComponent implements OnInit {
       if (this.currentPage <= 3) {
         endPage = maxPagesToShow;
       } else if (this.currentPage >= this.totalPages - 2) {
-        startPage = this.totalPages - maxPagesToShow + 1;
+        startPage = this. totalPages - maxPagesToShow + 1;
       }
       
       for (let i = startPage; i <= endPage; i++) {
@@ -408,17 +418,19 @@ export class SessionListComponent implements OnInit {
   /**
    * Maneja el evento de registro a una sesión
    * @param sessionId ID de la sesión
+   * *** MODIFICADO: Ahora navega a la página de detalle en lugar de solo marcar como vista ***
    */
   onRegister(sessionId: number): void {
     console.log('Registrarse en sesión:', sessionId);
     const session = this.paginatedSessions.find(s => s.id === sessionId);
     if (session && session.isSuggested && session.suggestionId) {
-      this.suggestionService.markSuggestionAsViewed(session.suggestionId).subscribe({
+      this. suggestionService.markSuggestionAsViewed(session.suggestionId).subscribe({
         next: () => {
+          console.log('✅ Sugerencia marcada como vista'); // *** NUEVO: Log de confirmación ***
           // actualizar estado local para remover sugerencia si lo deseas ***
           const idx = this.suggestedSessions.findIndex(s => s.id === session.suggestionId);
           if (idx !== -1) {
-            this.suggestedSessions.splice(idx, 1);
+            this.suggestedSessions. splice(idx, 1);
             this.organizeSessions();
           }
         },
@@ -427,6 +439,9 @@ export class SessionListComponent implements OnInit {
         }
       });
     }
+    
+    // *** NUEVO: Navegar a la página de detalle de la sesión ***
+    this. router.navigate(['/app/sessions', sessionId]);
   }
 
   /**
@@ -434,18 +449,18 @@ export class SessionListComponent implements OnInit {
    * @param session Sesión a mostrar
    */
   onViewDetails(session: ILearningSession): void {
-    const modalRef = this.modalService.open(SessionDetailModalComponent, {
+    const modalRef = this.modalService. open(SessionDetailModalComponent, {
       size: 'lg',
       centered: true,
       backdrop: 'static',
       modalDialogClass: 'session-detail-modal'
     });
     
-    modalRef.componentInstance.session = session;
+    modalRef.componentInstance. session = session;
     
     modalRef.result.then(
       (sessionId: number) => {
-        console.log('Registrarse desde modal en sesión:', sessionId);
+        console. log('Registrarse desde modal en sesión:', sessionId);
         this.onRegister(sessionId);
       },
       () => {
@@ -456,11 +471,11 @@ export class SessionListComponent implements OnInit {
 
   //#region Helpers
   /**
-   * Indica si una sesión está marcada como sugerida.
-   * Método agregado para que el template pueda consultar el estado. ***
+   * Indica si una sesión está marcada como sugerida. 
+   * Método agregado para que el template pueda consultar el estado.  ***
    */
   isSuggested(session: any): boolean {
-    return session?.isSuggested === true;
+    return session?. isSuggested === true;
   }
   //#endregion
 }
