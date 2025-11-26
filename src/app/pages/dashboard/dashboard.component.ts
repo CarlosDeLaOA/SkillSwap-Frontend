@@ -6,9 +6,11 @@ import { SkillsProgressComponent } from '../../components/skills-progress/skills
 import { LearningHoursComponent } from '../../components/learning-hours/learning-hours.component';
 import { UpcomingSessionsComponent } from '../../components/upcoming-sessions/upcoming-sessions.component';
 import { ReviewsSectionComponent } from '../../components/reviews-section/reviews-section.component';
+import { SessionHistoryComponent } from '../../components/session-history/session-history.component'; 
 import { PdfExportService } from '../../services/pdf-export.service';
 import { ExcelExportService } from '../../services/excel-export.service';
-import { IDashboardExportData } from '../../interfaces';
+import { AuthService } from '../../services/auth.service';
+import { IDashboardExportData, IPerson } from '../../interfaces';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,7 +22,8 @@ import { IDashboardExportData } from '../../interfaces';
     SkillsProgressComponent,
     LearningHoursComponent,
     UpcomingSessionsComponent,
-    ReviewsSectionComponent
+    ReviewsSectionComponent,
+    SessionHistoryComponent
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
@@ -37,11 +40,28 @@ export class DashboardComponent {
 
   isExporting = false;
   showExportMenu = false;
+  isLearner: boolean = false; 
 
   constructor(
     private pdfExportService: PdfExportService,
-    private excelExportService: ExcelExportService
-  ) { }
+    private excelExportService: ExcelExportService,
+    private authService: AuthService 
+  ) {
+    // ← Verificar rol en el constructor
+    this.checkUserRole();
+  }
+
+  /**
+   * Verifica si el usuario autenticado es un LEARNER
+   */
+  private checkUserRole(): void {
+    const user = this.authService.getUser() as IPerson;
+    
+    if (user) {
+      this.isLearner = !!user.learner;
+      console.log('👤 User role - isLearner:', this.isLearner);
+    }
+  }
 
   /**
    * Toggle del menú de exportación
