@@ -845,3 +845,133 @@ export interface ICommunityCredentialsResponse {
   data: ICommunityCredential[];
   count: number;
 }
+
+
+// ========================================
+// INTERFACES DE COMPRA DE SKILLCOINS
+// ========================================
+
+/**
+ * Paquete de SkillCoins disponible para compra
+ */
+export interface ICoinPackage {
+  type: 'BASIC' | 'MEDIUM' | 'LARGE' | 'PREMIUM';
+  coins: number;
+  priceUsd: number;
+  popular?: boolean;
+  name?: string;
+  image?: string;
+}
+
+/**
+ * Request para comprar SkillCoins
+ */
+export interface ICoinPurchaseRequest {
+  packageType: string;
+  paypalOrderId: string;
+}
+
+/**
+ * Response después de completar una compra
+ */
+export interface ICoinPurchaseResponse {
+  success: boolean;
+  transactionId: number;
+  paypalReference: string;
+  coinsAdded: number;
+  newBalance: number;
+  status: string;
+}
+
+/**
+ * Request para crear orden de PayPal
+ */
+export interface ICoinCreateOrderRequest {
+  packageType: string;
+}
+
+/**
+ * Response al crear orden de PayPal
+ */
+export interface ICoinCreateOrderResponse {
+  orderId: string;
+}
+
+/**
+ * Response de balance de SkillCoins
+ */
+export interface ICoinBalanceResponse {
+  balance: number;
+}
+
+/**
+ * Transacción de SkillCoins
+ */
+export interface ICoinTransaction {
+  id: number;
+  type: string;
+  skillcoinsAmount: number;
+  usdAmount: number;
+  status: string;
+  paymentMethod: string;
+  paypalReference: string;
+  transactionDate: string;
+// ========================================
+// INTERFACES DE SESSION HISTORY
+// ========================================
+}
+/**
+ * Sesión histórica del dashboard
+ */
+export interface ISessionHistory {
+  id: number;
+  title: string;
+  description: string;
+  scheduledDatetime: string;
+  durationMinutes: number;
+  status: string;
+  language: string;
+  instructor: {
+    id: number;
+    paypalAccount?: string;
+    skillcoinsBalance: number;
+    verifiedAccount: boolean;
+    averageRating: number;
+    sessionsTaught: number;
+    totalEarnings: number;
+    biography?: string;
+  };
+  skill: {
+    id: number;
+    name: string;
+    description?: string;
+    active: boolean;
+    knowledgeArea: {
+      id: number;
+      name: string;
+      description?: string;
+      iconUrl?: string;
+      active: boolean;
+    };
+  };
+}
+
+/**
+ * Response paginada de sesiones históricas
+ */
+export interface ISessionHistoryResponse {
+  sessions: ISessionHistory[];
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+}
+
+/**
+ * Detalles completos de una sesión histórica
+ */
+export interface ISessionDetail {
+  session: ISessionHistory;
+  participantCount?: number;
+}

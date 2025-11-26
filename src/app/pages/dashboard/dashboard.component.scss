@@ -263,3 +263,13 @@ app-reviews-section {
     grid-column: span 1;
   }
 }
+
+app-session-history {
+  grid-column: span 3;
+}
+
+@media (max-width: 768px) {
+  app-session-history {
+    grid-column: span 1;
+  }
+}
