@@ -846,10 +846,80 @@ export interface ICommunityCredentialsResponse {
   count: number;
 }
 
+
+// ========================================
+// INTERFACES DE COMPRA DE SKILLCOINS
+// ========================================
+
+/**
+ * Paquete de SkillCoins disponible para compra
+ */
+export interface ICoinPackage {
+  type: 'BASIC' | 'MEDIUM' | 'LARGE' | 'PREMIUM';
+  coins: number;
+  priceUsd: number;
+  popular?: boolean;
+  name?: string;
+  image?: string;
+}
+
+/**
+ * Request para comprar SkillCoins
+ */
+export interface ICoinPurchaseRequest {
+  packageType: string;
+  paypalOrderId: string;
+}
+
+/**
+ * Response después de completar una compra
+ */
+export interface ICoinPurchaseResponse {
+  success: boolean;
+  transactionId: number;
+  paypalReference: string;
+  coinsAdded: number;
+  newBalance: number;
+  status: string;
+}
+
+/**
+ * Request para crear orden de PayPal
+ */
+export interface ICoinCreateOrderRequest {
+  packageType: string;
+}
+
+/**
+ * Response al crear orden de PayPal
+ */
+export interface ICoinCreateOrderResponse {
+  orderId: string;
+}
+
+/**
+ * Response de balance de SkillCoins
+ */
+export interface ICoinBalanceResponse {
+  balance: number;
+}
+
+/**
+ * Transacción de SkillCoins
+ */
+export interface ICoinTransaction {
+  id: number;
+  type: string;
+  skillcoinsAmount: number;
+  usdAmount: number;
+  status: string;
+  paymentMethod: string;
+  paypalReference: string;
+  transactionDate: string;
 // ========================================
 // INTERFACES DE SESSION HISTORY
 // ========================================
-
+}
 /**
  * Sesión histórica del dashboard
  */
