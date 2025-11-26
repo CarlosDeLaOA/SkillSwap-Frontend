@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardService } from '../../services/dashboard.service';
 import { IAccountBalance, IBalanceData } from '../../interfaces';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-balance-dashboard',
@@ -15,14 +16,17 @@ export class BalanceDashboardComponent implements OnInit {
   accountBalance: number = 0; 
   isLoading: boolean = true;
   
-  constructor(private dashboardService: DashboardService) { }
+  constructor(
+    private dashboardService: DashboardService, 
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
     this.loadAccountBalance();
   }
   
   onSkillUpClick(): void {
-    console.log('Botón SkillUp clickeado');
+    this.router.navigate(['/app/coins/purchase']); 
   }
 
   /**
