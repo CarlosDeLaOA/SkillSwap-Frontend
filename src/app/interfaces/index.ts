@@ -841,3 +841,102 @@ export interface ISessionDetail {
   session: ISessionHistory;
   participantCount?: number;
 }
+
+// ========================================
+// INTERFACES DE DOCUMENTOS DE GRUPO - 
+// ========================================
+
+/**
+ * Documento de sesión grupal - 
+ */
+export interface IGroupSessionDocument {
+  id: number;
+  fileName: string;
+  originalFileName: string;
+  filePath: string;
+  fileSize: number;
+  contentType: string;
+  sessionDate: string;
+  uploadDate: string;
+  description?: string;
+  active: boolean;
+  formattedFileSize?: string;
+  learningCommunity: {
+    id: number;
+    name: string;
+  };
+  learningSession: {
+    id: number;
+    title: string;
+  } | null;
+  uploadedBy: {
+    id: number;
+    fullName: string;
+    profilePhotoUrl?: string;
+  };
+  // Campos para historial de borrado
+  deletedAt?: string;
+  deletedBy?: {
+    id: number;
+    fullName: string;
+    profilePhotoUrl?: string;
+  };
+  deletionReason?: string;
+}
+
+/**
+ * Response al subir documento - 
+ */
+export interface IDocumentUploadResponse {
+  success: boolean;
+  message: string;
+  data: IGroupSessionDocument;
+}
+
+/**
+ * Response con lista de documentos - 
+ */
+export interface IDocumentListResponse {
+  success: boolean;
+  data: IGroupSessionDocument[];
+  count: number;
+}
+
+/**
+ * Response con documentos agrupados por sesión - 
+ */
+export interface IDocumentGroupedBySessionResponse {
+  success: boolean;
+  data: { [sessionId: number]: IGroupSessionDocument[] };
+}
+
+/**
+ * Response con documentos agrupados por fecha - 
+ */
+export interface IDocumentGroupedByDateResponse {
+  success: boolean;
+  data: { [date: string]: IGroupSessionDocument[] };
+}
+
+/**
+ * Estadísticas de almacenamiento del grupo - 
+ */
+export interface IStorageStats {
+  usedBytes: number;
+  availableBytes: number;
+  maxBytes: number;
+  usedFormatted: string;
+  availableFormatted: string;
+  maxFormatted: string;
+  usagePercentage: number;
+  documentCount: number;
+}
+
+/**
+ * Response de estadísticas de almacenamiento - 
+ */
+export interface IStorageStatsResponse {
+  success: boolean;
+  data: IStorageStats;
+}
+

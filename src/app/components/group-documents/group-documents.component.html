@@ -1,0 +1,373 @@
+<!-- Contenedor Principal -->
+<div class="documents-container">
+
+    <!-- Header -->
+    <div class="documents-header">
+        <div class="header-left">
+            <i class='bx bx-folder'></i>
+            <h3>Documentos de la Comunidad</h3>
+        </div>
+        <div class="header-right">
+            <button class="btn-upload" (click)="openUploadModal()">
+                <i class='bx bx-upload'></i>
+                Subir Documento
+            </button>
+        </div>
+    </div>
+
+    <!-- Mensajes de Estado -->
+    <div class="alert alert-success" *ngIf="successMessage">
+        <i class='bx bx-check-circle'></i>
+        <span>{{ successMessage }}</span>
+    </div>
+
+    <div class="alert alert-error" *ngIf="errorMessage && !showUploadModal && !showDeleteModal">
+        <i class='bx bx-error-circle'></i>
+        <span>{{ errorMessage }}</span>
+    </div>
+
+    <!-- Storage Stats -->
+    <div class="storage-stats" *ngIf="storageStats">
+        <div class="storage-info">
+            <i class='bx bx-data'></i>
+            <span>{{ storageStats.usedFormatted }} de {{ storageStats.maxFormatted }} usados</span>
+            <span class="doc-count">({{ storageStats. documentCount }} documentos)</span>
+        </div>
+        <div class="storage-bar">
+            <div class="storage-fill" [style.width.%]="storageStats.usagePercentage"
+                [class.warning]="storageStats.usagePercentage > 70" [class.danger]="storageStats.usagePercentage > 90">
+            </div>
+        </div>
+    </div>
+
+    <!-- View Mode Tabs -->
+    <div class="view-tabs">
+        <button class="tab-btn" [class.active]="viewMode === 'byDate'" (click)="changeViewMode('byDate')">
+            <i class='bx bx-calendar'></i>
+            Por Fecha
+        </button>
+        <button class="tab-btn" [class.active]="viewMode === 'bySession'" (click)="changeViewMode('bySession')">
+            <i class='bx bx-video'></i>
+            Por Tipo
+        </button>
+        <button class="tab-btn" [class.active]="viewMode === 'list'" (click)="changeViewMode('list')">
+            <i class='bx bx-list-ul'></i>
+            Lista
+        </button>
+        <button class="tab-btn tab-deleted" [class.active]="viewMode === 'deleted'" (click)="changeViewMode('deleted')">
+            <i class='bx bx-trash'></i>
+            Borrados
+        </button>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading">
+        <div class="spinner"></div>
+        <p>Cargando documentos... </p>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="! isLoading && documents.length === 0 && viewMode !== 'deleted'">
+        <i class='bx bx-folder-open'></i>
+        <h4>No hay documentos</h4>
+        <p>Sube el primer documento PDF de la comunidad</p>
+    </div>
+
+    <!-- Empty State for Deleted -->
+    <div class="empty-state" *ngIf="! isLoading && documents.length === 0 && viewMode === 'deleted'">
+        <i class='bx bx-check-circle'></i>
+        <h4>No hay documentos eliminados</h4>
+        <p>El historial de documentos borrados aparecerá aquí</p>
+    </div>
+
+    <!-- Documents List View (includes deleted view) -->
+    <div class="documents-list" *ngIf="!isLoading && documents.length > 0 && (viewMode === 'list' || viewMode === 'deleted')">
+        <div class="document-card" [class.deleted-card]="viewMode === 'deleted'" *ngFor="let doc of documents">
+            <div class="doc-icon">
+                <i class='bx bxs-file-pdf'></i>
+            </div>
+            <div class="doc-info">
+                <h4 class="doc-name">{{ doc.originalFileName }}</h4>
+                <div class="doc-meta">
+                    <span class="meta-item">
+                        <i class='bx bx-calendar'></i>
+                        {{ formatDate(doc.sessionDate) }}
+                    </span>
+                    <span class="meta-item">
+                        <i class='bx bx-data'></i>
+                        {{ doc.formattedFileSize || formatFileSize(doc.fileSize) }}
+                    </span>
+                    <span class="meta-item doc-type-badge" [class.support]="isSupportMaterial(doc)" *ngIf="viewMode !== 'deleted'">
+                        <i class='bx' [ngClass]="isSupportMaterial(doc) ?  'bx-book' : 'bx-video'"></i>
+                        {{ getDocumentTypeLabel(doc) }}
+                    </span>
+                </div>
+                <div class="doc-uploader">
+                    <div class="uploader-avatar" [style.background]="getUserColor(doc.uploadedBy.id)">
+                        <img *ngIf="doc.uploadedBy.profilePhotoUrl" [src]="doc.uploadedBy.profilePhotoUrl"
+                            [alt]="doc.uploadedBy.fullName">
+                        <span *ngIf="!doc.uploadedBy.profilePhotoUrl">
+                            {{ getInitials(doc.uploadedBy.fullName) }}
+                        </span>
+                    </div>
+                    <span class="uploader-name">Subido por: {{ doc.uploadedBy.fullName }}</span>
+                </div>
+                <p class="doc-description" *ngIf="doc.description">{{ doc.description }}</p>
+
+                <!-- Info de borrado -->
+                <div class="deletion-info" *ngIf="viewMode === 'deleted' && doc.deletedBy">
+                    <div class="deletion-header">
+                        <i class='bx bx-trash'></i>
+                        <span>Eliminado por: <strong>{{ doc.deletedBy.fullName }}</strong></span>
+                        <span class="deletion-date">{{ doc.deletedAt ? formatDate(doc.deletedAt) : 'N/A' }}</span>
+                    </div>
+                    <p class="deletion-reason" *ngIf="doc.deletionReason">
+                        <i class='bx bx-message-detail'></i>
+                        Razón: {{ doc.deletionReason }}
+                    </p>
+                </div>
+                </div>
+                <div class="doc-actions" *ngIf="viewMode !== 'deleted'">
+                    <button class="btn-action btn-view" (click)="viewDocument(doc)" title="Visualizar">
+                        <i class='bx bx-show'></i>
+                    </button>
+                    <button class="btn-action btn-download" (click)="downloadDocument(doc)" title="Descargar">
+                        <i class='bx bx-download'></i>
+                    </button>
+                <button class="btn-action btn-delete" (click)="deleteDocument(doc)" title="Eliminar">
+                    <i class='bx bx-trash'></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Documents Grouped View -->
+    <div class="documents-grouped" *ngIf="!isLoading && documents.length > 0 && viewMode !== 'list' && viewMode !== 'deleted'">
+        <div class="group-section" *ngFor="let groupKey of getGroupKeys()">
+            <div class="group-header">
+                <i class='bx'
+                    [ngClass]="viewMode === 'byDate' ?  'bx-calendar' : (groupKey.includes('Apoyo') ? 'bx-book' : 'bx-video')"></i>
+                <h4>{{ viewMode === 'byDate' ?  formatGroupDate(groupKey) : groupKey }}</h4>
+                <span class="group-count">{{ groupedDocuments[groupKey].length }} documentos</span>
+            </div>
+            <div class="group-documents">
+                <div class="document-card" *ngFor="let doc of groupedDocuments[groupKey]">
+                    <div class="doc-icon">
+                        <i class='bx bxs-file-pdf'></i>
+                    </div>
+                    <div class="doc-info">
+                        <h4 class="doc-name">{{ doc.originalFileName }}</h4>
+                        <div class="doc-meta">
+                            <span class="meta-item">
+                                <i class='bx bx-time'></i>
+                                {{ formatDate(doc.uploadDate) }}
+                            </span>
+                            <span class="meta-item">
+                                <i class='bx bx-data'></i>
+                                {{ doc.formattedFileSize || formatFileSize(doc.fileSize) }}
+                            </span>
+                        </div>
+                        <div class="doc-uploader">
+                            <div class="uploader-avatar" [style.background]="getUserColor(doc.uploadedBy.id)">
+                                <img *ngIf="doc.uploadedBy.profilePhotoUrl" [src]="doc.uploadedBy.profilePhotoUrl"
+                                    [alt]="doc.uploadedBy.fullName">
+                                <span *ngIf="!doc.uploadedBy.profilePhotoUrl">
+                                    {{ getInitials(doc.uploadedBy.fullName) }}
+                                </span>
+                            </div>
+                            <span class="uploader-name">{{ doc.uploadedBy.fullName }}</span>
+                        </div>
+                        <p class="doc-description" *ngIf="doc.description">{{ doc.description }}</p>
+                    </div>
+                    <div class="doc-actions">
+                        <button class="btn-action btn-view" (click)="viewDocument(doc)" title="Visualizar">
+                            <i class='bx bx-show'></i>
+                        </button>
+                        <button class="btn-action btn-download" (click)="downloadDocument(doc)" title="Descargar">
+                            <i class='bx bx-download'></i>
+                        </button>
+                        <button class="btn-action btn-delete" (click)="deleteDocument(doc)" title="Eliminar">
+                            <i class='bx bx-trash'></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Upload Modal -->
+<div class="modal-overlay" *ngIf="showUploadModal" (click)="closeUploadModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2>
+                <i class='bx bx-upload'></i>
+                Subir Documento
+            </h2>
+            <button class="modal-close-btn" (click)="closeUploadModal()">
+                <i class='bx bx-x'></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <!-- Error en modal -->
+            <div class="alert alert-error" *ngIf="errorMessage">
+                <i class='bx bx-error-circle'></i>
+                <span>{{ errorMessage }}</span>
+            </div>
+
+            <!-- File Input -->
+            <div class="form-group">
+                <label class="form-label">
+                    Archivo PDF <span class="required">*</span>
+                </label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="fileInput" accept=".pdf,application/pdf" (change)="onFileSelected($event)"
+                        #fileInput hidden>
+                    <button class="btn-select-file" (click)="fileInput.click()">
+                        <i class='bx bx-file'></i>
+                        {{ selectedFile ?  selectedFile.name : 'Seleccionar archivo PDF' }}
+                    </button>
+                    <span class="file-hint">Solo archivos PDF, máximo 100MB</span>
+                </div>
+            </div>
+
+            <!-- Tipo de Documento con Radio Buttons Estilizados -->
+            <div class="form-group">
+                <label class="form-label">Tipo de Documento</label>
+                <div class="document-type-options">
+                    <label *ngFor="let type of documentTypes" class="type-option"
+                        [class.active]="selectedDocumentType === type. id">
+                        <input type="radio" name="documentType" [value]="type.id" [(ngModel)]="selectedDocumentType"
+                            hidden>
+                        <span class="radio-circle">
+                            <span class="radio-dot"></span>
+                        </span>
+                        <i class='bx' [ngClass]="type.icon"></i>
+                        <span class="type-label">{{ type.name }}</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Session Select con animación -->
+            <div class="form-group session-select-wrapper" [class.visible]="selectedDocumentType === 'session'">
+                <label class="form-label">
+                    Sesión <span class="required">*</span>
+                </label>
+                <select class="form-select" [(ngModel)]="uploadSessionId">
+                    <option [ngValue]="null" disabled>Selecciona una sesión</option>
+                    <option *ngFor="let session of availableSessions" [ngValue]="session.id">
+                        {{ session.title }}
+                    </option>
+                </select>
+                <span class="form-hint" *ngIf="availableSessions.length === 0">
+                    No hay sesiones disponibles.  Puedes subir como Material de Apoyo.
+                </span>
+            </div>
+
+            <!-- Session Date -->
+            <div class="form-group">
+                <label class="form-label">Fecha del Documento</label>
+                <input type="datetime-local" class="form-input" [(ngModel)]="uploadSessionDate">
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+                <label class="form-label">Descripción (opcional)</label>
+                <textarea class="form-textarea" [(ngModel)]="uploadDescription"
+                    placeholder="Describe el contenido del documento..." rows="3"></textarea>
+            </div>
+
+            <!-- Storage Warning -->
+            <div class="storage-warning" *ngIf="storageStats && storageStats. usagePercentage > 80">
+                <i class='bx bx-error'></i>
+                <span>Almacenamiento casi lleno: {{ storageStats.availableFormatted }} disponible</span>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-secondary" (click)="closeUploadModal()" [disabled]="isUploading">
+                Cancelar
+            </button>
+            <button class="btn-primary" (click)="uploadDocument()"
+                [disabled]="isUploading || !selectedFile || (selectedDocumentType === 'session' && !uploadSessionId)">
+                <span *ngIf="! isUploading">
+                    <i class='bx bx-upload'></i>
+                    Subir Documento
+                </span>
+                <span *ngIf="isUploading">
+                    <i class='bx bx-loader-alt bx-spin'></i>
+                    Subiendo...
+                </span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal-overlay" *ngIf="showDeleteModal" (click)="closeDeleteModal()">
+    <div class="modal-content delete-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header delete-header">
+            <h2>
+                <i class='bx bx-trash'></i>
+                Eliminar Documento
+            </h2>
+            <button class="modal-close-btn" (click)="closeDeleteModal()">
+                <i class='bx bx-x'></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <!-- Información del documento a eliminar -->
+            <div class="delete-document-info" *ngIf="documentToDelete">
+                <div class="doc-icon-large">
+                    <i class='bx bxs-file-pdf'></i>
+                </div>
+                <div class="doc-details">
+                    <h4>{{ documentToDelete.originalFileName }}</h4>
+                    <p>{{ documentToDelete.formattedFileSize || formatFileSize(documentToDelete.fileSize) }}</p>
+                </div>
+            </div>
+
+            <div class="delete-warning">
+                <i class='bx bx-error-circle'></i>
+                <p>Esta acción moverá el documento al historial de borrados.  Podrás ver quién lo eliminó y por qué.</p>
+            </div>
+
+            <!-- Razón de eliminación -->
+            <div class="form-group">
+                <label class="form-label">
+                    Razón de eliminación <span class="required">*</span>
+                </label>
+                <textarea 
+                    class="form-textarea"
+                    [(ngModel)]="deleteReason"
+                    placeholder="Explica por qué se elimina este documento..."
+                    rows="3"></textarea>
+            </div>
+
+            <!-- Error -->
+            <div class="alert alert-error" *ngIf="errorMessage">
+                <i class='bx bx-error-circle'></i>
+                <span>{{ errorMessage }}</span>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-secondary" (click)="closeDeleteModal()" [disabled]="isDeleting">
+                Cancelar
+            </button>
+            <button class="btn-danger" (click)="confirmDelete()" [disabled]="isDeleting || !deleteReason. trim()">
+                <span *ngIf="! isDeleting">
+                    <i class='bx bx-trash'></i>
+                    Eliminar Documento
+                </span>
+                <span *ngIf="isDeleting">
+                    <i class='bx bx-loader-alt bx-spin'></i>
+                    Eliminando...
+                </span>
+            </button>
+        </div>
+    </div>
+</div>
