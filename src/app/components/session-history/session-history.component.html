@@ -7,7 +7,7 @@
     </div>
   </div>
 
-  <!-- Loading State SOLO para carga inicial -->
+  <!-- Loading State -->
   <div class="loading-container" *ngIf="isLoading && sessions.length === 0">
     <i class='bx bx-loader-alt bx-spin loading-icon'></i>
     <p class="loading-text">Cargando historial...</p>
@@ -30,7 +30,7 @@
     <p class="empty-subtext">Las sesiones finalizadas o canceladas aparecerán aquí</p>
   </div>
 
-  <!-- Sessions Grid - SIEMPRE visible cuando hay datos -->
+  <!-- Sessions Grid -->
   <div 
     class="sessions-grid" 
     *ngIf="sessions.length > 0"
@@ -110,7 +110,7 @@
   </div>
 </div>
 
-<!-- Modal de detalles (sin cambios) -->
+<!-- Modal de detalles -->
 <div class="modal-overlay" *ngIf="showDetailModal" (click)="closeDetailModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     
