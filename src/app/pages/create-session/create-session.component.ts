@@ -18,8 +18,8 @@ import { SessionPreviewModalComponent } from '../../components/sessions/session-
   selector: 'app-create-session',
   standalone: true,
   imports: [
-    CommonModule, 
-    FormsModule, 
+    CommonModule,
+    FormsModule,
     ReactiveFormsModule,
     SessionPreviewModalComponent,
     MatDatepickerModule,
@@ -34,7 +34,7 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
 
   //#region Properties
   private destroy$ = new Subject<void>();
-  
+
   public sessionData: ICreateSessionRequest = {
     skill: { id: 0 },
     title: '',
@@ -51,22 +51,21 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
   public filteredSkills: IUserSkill[] = [];
   public categories: IKnowledgeArea[] = [];
   public selectedCategory: number = 0;
-  
 
   public dateControl = new FormControl(new Date());
-  public minDate = new Date(); // Fecha mínima es hoy
-  
+  public minDate = new Date();
+
   public sessionHour: string = '10';
   public sessionMinute: string = '00';
-  
+
   public hours: string[] = [];
   public minutes: string[] = ['00', '15', '30', '45'];
-  
+
   public isLoading: boolean = false;
   public isLoadingProfile: boolean = true;
   public showPreviewModal: boolean = false;
   public createdSession: ILearningSession | null = null;
-  
+
   public showNotification: boolean = false;
   public notificationType: 'success' | 'error' | 'warning' = 'success';
   public notificationMessage: string = '';
@@ -95,18 +94,18 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
 
   //#region Lifecycle Hooks
   ngOnInit(): void {
-    console.log(' CreateSessionComponent initialized');
-    
+    console.log('CreateSessionComponent initialized');
+
     const person = this.profileService.person$();
-    
+
     if (! person || !person.id || !person.userSkills) {
-      console.log(' Perfil no cargado, obteniendo datos del servidor...');
+      console.log('Perfil no cargado, obteniendo datos del servidor...');
       this.profileService.getUserProfile();
       setTimeout(() => {
         this.initializeComponent();
       }, 1500);
     } else {
-      console.log(' Perfil ya cargado desde sesión anterior');
+      console.log('Perfil ya cargado desde sesión anterior');
       this.initializeComponent();
     }
 
@@ -129,15 +128,15 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
   //#region Private Methods - Initialization
   private initializeComponent(): void {
     const person = this.profileService.person$();
-    
-    console.log('🔍 Verificando datos del usuario:', {
+
+    console.log('Verificando datos del usuario:', {
       hasId: !!person.id,
       hasUserSkills: !!person.userSkills,
       userSkillsCount: person.userSkills?.length || 0,
       isInstructor: this.profileService.isInstructor()
     });
-    
-    if (! this.profileService.isInstructor()) {
+
+    if (!this.profileService.isInstructor()) {
       this.isLoadingProfile = false;
       this.showToast('error', 'Solo los instructores pueden crear sesiones');
       setTimeout(() => {
@@ -148,14 +147,14 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
 
     if (!person.userSkills || person.userSkills.length === 0) {
       this.isLoadingProfile = false;
-      this.showToast('warning', 'Necesitas agregar habilidades antes de crear una sesión. Redirigiendo...');
+      this.showToast('warning', 'Necesitas agregar habilidades antes de crear una sesión.Redirigiendo...');
       setTimeout(() => {
         this.router.navigate(['/app/profile']);
       }, 3000);
       return;
     }
-    
-    console.log(' Todo OK, cargando skills y categorías');
+
+    console.log('Todo OK, cargando skills y categorías');
     this.loadUserSkills();
     this.loadCategories();
     this.isLoadingProfile = false;
@@ -165,26 +164,26 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
   //#region Public Methods - Category & Skills
   onCategoryChange(): void {
     const selectedCategoryId = Number(this.selectedCategory);
-    console.log(' Category changed:', selectedCategoryId);
-    
+    console.log('Category changed:', selectedCategoryId);
+
     if (selectedCategoryId === 0) {
       this.filteredSkills = this.userSkills;
-      console.log(' Showing all skills:', this.filteredSkills.length);
+      console.log('Showing all skills:', this.filteredSkills.length);
     } else {
       this.filteredSkills = this.userSkills.filter(
         us => us.skill.knowledgeArea?.id === selectedCategoryId
       );
-      console.log(' Filtered skills:', this.filteredSkills.length);
-      console.log(' Skills found:', this.filteredSkills.map(us => us.skill.name));
+      console.log('Filtered skills:', this.filteredSkills.length);
+      console.log('Skills found:', this.filteredSkills.map(us => us.skill.name));
     }
-    
+
     if (this.sessionData.skill.id !== 0) {
       const skillExists = this.filteredSkills.some(
         us => us.skill.id === this.sessionData.skill.id
       );
       if (!skillExists) {
         this.sessionData.skill.id = 0;
-        console.log(' Skill reset because it is not in filtered category');
+        console.log('Skill reset because it is not in filtered category');
       }
     }
   }
@@ -205,14 +204,34 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Incrementa el costo en 5 SkillCoins
+   */
+  incrementCost(): void {
+    if (this.sessionData.skillcoinsCost < 50) {
+      this.sessionData.skillcoinsCost = Math.min(50, this.sessionData.skillcoinsCost + 5);
+      this.validateSkillcoinsCost();
+    }
+  }
+
+  /**
+   * Decrementa el costo en 5 SkillCoins
+   */
+  decrementCost(): void {
+    if (this.sessionData.skillcoinsCost > 5) {
+      this.sessionData.skillcoinsCost = Math.max(5, this.sessionData.skillcoinsCost - 5);
+      this.validateSkillcoinsCost();
+    }
+  }
+
   private updateScheduledDatetimeFromDatePicker(date: Date): void {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    
+
     const dateString = `${year}-${month}-${day}`;
     const datetimeString = `${dateString}T${this.sessionHour}:${this.sessionMinute}:00`;
-    
+
     const selectedDate = new Date(datetimeString);
     const now = new Date();
 
@@ -232,8 +251,8 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
   //#region Public Methods - Validation
   validateTitle(): void {
     const title = this.sessionData.title.trim();
-    
-    if (!title) {
+
+    if (! title) {
       this.validation.title = {
         isValid: false,
         error: 'El título es obligatorio'
@@ -254,8 +273,8 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
 
   validateDescription(): void {
     const description = this.sessionData.description.trim();
-    
-    if (! description) {
+
+    if (!description) {
       this.validation.description = {
         isValid: false,
         error: 'La descripción es obligatoria'
@@ -276,7 +295,7 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
 
   validateSkill(): void {
     const skillId = Number(this.sessionData.skill.id);
-    
+
     if (! skillId || skillId === 0) {
       this.validation.skill = {
         isValid: false,
@@ -291,7 +310,7 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
 
   validateScheduledDatetime(): void {
     const date = this.dateControl.value;
-    
+
     if (!date || ! this.sessionHour || !this.sessionMinute) {
       this.validation.scheduledDatetime = {
         isValid: false,
@@ -305,7 +324,7 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
 
   validateDuration(): void {
     const duration = this.sessionData.durationMinutes;
-    
+
     if (! duration || duration <= 0) {
       this.validation.durationMinutes = {
         isValid: false,
@@ -327,7 +346,7 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
 
   validateMaxCapacity(): void {
     const capacity = this.sessionData.maxCapacity;
-    
+
     if (!capacity || capacity <= 0) {
       this.validation.maxCapacity = {
         isValid: false,
@@ -387,28 +406,28 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
     this.validateSkillcoinsCost();
 
     const isValid = Object.values(this.validation).every((field: any) => field.isValid);
-    
+
     if (! isValid) {
-      console.log(' Form validation failed:', this.validation);
+      console.log('Form validation failed:', this.validation);
     } else {
-      console.log(' Form validation passed');
+      console.log('Form validation passed');
     }
-    
+
     return isValid;
   }
   //#endregion
 
   //#region Public Methods - Form Submission
   onSubmit(): void {
-    console.log(' Form submitted');
-    
+    console.log('Form submitted');
+
     if (!this.validateForm()) {
       this.showToast('error', 'Por favor corrige los errores en el formulario');
       return;
     }
 
     this.isLoading = true;
-    
+
     const sessionDataToSend: ICreateSessionRequest = {
       ...this.sessionData,
       skill: { id: Number(this.sessionData.skill.id) },
@@ -416,25 +435,25 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
       maxCapacity: Number(this.sessionData.maxCapacity),
       skillcoinsCost: Number(this.sessionData.skillcoinsCost)
     };
-    
-    console.log(' Session data to send:', sessionDataToSend);
+
+    console.log('Session data to send:', sessionDataToSend);
 
     this.learningSessionService.createSession(sessionDataToSend)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          console.log(' Session created in DRAFT:', response);
+          console.log('Session created in DRAFT:', response);
           this.isLoading = false;
           this.createdSession = response.data;
           this.showPreviewModal = true;
         },
         error: (error) => {
-          console.error(' Error creating session:', error);
+          console.error('Error creating session:', error);
           this.isLoading = false;
-          
-          const errorMessage = error.error?.message || 
-                              error.error?.error || 
-                              'Error al crear la sesión';
+
+          const errorMessage = error.error?.message ||
+            error.error?.error ||
+            'Error al crear la sesión';
           this.showToast('error', errorMessage);
         }
       });
@@ -454,7 +473,7 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
   onSessionPublished(publishedSession: ILearningSession): void {
     this.showPreviewModal = false;
     this.showToast('success', 'Sesión publicada exitosamente');
-    
+
     setTimeout(() => {
       this.router.navigate(['/app/sessions']);
     }, 1500);
@@ -464,29 +483,29 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
   //#region Private Methods
   private loadUserSkills(): void {
     const person = this.profileService.person$();
-    console.log(' Person data:', person);
-    
+    console.log('Person data:', person);
+
     this.userSkills = person.userSkills?.filter(us => us.active) || [];
     this.filteredSkills = this.userSkills;
 
-    console.log(' User skills loaded:', this.userSkills.length);
-    console.log(' Skills:', this.userSkills);
+    console.log('User skills loaded:', this.userSkills.length);
+    console.log('Skills:', this.userSkills);
   }
 
   private loadCategories(): void {
     const uniqueCategories = new Map<number, IKnowledgeArea>();
-    
+
     this.userSkills.forEach(userSkill => {
       const area = userSkill.skill.knowledgeArea;
       if (area && !uniqueCategories.has(area.id)) {
         uniqueCategories.set(area.id, area);
       }
     });
-    
+
     this.categories = Array.from(uniqueCategories.values());
-    
-    console.log(' Categories loaded:', this.categories.length);
-    console.log(' Categories:', this.categories);
+
+    console.log('Categories loaded:', this.categories.length);
+    console.log('Categories:', this.categories);
   }
 
   private showToast(type: 'success' | 'error' | 'warning', message: string): void {

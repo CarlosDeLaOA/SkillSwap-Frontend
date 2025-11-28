@@ -70,7 +70,6 @@
       <div class="form-section">
         <h2>Especificaciones de la sesión</h2>
         
-       
         <div class="form-row-two">
           
           <div class="form-group">
@@ -161,7 +160,7 @@
               name="durationMinutes"
               [(ngModel)]="sessionData.durationMinutes"
               (change)="validateDuration()"
-              [class.invalid]="! validation.durationMinutes.isValid">
+              [class.invalid]="!validation.durationMinutes.isValid">
               <option [value]="30">30 min</option>
               <option [value]="45">45 min</option>
               <option [value]="60" selected>60 min</option>
@@ -227,22 +226,40 @@
                 name="skillcoinsCost"
                 [(ngModel)]="sessionData.skillcoinsCost"
                 (blur)="validateSkillcoinsCost()"
-                [class.invalid]="! validation.skillcoinsCost.isValid"
+                [class.invalid]="!validation.skillcoinsCost.isValid"
                 min="5"
                 max="50"
                 placeholder="5">
+              
+              <!-- Controles personalizados -->
+              <div class="cost-controls">
+                <button 
+                  type="button" 
+                  (click)="incrementCost()" 
+                  [disabled]="sessionData.skillcoinsCost >= 50"
+                  title="Aumentar">
+                  <i class='bx bx-chevron-up'></i>
+                </button>
+                <button 
+                  type="button" 
+                  (click)="decrementCost()" 
+                  [disabled]="sessionData.skillcoinsCost <= 5"
+                  title="Disminuir">
+                  <i class='bx bx-chevron-down'></i>
+                </button>
+              </div>
+              
               <span class="cost-suffix">
                 <i class='bx bx-coin'></i>
                 SkillCoins
               </span>
             </div>
             <small class="helper-text">Mínimo 5, máximo 50 SkillCoins</small>
-            <small *ngIf="!validation.skillcoinsCost.isValid" class="error-text">
+            <small *ngIf="! validation.skillcoinsCost.isValid" class="error-text">
               {{ validation.skillcoinsCost.error }}
             </small>
           </div>
         </div>
-     
 
         <input type="hidden" [(ngModel)]="sessionData.language" name="language" value="es">
         <input type="hidden" [(ngModel)]="sessionData.maxCapacity" name="maxCapacity" value="10">
