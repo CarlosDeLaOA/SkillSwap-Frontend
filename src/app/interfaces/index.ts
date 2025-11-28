@@ -165,9 +165,9 @@ export interface IUpcomingSession {
   status: string;
   videoCallLink: string;
   skillName: string;
-  bookingId?: number; // *** campo para almacenar ID del booking del usuario
-  bookingType?: "INDIVIDUAL" | "GROUP"; // *** tipo de booking cuando aplica
-  currentParticipants?: number; // *** participantes actuales (útil para instructores)
+  bookingId?: number;
+  bookingType?: "INDIVIDUAL" | "GROUP";
+  currentParticipants?: number;
 }
 
 export interface ICredential {
@@ -219,6 +219,8 @@ export interface ICreateSessionRequest {
   durationMinutes: number;
   language: string;
   maxCapacity: number;
+  isPremium: boolean;
+  skillcoinsCost: number;
 }
 
 export interface ILearningSession {
@@ -286,7 +288,7 @@ export interface ILearningSessionWithSuggestion extends ILearningSession {
   matchScore?: number;
   reason?: string;
   suggestionId?: number;
-} // *** interfaz para sesiones con campos de sugerencia
+}
 
 export interface ISessionSuggestion {
   id: number;
@@ -297,14 +299,14 @@ export interface ISessionSuggestion {
   viewed: boolean;
   createdAt: string;
   viewedAt?: string;
-} // *** DTO que representa una sugerencia
+}
 
 export interface ISuggestionResponse {
   success: boolean;
   message: string;
   count: number;
   data: ISessionSuggestion[];
-} // *** respuesta del endpoint de sugerencias
+}
 
 // Dashboard export types
 export interface IDashboardExportData {
@@ -466,6 +468,10 @@ export interface ISessionValidation {
     error: string;
   };
   maxCapacity: {
+    isValid: boolean;
+    error: string;
+  };
+  skillcoinsCost: {
     isValid: boolean;
     error: string;
   };
@@ -782,10 +788,12 @@ export interface ICoinTransaction {
   paymentMethod: string;
   paypalReference: string;
   transactionDate: string;
+}
+
 // ========================================
 // INTERFACES DE SESSION HISTORY
 // ========================================
-}
+
 /**
  * Sesión histórica del dashboard
  */
@@ -843,11 +851,11 @@ export interface ISessionDetail {
 }
 
 // ========================================
-// INTERFACES DE DOCUMENTOS DE GRUPO - 
+// INTERFACES DE DOCUMENTOS DE GRUPO
 // ========================================
 
 /**
- * Documento de sesión grupal - 
+ * Documento de sesión grupal
  */
 export interface IGroupSessionDocument {
   id: number;
@@ -885,7 +893,7 @@ export interface IGroupSessionDocument {
 }
 
 /**
- * Response al subir documento - 
+ * Response al subir documento
  */
 export interface IDocumentUploadResponse {
   success: boolean;
@@ -894,7 +902,7 @@ export interface IDocumentUploadResponse {
 }
 
 /**
- * Response con lista de documentos - 
+ * Response con lista de documentos
  */
 export interface IDocumentListResponse {
   success: boolean;
@@ -903,7 +911,7 @@ export interface IDocumentListResponse {
 }
 
 /**
- * Response con documentos agrupados por sesión - 
+ * Response con documentos agrupados por sesión
  */
 export interface IDocumentGroupedBySessionResponse {
   success: boolean;
@@ -911,7 +919,7 @@ export interface IDocumentGroupedBySessionResponse {
 }
 
 /**
- * Response con documentos agrupados por fecha - 
+ * Response con documentos agrupados por fecha
  */
 export interface IDocumentGroupedByDateResponse {
   success: boolean;
@@ -919,7 +927,7 @@ export interface IDocumentGroupedByDateResponse {
 }
 
 /**
- * Estadísticas de almacenamiento del grupo - 
+ * Estadísticas de almacenamiento del grupo
  */
 export interface IStorageStats {
   usedBytes: number;
@@ -933,10 +941,9 @@ export interface IStorageStats {
 }
 
 /**
- * Response de estadísticas de almacenamiento - 
+ * Response de estadísticas de almacenamiento
  */
 export interface IStorageStatsResponse {
   success: boolean;
   data: IStorageStats;
 }
-

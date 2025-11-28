@@ -7,7 +7,6 @@ import {
   IStorageStats
 } from '../../interfaces';
 
-// Interface para tipos de documento
 interface DocumentType {
   id: string;
   name: string;
@@ -53,14 +52,12 @@ export class GroupDocumentsComponent implements OnInit {
 
   availableSessions: { id: number; title: string }[] = [];
 
-  // Tipos de documento
   documentTypes: DocumentType[] = [
     { id: 'support', name: 'Material de Apoyo / Repaso', icon: 'bx-book' },
     { id: 'session', name: 'Documento de Sesión', icon: 'bx-video' }
   ];
   selectedDocumentType: string = 'support';
 
-  // Para modal de confirmación de borrado
   showDeleteModal: boolean = false;
   documentToDelete: IGroupSessionDocument | null = null;
   deleteReason: string = '';
@@ -109,7 +106,7 @@ export class GroupDocumentsComponent implements OnInit {
           this.documents = response.data;
           this.extractAvailableSessions();
         }
-        this. isLoading = false;
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('Error al cargar documentos:', error);
@@ -200,7 +197,7 @@ export class GroupDocumentsComponent implements OnInit {
         sessionsMap.set(doc.learningSession.id, doc.learningSession.title);
       }
     });
-    this.availableSessions = Array.from(sessionsMap.entries()). map(([id, title]) => ({ id, title }));
+    this.availableSessions = Array.from(sessionsMap.entries()).map(([id, title]) => ({ id, title }));
   }
 
   /**
@@ -277,7 +274,7 @@ export class GroupDocumentsComponent implements OnInit {
     }
 
     this.isUploading = true;
-    this. errorMessage = '';
+    this.errorMessage = '';
 
     const sessionId = this.selectedDocumentType === 'session' ? this.uploadSessionId : null;
     const sessionDate = this.uploadSessionDate || new Date().toISOString();
@@ -288,10 +285,10 @@ export class GroupDocumentsComponent implements OnInit {
       sessionId,
       sessionDate,
       this.uploadDescription
-    ). subscribe({
+    ).subscribe({
       next: (response) => {
         if (response.success) {
-          this. successMessage = 'Documento subido exitosamente';
+          this.successMessage = 'Documento subido exitosamente';
           this.closeUploadModal();
           this.loadDocuments();
           this.loadStorageStats();
@@ -320,17 +317,12 @@ export class GroupDocumentsComponent implements OnInit {
 
   //#region Download Methods
   /**
-   * Descarga un documento
+   * Descarga un documento desde Cloudinary
    */
   downloadDocument(document: IGroupSessionDocument): void {
     this.documentService.downloadDocument(document.id).subscribe({
-      next: (blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = window.document.createElement('a');
-        a.href = url;
-        a.download = document.originalFileName;
-        a. click();
-        window.URL.revokeObjectURL(url);
+      next: () => {
+        console.log('Descarga iniciada');
       },
       error: (error) => {
         console.error('Error al descargar:', error);
@@ -341,13 +333,12 @@ export class GroupDocumentsComponent implements OnInit {
   }
 
   /**
-   * Abre documento en nueva pestaña para visualizar
+   * Abre documento en nueva pestaña para visualizar desde Cloudinary
    */
   viewDocument(document: IGroupSessionDocument): void {
-    this.documentService.downloadDocument(document.id).subscribe({
-      next: (blob) => {
-        const url = window.URL.createObjectURL(blob);
-        window.open(url, '_blank');
+    this.documentService.viewDocument(document.id).subscribe({
+      next: () => {
+        console.log('Documento abierto');
       },
       error: (error) => {
         console.error('Error al visualizar:', error);
@@ -459,7 +450,7 @@ export class GroupDocumentsComponent implements OnInit {
    * Obtiene las iniciales del nombre
    */
   getInitials(fullName: string): string {
-    if (!fullName) return '? ';
+    if (!fullName) return '?';
     const names = fullName.split(' ');
     if (names.length >= 2) {
       return (names[0][0] + names[1][0]).toUpperCase();

@@ -319,6 +319,114 @@
       }
     }
 
+    /* Selector de tipo de sesión (Premium/Gratuita) */
+    .session-type-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+      }
+
+      .radio-option {
+        position: relative;
+
+        input[type="radio"] {
+          position: absolute;
+          opacity: 0;
+          width: 0;
+          height: 0;
+        }
+
+        label {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          padding: 20px;
+          background-color: rgba(0, 0, 0, 0.4);
+          border: 2px solid rgba(255, 255, 255, 0.15);
+          border-radius: 12px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          min-height: 80px;
+
+          &:hover {
+            border-color: #aae16b;
+            background-color: rgba(170, 225, 107, 0.05);
+          }
+
+          i {
+            font-size: 28px;
+            color: #aae16b;
+            flex-shrink: 0;
+          }
+
+          .option-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            .option-title {
+              font-size: 16px;
+              font-weight: 600;
+              color: #ffffff;
+            }
+
+            .option-description {
+              font-size: 13px;
+              color: rgba(255, 255, 255, 0.6);
+            }
+          }
+        }
+
+        input[type="radio"]:checked + label {
+          border-color: #6366F1;
+          background-color: rgba(99, 102, 241, 0.1);
+          box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+
+          i {
+            color: #6366F1;
+          }
+
+          .option-content .option-title {
+            color: #6366F1;
+          }
+        }
+      }
+    }
+
+    /* Grupo de costo en SkillCoins */
+    .cost-group {
+      .cost-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+
+        input {
+          padding-right: 140px ! important;
+        }
+
+        .cost-suffix {
+          position: absolute;
+          right: 16px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          color: #aae16b;
+          font-size: 14px;
+          font-weight: 600;
+          pointer-events: none;
+
+          i {
+            font-size: 16px;
+            color: #ffd700;
+          }
+        }
+      }
+    }
+
    
     .form-actions {
       display: flex;
@@ -371,11 +479,11 @@
 select {
   option {
     background-color: #000000 !important;
-    color: #ffffff !important;
+    color: #ffffff ! important;
   }
   
   option:checked {
-    background-color: #6366F1 !important;
+    background-color: #6366F1 ! important;
     color: #ffffff !important;
   }
 }
@@ -395,11 +503,11 @@ select {
 
     .mat-mdc-form-field-flex {
       height: 48px !important; 
-      align-items: center !important;
+      align-items: center ! important;
     }
 
     .mat-mdc-form-field-infix {
-      padding: 0 !important;
+      padding: 0 ! important;
       border: 0 !important;
       min-height: 48px !important;
       display: flex !important;
@@ -409,10 +517,10 @@ select {
    
     .mat-mdc-input-element {
       color: #ffffff !important;
-      font-family: 'Epilogue', sans-serif !important;
+      font-family: 'Epilogue', sans-serif ! important;
       font-size: 14px !important;
       padding: 14px 16px !important;
-      height: 48px !important;
+      height: 48px ! important;
       line-height: normal !important;
       box-sizing: border-box !important;
     }
@@ -481,7 +589,7 @@ select {
 .mat-calendar-header {
   background-color: #2a3239 !important;
   color: #ffffff !important;
-  padding: 16px !important;
+  padding: 16px ! important;
   border-radius: 12px 12px 0 0 !important;
 }
 
@@ -522,7 +630,7 @@ select {
   .mat-calendar-body-cell-content {
     color: #ffffff !important;
     border-radius: 8px !important;
-    font-weight: 500 !important;
+    font-weight: 500 ! important;
   }
 
  
@@ -531,7 +639,7 @@ select {
     border-width: 2px !important;
     
     .mat-calendar-body-cell-content {
-      color: #aae16b !important;
+      color: #aae16b ! important;
     }
   }
 
@@ -541,7 +649,7 @@ select {
     
     .mat-calendar-body-cell-content {
       background-color: #504ab7 !important;
-      color: #ffffff !important;
+      color: #ffffff ! important;
       font-weight: 700 !important;
     }
   }
@@ -557,7 +665,7 @@ select {
   .mat-calendar-body-disabled {
     .mat-calendar-body-cell-content {
       color: rgba(255, 255, 255, 0.3) !important;
-      cursor: not-allowed !important;
+      cursor: not-allowed ! important;
     }
   }
 
@@ -568,8 +676,8 @@ select {
 
 
   .mat-datepicker-actions {
-    background-color: #2a3239 !important;
-    padding: 12px !important;
+    background-color: #2a3239 ! important;
+    padding: 12px ! important;
     border-radius: 0 0 12px 12px !important;
     
     button {
@@ -586,4 +694,4 @@ select {
   .bx-calendar {
     font-size: 20px !important;
   }
-} 
+}

@@ -42,7 +42,9 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
     scheduledDatetime: '',
     durationMinutes: 60,
     language: 'es',
-    maxCapacity: 10
+    maxCapacity: 10,
+    isPremium: false,
+    skillcoinsCost: 0
   };
 
   public userSkills: IUserSkill[] = [];
@@ -76,7 +78,8 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
     skill: { isValid: true, error: '' },
     scheduledDatetime: { isValid: true, error: '' },
     durationMinutes: { isValid: true, error: '' },
-    maxCapacity: { isValid: true, error: '' }
+    maxCapacity: { isValid: true, error: '' },
+    skillcoinsCost: { isValid: true, error: '' }
   };
   //#endregion
 
@@ -96,7 +99,7 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
     
     const person = this.profileService.person$();
     
-    if (!person || !person.id || !person.userSkills) {
+    if (! person || !person.id || !person.userSkills) {
       console.log(' Perfil no cargado, obteniendo datos del servidor...');
       this.profileService.getUserProfile();
       setTimeout(() => {
@@ -134,7 +137,7 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
       isInstructor: this.profileService.isInstructor()
     });
     
-    if (!this.profileService.isInstructor()) {
+    if (! this.profileService.isInstructor()) {
       this.isLoadingProfile = false;
       this.showToast('error', 'Solo los instructores pueden crear sesiones');
       setTimeout(() => {
@@ -190,6 +193,17 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
     this.validateScheduledDatetime();
   }
 
+  /**
+   * Maneja el cambio de tipo de sesión (Premium/Gratuita)
+   */
+  onSessionTypeChange(): void {
+    if (! this.sessionData.isPremium) {
+      this.sessionData.skillcoinsCost = 0;
+      this.validation.skillcoinsCost = { isValid: true, error: '' };
+    } else {
+      this.sessionData.skillcoinsCost = 5;
+    }
+  }
 
   private updateScheduledDatetimeFromDatePicker(date: Date): void {
     const year = date.getFullYear();
@@ -241,7 +255,7 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
   validateDescription(): void {
     const description = this.sessionData.description.trim();
     
-    if (!description) {
+    if (! description) {
       this.validation.description = {
         isValid: false,
         error: 'La descripción es obligatoria'
@@ -263,7 +277,7 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
   validateSkill(): void {
     const skillId = Number(this.sessionData.skill.id);
     
-    if (!skillId || skillId === 0) {
+    if (! skillId || skillId === 0) {
       this.validation.skill = {
         isValid: false,
         error: 'Debes seleccionar una habilidad'
@@ -278,7 +292,7 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
   validateScheduledDatetime(): void {
     const date = this.dateControl.value;
     
-    if (!date || !this.sessionHour || !this.sessionMinute) {
+    if (!date || ! this.sessionHour || !this.sessionMinute) {
       this.validation.scheduledDatetime = {
         isValid: false,
         error: 'La fecha y hora son obligatorias'
@@ -292,7 +306,7 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
   validateDuration(): void {
     const duration = this.sessionData.durationMinutes;
     
-    if (!duration || duration <= 0) {
+    if (! duration || duration <= 0) {
       this.validation.durationMinutes = {
         isValid: false,
         error: 'La duración debe ser un valor positivo'
@@ -333,6 +347,36 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
     this.validation.maxCapacity = { isValid: true, error: '' };
   }
 
+  /**
+   * Valida el costo en SkillCoins para sesiones premium
+   */
+  validateSkillcoinsCost(): void {
+    if (! this.sessionData.isPremium) {
+      this.validation.skillcoinsCost = { isValid: true, error: '' };
+      return;
+    }
+
+    const cost = this.sessionData.skillcoinsCost;
+
+    if (! cost || cost <= 0) {
+      this.validation.skillcoinsCost = {
+        isValid: false,
+        error: 'El costo debe ser un valor positivo para sesiones premium'
+      };
+      return;
+    }
+
+    if (cost < 5 || cost > 50) {
+      this.validation.skillcoinsCost = {
+        isValid: false,
+        error: 'El costo debe estar entre 5 y 50 SkillCoins'
+      };
+      return;
+    }
+
+    this.validation.skillcoinsCost = { isValid: true, error: '' };
+  }
+
   validateForm(): boolean {
     this.validateTitle();
     this.validateDescription();
@@ -340,10 +384,11 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
     this.validateScheduledDatetime();
     this.validateDuration();
     this.validateMaxCapacity();
+    this.validateSkillcoinsCost();
 
     const isValid = Object.values(this.validation).every((field: any) => field.isValid);
     
-    if (!isValid) {
+    if (! isValid) {
       console.log(' Form validation failed:', this.validation);
     } else {
       console.log(' Form validation passed');
@@ -368,7 +413,8 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
       ...this.sessionData,
       skill: { id: Number(this.sessionData.skill.id) },
       durationMinutes: Number(this.sessionData.durationMinutes),
-      maxCapacity: Number(this.sessionData.maxCapacity)
+      maxCapacity: Number(this.sessionData.maxCapacity),
+      skillcoinsCost: Number(this.sessionData.skillcoinsCost)
     };
     
     console.log(' Session data to send:', sessionDataToSend);

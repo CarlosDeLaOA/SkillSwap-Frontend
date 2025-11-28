@@ -15,7 +15,7 @@ import { ILearningSession } from '../../interfaces';
 export class SessionCardComponent {
   
   //#region Input/Output Properties
-  @Input() session!: ILearningSession;
+  @Input() session! : ILearningSession;
   @Input() isSuggested?: boolean; // indica si la tarjeta es una sugerencia *** 
   @Input() matchScore?: number; // score [0..1] recibido desde backend *** 
   @Input() reason?: string; // razón por la que se sugiere la sesión *** 
@@ -39,7 +39,7 @@ export class SessionCardComponent {
 
   /**
    * Emite evento register con el id de la sesión.
-   * El parent decide la navegación o el flujo adicional. ***
+   * El parent decide la navegación o el flujo adicional.***
    */
   onRegister(): void {
     if (this.session && this.session.id) {
@@ -77,7 +77,7 @@ export class SessionCardComponent {
    * @returns Hora formateada
    */
   formatTime(dateString: string): string {
-    if (!dateString) { return ''; }
+    if (! dateString) { return ''; }
     const date = new Date(dateString);
     return date.toLocaleTimeString('es-ES', { 
       hour: '2-digit', 

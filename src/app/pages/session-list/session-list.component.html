@@ -33,8 +33,8 @@
     <p class="loading-text">Cargando sesiones...</p>
   </div>
 
-  <!-- Error Message -->
-  <div *ngIf="errorMessage && !isLoading" class="error-container">
+  <!-- Mensaje de Error -->
+  <div *ngIf="errorMessage && ! isLoading" class="error-container">
     <div class="alert alert-danger" role="alert">
       <i class='bx bx-error-circle me-2'></i>
       {{ errorMessage }}
@@ -42,7 +42,7 @@
   </div>
 
   <!-- Lista de sesiones -->
-  <div *ngIf="!isLoading && !errorMessage" class="sessions-container">
+  <div *ngIf="! isLoading && ! errorMessage" class="sessions-container">
     <div class="sessions-list">
       <!-- Cuando hay sesiones -->
       <ng-container *ngIf="paginatedSessions && paginatedSessions.length > 0">
@@ -59,7 +59,7 @@
       </ng-container>
 
       <!-- Cuando no hay sesiones -->
-      <div *ngIf="!paginatedSessions || paginatedSessions.length === 0" class="no-sessions">
+      <div *ngIf="! paginatedSessions || paginatedSessions.length === 0" class="no-sessions">
         <i class='bx bx-calendar-x'></i>
         <h3>No hay sesiones disponibles</h3>
         <p>No se encontraron sesiones que coincidan con tus criterios de búsqueda.</p>

@@ -11,13 +11,13 @@
   position: relative;
   z-index: 0;
   
-  /* hover neon effect: only the hovered card will get the glow (no breathing animation) ***
-     For suggested cards we keep a golden border in normal state; hover will override with neon glow. */
+  /* efecto neon en hover: solo la tarjeta con hover obtiene el brillo (sin animación de respiración) ***
+     Para tarjetas sugeridas mantenemos un borde dorado en estado normal; hover lo sobreescribe con brillo neon.*/
   &:hover {
     transform: translateY(-4px);
   }
 
-  /* general neon for non-suggested cards on hover (greenish) *** */
+  /* neon general para tarjetas no sugeridas en hover (verdoso) *** */
   &:hover {
     border-color: #7be28b;
     box-shadow:
@@ -26,7 +26,7 @@
       0 8px 30px rgba(0, 0, 0, 0.45);
   }
 
-  /* stronger neon for suggested cards on hover (gold) *** */
+  /* neon más fuerte para tarjetas sugeridas en hover (dorado) *** */
   &.suggested:hover {
     border-color: #ffd666;
     box-shadow:
@@ -42,7 +42,7 @@
 .suggested-tag {
   position: absolute;
   top: 12px;
-  right: 12px; /* moved to top-right *** */
+  right: 12px; /* movido a la esquina superior derecha *** */
   left: auto;
   display: flex;
   align-items: center;
@@ -72,7 +72,7 @@
     font-weight: 800;
   }
 
-  /* star icon styling (spin) *** */
+  /* estilos del icono de estrella (giro) *** */
   .star-icon {
     font-size: 16px;
     color: #FFD666;
@@ -85,21 +85,21 @@
   }
 }
 
-/* remove previous breathing/goldenPulse animations entirely (we want hover neon only) */
+/* eliminamos las animaciones previas de respiración/goldenPulse (solo queremos neon en hover) */
 
-/* Star spin keyframes for the little star in the tag *** */
+/* Keyframes de giro de estrella para la estrellita en el tag *** */
 @keyframes spinStar {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
 
-/* Keep the suggested card with a thin gold border in normal state (no animation) *** */
+/* Mantener la tarjeta sugerida con un borde dorado delgado en estado normal (sin animación) *** */
 .session-card.suggested {
   border: 2px solid #D4AF37;
   box-shadow: 0 6px 18px rgba(212, 175, 55, 0.08);
 }
 
-/* rest of existing styles (unchanged) */
+/* resto de estilos existentes (sin cambios) */
 .session-content {
   flex: 1;
 }
@@ -141,6 +141,40 @@
   
   i {
     font-size: 1rem;
+  }
+}
+
+/* Badge para mostrar si la sesión es Premium o Gratuita */
+.session-type-badge {
+  padding: 0.3rem 0.8rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid;
+
+  &.premium {
+    background-color: rgba(255, 215, 0, 0.2);
+    color: #ffd700;
+    border-color: rgba(255, 215, 0, 0.4);
+
+    i {
+      font-size: 1rem;
+      color: #ffd700;
+    }
+  }
+
+  &.free {
+    background-color: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+    border-color: rgba(34, 197, 94, 0.4);
+
+    i {
+      font-size: 1rem;
+      color: #22c55e;
+    }
   }
 }
 

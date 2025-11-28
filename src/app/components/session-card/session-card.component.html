@@ -1,11 +1,11 @@
 <div class="session-card" [class.suggested]="isSuggested">
 
-  <!-- Tag moved to top-right and replaced percentage with spinning star icon ***
-       aria-label kept for screen readers -->
+  <!-- Tag movido a la esquina superior derecha y porcentaje reemplazado con icono de estrella giratorio ***
+       aria-label mantenido para lectores de pantalla -->
   <div *ngIf="isSuggested" class="suggested-tag" role="status" aria-label="Recomendado para ti">
     <span class="tag-text">Para ti</span>
     <span class="match-percentage" aria-hidden="true">
-      <!-- Using boxicons star class; if you don't have boxicons, replace with an inline SVG ★ -->
+      <!-- Usando clase de estrella de boxicons; si no tienes boxicons, reemplaza con un SVG inline ★ -->
       <i class="bx bx-star star-icon" aria-hidden="true"></i>
     </span>
   </div>
@@ -18,6 +18,12 @@
       <span class="session-category badge" *ngIf="session.skill?.knowledgeArea?.name">
         <i class='bx bx-category-alt me-1'></i>
         {{ session.skill.knowledgeArea.name }}
+      </span>
+      <!-- Badge para indicar si es Premium o Gratuita -->
+      <span class="session-type-badge" [class.premium]="session.isPremium" [class.free]="! session.isPremium">
+        <i class='bx' [class.bx-crown]="session.isPremium" [class.bx-gift]="! session.isPremium"></i>
+        <span *ngIf="session.isPremium">{{ session.skillcoinsCost }} SkillCoins</span>
+        <span *ngIf="!session.isPremium">Gratuita</span>
       </span>
     </div>
     <p class="session-description">{{ session.description }}</p>

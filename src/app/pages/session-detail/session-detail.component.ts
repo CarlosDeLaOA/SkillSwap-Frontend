@@ -62,7 +62,7 @@ export class SessionDetailComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.sessionId = +params['id'];
-      this. loadSession();
+      this.loadSession();
     });
   }
 
@@ -72,7 +72,7 @@ export class SessionDetailComponent implements OnInit {
   loadSession(): void {
     this.isLoading = true;
     
-    this.learningSessionService. getSessionById(this.sessionId).subscribe({
+    this.learningSessionService.getSessionById(this.sessionId).subscribe({
       next: (response: any) => {
         console.log('✅ Respuesta de sesión recibida:', response);
         
@@ -100,14 +100,14 @@ export class SessionDetailComponent implements OnInit {
         if (error.status === 404) {
           this.errorMessage = 'La sesión no existe o fue eliminada';
         } else if (error.status === 401) {
-          this. errorMessage = 'Debes iniciar sesión para ver esta sesión';
+          this.errorMessage = 'Debes iniciar sesión para ver esta sesión';
         } else if (error.status === 403) {
           this.errorMessage = 'No tienes permiso para ver esta sesión';
         } else if (error.status === 500) {
-          this.errorMessage = 'Error del servidor al cargar la sesión.  Contacta al soporte técnico.';
-          console.error('❌ Error 500 - Detalles completos:', error. error);
+          this.errorMessage = 'Error del servidor al cargar la sesión.Contacta al soporte técnico.';
+          console.error('❌ Error 500 - Detalles completos:', error.error);
         } else {
-          this.errorMessage = 'Error al cargar la sesión. Por favor, intenta nuevamente.';
+          this.errorMessage = 'Error al cargar la sesión.Por favor, intenta nuevamente.';
         }
         
         this.isLoading = false;
@@ -157,11 +157,11 @@ export class SessionDetailComponent implements OnInit {
     this.registrationError = '';
 
     const token = localStorage.getItem('authToken');
-    console.log('🔑 Verificando token:', token ? 'Existe' : 'No existe');
+    console.log('🔑 Verificando token:', token ?  'Existe' : 'No existe');
     
     if (! token) {
       this.isLoadingCommunities = false;
-      this.registrationError = 'No hay sesión activa. Por favor, inicia sesión nuevamente.';
+      this.registrationError = 'No hay sesión activa.Por favor, inicia sesión nuevamente.';
       console.error('❌ No hay token');
       return;
     }
@@ -171,16 +171,16 @@ export class SessionDetailComponent implements OnInit {
     this.communityService.getMyCommunities().subscribe({
       next: (response) => {
         console.log('✅ Comunidades cargadas:', response);
-        this.communities = response. data || [];
+        this.communities = response.data || [];
         this.isLoadingCommunities = false;
         
         if (this.communities.length === 0) {
-          this. registrationError = 'No tienes comunidades disponibles para registro grupal.';
+          this.registrationError = 'No tienes comunidades disponibles para registro grupal.';
         }
       },
       error: (error) => {
         console.error('❌ Error loading communities:', error);
-        this. isLoadingCommunities = false;
+        this.isLoadingCommunities = false;
         this.registrationError = 'Error al cargar comunidades: ' + (error.error?.message || error.message);
       }
     });
@@ -190,13 +190,13 @@ export class SessionDetailComponent implements OnInit {
    * Maneja el registro en la sesión
    */
   registerToSession(): void {
-    if (! this.session) return;
+    if (!this.session) return;
 
     this.registrationSuccess = false;
     this.registrationError = '';
 
     if (this.registrationType === 'group') {
-      if (!this.selectedCommunityId) {
+      if (! this.selectedCommunityId) {
         this.registrationError = 'Debes seleccionar una comunidad';
         return;
       }
@@ -219,7 +219,7 @@ export class SessionDetailComponent implements OnInit {
     }).subscribe({
       next: (response) => {
         console.log('✅ Booking individual creado:', response);
-        this. isRegistering = false;
+        this.isRegistering = false;
         this.registrationSuccess = true;
         
         setTimeout(() => {
@@ -240,11 +240,11 @@ export class SessionDetailComponent implements OnInit {
    * Registra de forma grupal y navega a la lista de sesiones
    */
   private registerGroup(): void {
-    if (!this.session || !this.selectedCommunityId) return;
+    if (! this.session || !this.selectedCommunityId) return;
 
     this.isRegistering = true;
 
-    this. bookingService.createGroupBooking({
+    this.bookingService.createGroupBooking({
       learningSessionId: this.session.id,
       communityId: this.selectedCommunityId
     }).subscribe({
@@ -255,7 +255,7 @@ export class SessionDetailComponent implements OnInit {
         
         setTimeout(() => {
           this.registrationSuccess = false;
-          console. log('📍 Navegando a lista de sesiones...');
+          console.log('📍 Navegando a lista de sesiones...');
           this.router.navigate(['/app/sessions']);
         }, 3000);
       },
@@ -271,7 +271,7 @@ export class SessionDetailComponent implements OnInit {
    * Une al usuario a la lista de espera y navega a la lista de sesiones
    */
   joinWaitlist(): void {
-    if (!this.session) return;
+    if (! this.session) return;
 
     this.isJoiningWaitlist = true;
     this.registrationError = '';
@@ -279,13 +279,13 @@ export class SessionDetailComponent implements OnInit {
 
     this.bookingService.joinWaitlist({ 
       learningSessionId: this.session.id 
-    }). subscribe({
+    }).subscribe({
       next: (response) => {
         console.log('✅ Unido a lista de espera:', response);
         this.isJoiningWaitlist = false;
         this.waitlistSuccess = true;
         
-        this.userWaitlistBooking = response. data;
+        this.userWaitlistBooking = response.data;
         
         setTimeout(() => {
           this.waitlistSuccess = false;
@@ -312,7 +312,7 @@ export class SessionDetailComponent implements OnInit {
    * Cancela la salida de lista de espera
    */
   cancelLeaveWaitlist(): void {
-    this. showLeaveConfirmModal = false;
+    this.showLeaveConfirmModal = false;
   }
 
   /**
@@ -354,9 +354,9 @@ export class SessionDetailComponent implements OnInit {
     if (error.error && error.error.message) {
       this.registrationError = error.error.message;
     } else if (error.status === 401) {
-      this.registrationError = 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.';
+      this.registrationError = 'Tu sesión ha expirado.Por favor, inicia sesión nuevamente.';
     } else {
-      this.registrationError = 'Error al registrarse en la sesión. Por favor, intenta de nuevo.';
+      this.registrationError = 'Error al registrarse en la sesión.Por favor, intenta de nuevo.';
     }
     
     setTimeout(() => {
@@ -368,8 +368,8 @@ export class SessionDetailComponent implements OnInit {
    * Obtiene el nombre de la comunidad seleccionada
    */
   getSelectedCommunityName(): string {
-    if (!this.selectedCommunityId) return '';
-    const community = this.communities.find(c => c.id === this. selectedCommunityId);
+    if (! this.selectedCommunityId) return '';
+    const community = this.communities.find(c => c.id === this.selectedCommunityId);
     return community ? community.name : '';
   }
 
@@ -377,7 +377,7 @@ export class SessionDetailComponent implements OnInit {
    * Cuenta miembros activos de una comunidad
    */
   getActiveMembersCount(community: ILearningCommunity): number {
-    return community.members?. filter(m => m.active).length || 0;
+    return community.members?.filter(m => m.active).length || 0;
   }
 
   formatDate(dateString: string): string {
@@ -403,16 +403,16 @@ export class SessionDetailComponent implements OnInit {
   }
 
   getAvailableSpots(): number {
-    if (!this.session) return 0;
+    if (! this.session) return 0;
     
     const confirmedBookings = this.session.bookings?.filter(
       b => b.status === 'CONFIRMED'
-    ). length || 0;
+    ).length || 0;
     
     return this.session.maxCapacity - confirmedBookings;
   }
 
   goBack(): void {
-    this. router.navigate(['/app/sessions']);
+    this.router.navigate(['/app/sessions']);
   }
 }
