@@ -314,7 +314,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     const jitsiApi = this.videoCallService.jitsiApi;
     if (!jitsiApi) return;
 
-    console.log('👂 Configurando listeners de participantes...');
+    console.log(' Configurando listeners de participantes...');
 
     jitsiApi.addEventListener('videoConferenceJoined', async (participant: any) => {
       console.log(' Usuario local unido:', participant);
@@ -745,7 +745,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
               
               console.log(' Grabación iniciada exitosamente');
               
-              // ⭐ Toast pequeño en lugar de modal grande
+             
               this.displayToast('Grabación iniciada', 'success');
             } else {
               await this.videoCallService.stopRecording(this.sessionId).toPromise();
@@ -1036,7 +1036,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
 
   //#region Transcription Management
 /**
- * 📥 Descarga la transcripción como archivo .txt
+ *  Descarga la transcripción como archivo .txt
  */
 downloadTranscription(): void {
   if (!this.videoCallData?.isModerator) {
@@ -1052,7 +1052,7 @@ downloadTranscription(): void {
     'Descargar',
     'Cancelar',
     () => {
-      console.log('📥 Solicitando transcripción...');
+      console.log(' Solicitando transcripción...');
       
       this.transcriptionService.getTranscription(this.sessionId).subscribe({
         next: (response: any) => {
@@ -1061,7 +1061,7 @@ downloadTranscription(): void {
             const wordCount = response.data.wordCount || 0;
             const duration = response.data.durationSeconds || 0;
             
-            console.log('✅ Transcripción obtenida');
+            console.log(' Transcripción obtenida');
             console.log('   Palabras:', wordCount);
             console.log('   Duración:', duration, 'segundos');
             
@@ -1091,16 +1091,16 @@ Fecha: ${new Date().toLocaleString('es-ES')}
             document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
             
-            console.log('✅ Archivo descargado:', fileName);
+            console.log(' Archivo descargado:', fileName);
             this.displayToast('Transcripción descargada exitosamente', 'success');
             
           } else {
-            console.warn('⚠️ No hay transcripción disponible');
+            console.warn(' No hay transcripción disponible');
             this.displayToast('No hay transcripción disponible para esta sesión', 'error');
           }
         },
         error: (error: any) => {
-          console.error('❌ Error al descargar transcripción:', error);
+          console.error(' Error al descargar transcripción:', error);
           
           if (error.status === 404) {
             this.displayToast('No hay transcripción disponible aún', 'error');
