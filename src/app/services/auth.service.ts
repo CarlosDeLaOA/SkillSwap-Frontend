@@ -8,10 +8,10 @@ import { ProfileService } from './profile.service';
   providedIn: 'root',
 })
 export class AuthService {
- 
+
   private accessToken!: string;
   private expiresIn!: number;
-  private user: IUser | null = null; 
+    private user: IUser | null = null;
   private http: HttpClient = inject(HttpClient);
   private profileService: ProfileService = inject(ProfileService);
   

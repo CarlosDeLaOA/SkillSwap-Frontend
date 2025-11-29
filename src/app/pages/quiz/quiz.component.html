@@ -1,0 +1,104 @@
+<div class="quiz-container">
+  <div class="quiz-background"></div>
+
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando cuestionario...</p>
+  </div>
+
+  <div *ngIf="!loading && quiz" class="quiz-content">
+    <div class="quiz-header">
+      <div class="header-icon">
+        <img src="assets/img/Imagotipo.png" alt="SkillSwap" />
+      </div>
+      <h1>Comprueba tus <span class="highlight">conocimientos</span></h1>
+      <div class="quiz-info">
+        <div class="info-item">
+          <span class="label">Intento:</span>
+          <span class="value">{{ currentAttempt }} de 2</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Preguntas:</span>
+          <span class="value">{{ questions.length }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Aprobación:</span>
+          <span class="value">70%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz-main">
+      <div class="questions-section">
+        <div 
+          *ngFor="let question of questions; let i = index" 
+          class="question-card"
+          [class.has-answer]="getSelectedAnswer(question.number)">
+          
+          <div class="question-number">{{ question.number }}</div>
+          
+          <div class="question-text">
+            {{ getQuestionText(question) }}
+          </div>
+
+          <div 
+            class="drop-zone"
+            [class.active]="isDropZoneActive(question.number)"
+            [class.filled]="getSelectedAnswer(question.number)"
+            (dragover)="onDragOver($event, question.number)"
+            (dragleave)="onDragLeave($event)"
+            (drop)="onDrop($event, question.number)">
+            
+            <div *ngIf="!getSelectedAnswer(question.number)" class="drop-placeholder">
+              Arrastra la respuesta aquí
+            </div>
+
+            <div *ngIf="getSelectedAnswer(question.number)" class="selected-answer">
+              <span class="answer-text">{{ getSelectedAnswer(question.number) }}</span>
+              <button 
+                class="remove-btn" 
+                (click)="removeAnswer(question.number)"
+                type="button">
+                ✕
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="options-section">
+        <h3>Respuestas disponibles</h3>
+        <div class="options-container">
+          <div 
+            *ngFor="let option of options.available" 
+            class="option-card"
+            draggable="true"
+            (dragstart)="onDragStart($event, option)">
+            {{ option }}
+          </div>
+          
+          <div *ngIf="options.available.length === 0" class="no-options">
+            Todas las respuestas han sido usadas
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz-footer">
+      <div class="progress-indicator">
+        <span>Progreso: {{ options.used.size }} / {{ questions.length }}</span>
+      </div>
+      
+      <button 
+        class="submit-btn"
+        [disabled]="!canSubmit || submitting"
+        [class.disabled]="!canSubmit"
+        (click)="submitQuiz()"
+        type="button">
+        <span *ngIf="!submitting">Enviar</span>
+        <span *ngIf="submitting">Enviando...</span>
+        <span class="checkmark">✓</span>
+      </button>
+    </div>
+  </div>
+</div>
