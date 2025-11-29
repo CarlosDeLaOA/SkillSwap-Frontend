@@ -442,9 +442,9 @@ export class VideoCallService {
           },
           disableFilmstripAutohiding: true,
           
-          toolbarButtons: [
-            'microphone', 'camera', 'desktop', 'raisehand', 'hangup'
-          ],
+          toolbarButtons: videoCallData.isModerator 
+           ? ['microphone', 'camera', 'desktop', 'raisehand', 'hangup']
+           : ['microphone', 'camera', 'raisehand'], 
           disableInviteFunctions: !videoCallData.isModerator,
           doNotStoreRoom: true,
           enableInsecureRoomNameWarning: false,

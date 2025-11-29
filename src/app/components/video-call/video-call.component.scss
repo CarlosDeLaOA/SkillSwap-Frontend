@@ -1180,3 +1180,23 @@
 .download-transcription-btn.downloading {
   animation: download-pulse 1.5s infinite;
 }
+
+.leave-btn {
+  background: rgba(244, 67, 54, 0.2) !important;
+  border: 2px solid rgba(244, 67, 54, 0.4);
+
+  i {
+    font-size: 24px;
+    color: #F44336;
+  }
+
+  &:hover {
+    background: rgba(244, 67, 54, 0.3) !important;
+    border-color: rgba(244, 67, 54, 0.6);
+    transform: scale(1.05);
+    
+    i {
+      color: #ff5252;
+    }
+  }
+}
