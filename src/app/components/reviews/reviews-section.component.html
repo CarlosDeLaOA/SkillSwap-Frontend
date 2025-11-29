@@ -1,0 +1,114 @@
+<div class="reviews-section">
+  <!-- Header -->
+  <div class="section-header">
+    <div class="title-container">
+      <h3 class="section-title">
+        <i class='bx bx-message-square'></i>
+        Reseñas recibidas
+      </h3>
+      <span class="badge">{{ totalReviews }}</span>
+    </div>
+    <a routerLink="/app/reviews" class="view-all-link">
+      Ver todas
+      <i class='bx bx-chevron-right'></i>
+    </a>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando reseñas...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="! isLoading && errorMessage" class="error-state">
+    <i class='bx bx-error-circle'></i>
+    <p>{{ errorMessage }}</p>
+    <button class="retry-btn" (click)="loadRecentReviews()">
+      <i class='bx bx-refresh'></i>
+      Reintentar
+    </button>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && totalReviews === 0" class="empty-state">
+    <i class='bx bx-message-square'></i>
+    <p>Aún no tienes reseñas</p>
+    <p class="subtitle">Cuando recibas reseñas de tus estudiantes, aparecerán aquí</p>
+  </div>
+
+  <!-- Carousel -->
+  <div *ngIf="!isLoading && totalReviews > 0" class="carousel-wrapper">
+    <!-- Previous Button -->
+    <button
+      class="carousel-nav prev"
+      (click)="prev()"
+      [disabled]="isPrevDisabled"
+      title="Reseñas anteriores"
+      aria-label="Anterior">
+      <i class='bx bx-chevron-left'></i>
+    </button>
+
+    <!-- Cards Container -->
+    <div class="carousel-container">
+      <div class="cards-wrapper">
+        <div *ngFor="let review of visibleReviews" class="review-card">
+          <!-- Card Header -->
+          <div class="card-header">
+            <div class="learner-info">
+              <div class="learner-avatar anonymous">
+                <i class='bx bx-user-voice'></i>
+              </div>
+              <div class="learner-name">Estudiante Anónimo</div>
+            </div>
+            <div class="rating" [title]="review.rating + ' de 5 estrellas'">
+              {{ review.ratingStars || '☆☆☆☆☆' }}
+            </div>
+          </div>
+
+          <!-- Card Body -->
+          <div class="card-body">
+            <p class="comment" [title]="review.comment">
+              {{ review.comment || 'Sin comentario' }}
+            </p>
+          </div>
+
+          <!-- Card Footer -->
+          <div class="card-footer">
+            <div class="meta-info">
+              <div class="session">
+                <i class='bx bx-book'></i>
+                {{ review.learningSession?.title || review.sessionTitle || 'Sesión desconocida' }}
+              </div>
+              <div class="date">
+                <i class='bx bx-calendar'></i>
+                {{ review.formattedDate || review.creationDate }}
+              </div>
+            </div>
+
+            <!-- Audio Indicator -->
+            <div *ngIf="review.hasAudio || review.hasTranscription" class="audio-badge">
+              <i class='bx bx-microphone' *ngIf="review.hasAudio" title="Incluye audio"></i>
+              <i class='bx bx-file-blank' *ngIf="review.hasTranscription && !review.hasAudio" title="Incluye transcripción"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Next Button -->
+    <button
+      class="carousel-nav next"
+      (click)="next()"
+      [disabled]="isNextDisabled"
+      title="Siguientes reseñas"
+      aria-label="Siguiente">
+      <i class='bx bx-chevron-right'></i>
+    </button>
+  </div>
+
+  <!-- Page Indicator -->
+  <div *ngIf="! isLoading && totalReviews > 0" class="page-indicator">
+    <span class="current-page">{{ currentPage }} / {{ totalPages }}</span>
+  </div>
+</div>

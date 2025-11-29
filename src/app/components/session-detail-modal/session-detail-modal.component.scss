@@ -1,4 +1,3 @@
-
 .modal-glass-container {
   background: rgba(57, 67, 75, 0.90);
   backdrop-filter: blur(20px);
@@ -159,6 +158,12 @@
     font-size: 0.95rem;
     font-weight: 500;
     line-height: 1.4;
+  }
+
+  /* Estilo para el valor de costo en SkillCoins */
+  .cost-value {
+    color: #ffd700;
+    font-weight: 600;
   }
 
   &:hover {

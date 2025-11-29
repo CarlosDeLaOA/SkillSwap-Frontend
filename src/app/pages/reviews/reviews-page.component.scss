@@ -1,0 +1,705 @@
+.reviews-page {
+  background-color: #141414;
+  min-height: 100vh;
+  padding: 30px 20px;
+  color: #FFFFFF;
+}
+
+/* ====================================== */
+/* HEADER */
+/* ====================================== */
+
+.page-header {
+  max-width: 1200px;
+  margin: 0 auto 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.header-content {
+  flex: 1;
+  min-width: 300px;
+}
+
+.page-title {
+  margin: 0 0 8px 0;
+  font-size: 32px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  i {
+    font-size: 36px;
+    color: #AAE16B;
+  }
+}
+
+.page-subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Controles de ordenamiento */
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(170, 225, 107, 0.08);
+  border: 2px solid #AAE16B;
+  padding: 14px 16px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(170, 225, 107, 0.15);
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(170, 225, 107, 0.12);
+    box-shadow: 0 0 30px rgba(170, 225, 107, 0.25);
+  }
+
+  &:focus-within {
+    background: rgba(170, 225, 107, 0.15);
+    box-shadow: 0 0 40px rgba(170, 225, 107, 0.3);
+  }
+}
+
+.sort-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #AAE16B;
+  white-space: nowrap;
+  text-shadow: 0 0 10px rgba(170, 225, 107, 0.3);
+}
+
+.sort-select {
+  padding: 10px 14px;
+  background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
+  border: 1px solid rgba(170, 225, 107, 0.4);
+  border-radius: 8px;
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 0 10px rgba(170, 225, 107, 0.05);
+  min-width: 200px;
+
+  &:hover:not(:disabled) {
+    border-color: #AAE16B;
+    background: linear-gradient(135deg, #333333 0%, #2a2a2a 100%);
+    box-shadow: inset 0 0 10px rgba(170, 225, 107, 0.1), 0 0 15px rgba(170, 225, 107, 0.2);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #AAE16B;
+    box-shadow: inset 0 0 10px rgba(170, 225, 107, 0.15), 0 0 25px rgba(170, 225, 107, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  option {
+    background: #2a2a2a;
+    color: #FFFFFF;
+    padding: 10px;
+    font-weight: 600;
+
+    &:checked {
+      background: linear-gradient(#AAE16B, #AAE16B);
+      background-color: #AAE16B ! important;
+      color: #1f1f1f ! important;
+    }
+
+    &:hover {
+      background: linear-gradient(#AAE16B, #AAE16B);
+      background-color: #AAE16B !important;
+      color: #1f1f1f !important;
+    }
+  }
+}
+
+/* ====================================== */
+/* CONTENEDORES DE ESTADO */
+/* ====================================== */
+
+.loading-container,
+.error-container,
+.empty-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Cargando */
+.loading-container {
+  flex-direction: column;
+  gap: 16px;
+
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(170, 225, 107, 0.2);
+    border-top-color: #AAE16B;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  p {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+
+  i {
+    font-size: 48px;
+    color: #F44336;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 20px;
+    color: #FFFFFF;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 400px;
+  }
+
+  .retry-button {
+    margin-top: 12px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #F44336 0%, #d32f2f 100%);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 25px rgba(244, 67, 54, 0.5);
+      background: linear-gradient(135deg, #ff5252 0%, #f44336 100%);
+    }
+
+    &:active {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 10px rgba(244, 67, 54, 0.3);
+    }
+
+    i {
+      font-size: 18px;
+      color: #FFFFFF;
+    }
+  }
+}
+
+/* Vacío */
+.empty-container {
+  background: rgba(170, 225, 107, 0.05);
+  border-radius: 16px;
+  border: 1px dashed rgba(170, 225, 107, 0.3);
+}
+
+.empty-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+
+  i {
+    font-size: 48px;
+    color: rgba(170, 225, 107, 0.3);
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 20px;
+    color: #FFFFFF;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+  }
+}
+
+/* ====================================== */
+/* CONTENEDOR PRINCIPAL DE RESEÑAS */
+/* ====================================== */
+
+.reviews-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.pagination-info {
+  padding: 12px 16px;
+  background: rgba(170, 225, 107, 0.08);
+  border-left: 3px solid #AAE16B;
+  border-radius: 8px;
+
+  .info-text {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+
+    strong {
+      color: #AAE16B;
+      font-weight: 600;
+    }
+  }
+}
+
+/* ====================================== */
+/* LISTA DE RESEÑAS */
+/* ====================================== */
+
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: #39434B;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.review-item {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Información del estudiante - ANÓNIMA */
+.review-learner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.learner-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(170, 225, 107, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+
+  .avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .avatar-placeholder {
+    font-size: 24px;
+    color: #AAE16B;
+  }
+
+  /* Avatar anónimo */
+  &.anonymous {
+    background: linear-gradient(135deg, rgba(170, 225, 107, 0.1) 0%, rgba(170, 225, 107, 0.05) 100%);
+    border: 2px solid rgba(170, 225, 107, 0.2);
+
+    i {
+      font-size: 24px;
+      color: #AAE16B;
+    }
+  }
+}
+
+.learner-details {
+  flex: 1;
+}
+
+.learner-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+.review-date {
+  margin: 4px 0 0 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.rating-badge {
+  font-size: 18px;
+  color: #FFB74D;
+  letter-spacing: 2px;
+  flex-shrink: 0;
+}
+
+/* Contenido de la reseña */
+.review-content {
+  background: rgba(0, 0, 0, 0.1);
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.review-comment {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.85);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Metadatos */
+.review-metadata {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.metadata-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+
+  i {
+    font-size: 16px;
+    color: #AAE16B;
+    flex-shrink: 0;
+  }
+
+  .label {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .value {
+    color: rgba(255, 255, 255, 0.7);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* Indicadores */
+.review-indicators {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  .indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+
+    i {
+      font-size: 14px;
+    }
+  }
+
+  .audio-indicator {
+    background: rgba(76, 175, 80, 0.15);
+    color: #4CAF50;
+
+    i {
+      color: #4CAF50;
+    }
+  }
+
+  .transcription-indicator {
+    background: rgba(33, 150, 243, 0.15);
+    color: #2196F3;
+
+    i {
+      color: #2196F3;
+    }
+  }
+
+  .comment-indicator {
+    background: rgba(170, 225, 107, 0.15);
+    color: #AAE16B;
+
+    i {
+      color: #AAE16B;
+    }
+  }
+}
+
+/* Divisor */
+.review-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 0 -20px;
+
+  &:last-of-type {
+    display: none;
+  }
+}
+
+.review-item:last-child .review-divider {
+  display: none;
+}
+
+/* ====================================== */
+/* PAGINACIÓN */
+/* ====================================== */
+
+.pagination-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: #39434B;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  flex-wrap: wrap;
+}
+
+.pagination-button {
+  padding: 10px 16px;
+  background: rgba(170, 225, 107, 0.15);
+  border: 1px solid rgba(170, 225, 107, 0.3);
+  border-radius: 8px;
+  color: #AAE16B;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: rgba(170, 225, 107, 0.25);
+    border-color: #AAE16B;
+    transform: translateY(-2px);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  i {
+    font-size: 16px;
+  }
+}
+
+.page-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.current-page-info {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+
+  strong {
+    color: #AAE16B;
+    font-weight: 600;
+  }
+}
+
+/* ====================================== */
+/* RESPONSIVE */
+/* ====================================== */
+
+@media (max-width: 1024px) {
+  .page-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .sort-controls {
+    width: 100%;
+  }
+
+  .review-metadata {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .reviews-page {
+    padding: 20px 16px;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+
+  .page-header {
+    margin-bottom: 24px;
+  }
+
+  .review-learner {
+    flex-wrap: wrap;
+  }
+
+  .learner-details {
+    flex: 1;
+    min-width: 150px;
+  }
+
+  .rating-badge {
+    flex-basis: 100%;
+    margin-top: 8px;
+    text-align: left;
+  }
+
+  .review-metadata {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .review-indicators {
+    gap: 6px;
+
+    .indicator {
+      padding: 5px 10px;
+      font-size: 11px;
+    }
+  }
+
+  .pagination-footer {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .pagination-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .page-indicators {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .reviews-page {
+    padding: 16px 12px;
+  }
+
+  .page-title {
+    font-size: 20px;
+
+    i {
+      font-size: 24px;
+    }
+  }
+
+  .page-subtitle {
+    font-size: 12px;
+  }
+
+  .sort-controls {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .sort-label {
+    align-self: flex-start;
+  }
+
+  .sort-select {
+    width: 100%;
+  }
+
+  .review-item {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .learner-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .learner-name {
+    font-size: 14px;
+  }
+
+  .review-comment {
+    font-size: 13px;
+  }
+
+  .metadata-item {
+    font-size: 12px;
+
+    i {
+      font-size: 14px;
+    }
+  }
+
+  .rating-badge {
+    font-size: 16px;
+  }
+
+  .pagination-info .info-text {
+    font-size: 12px;
+  }
+
+  .current-page-info {
+    font-size: 12px;
+  }
+}

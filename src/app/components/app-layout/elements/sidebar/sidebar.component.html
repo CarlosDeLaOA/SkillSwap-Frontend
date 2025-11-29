@@ -27,7 +27,7 @@
       <i class='bx bx-compass'></i>
     </button>
 
-    <button class="menu-item spacer" *ngIf="isInstructor()" [class.active]="isActive('/app/instructor/sessions')"
+    <button class="menu-item" *ngIf="isInstructor()" [class.active]="isActive('/app/instructor/sessions')"
       (click)="navigateTo('/app/instructor/sessions')" title="Mi calendario">
       <i class='bx bx-calendar'></i>
     </button>
@@ -35,6 +35,11 @@
     <button class="menu-item spacer" *ngIf="isLearner()" [class.active]="isActive('/app/create-community')"
       (click)="navigateToCommunity()" title="Mis comunidades">
       <i class='bx bx-group'></i>
+    </button>
+
+    <!-- Botón de Reseñas -->
+    <button class="menu-item spacer" *ngIf="isInstructor()" [class.active]="isActive('/app/reviews')" (click)="navigateTo('/app/reviews')" title="Reseñas" aria-label="Reseñas">
+      <i class='bx bx-message-square'></i>
     </button>
 
   </nav>

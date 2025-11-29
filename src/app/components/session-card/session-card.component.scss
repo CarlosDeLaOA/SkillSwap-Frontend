@@ -7,15 +7,99 @@
   align-items: center;
   gap: 2rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
+  transition: border-color 200ms ease, box-shadow 200ms ease, transform 150ms ease;
+  position: relative;
+  z-index: 0;
   
+  /* efecto neon en hover: solo la tarjeta con hover obtiene el brillo (sin animación de respiración) ***
+     Para tarjetas sugeridas mantenemos un borde dorado en estado normal; hover lo sobreescribe con brillo neon.*/
   &:hover {
-    border-color: #AAE16B;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    transform: translateY(-4px);
+  }
+
+  /* neon general para tarjetas no sugeridas en hover (verdoso) *** */
+  &:hover {
+    border-color: #7be28b;
+    box-shadow:
+      0 0 8px rgba(123, 226, 139, 0.25),
+      0 0 20px rgba(123, 226, 139, 0.12),
+      0 8px 30px rgba(0, 0, 0, 0.45);
+  }
+
+  /* neon más fuerte para tarjetas sugeridas en hover (dorado) *** */
+  &.suggested:hover {
+    border-color: #ffd666;
+    box-shadow:
+      0 0 10px rgba(212, 175, 55, 0.35),
+      0 0 26px rgba(212, 175, 55, 0.18),
+      0 12px 36px rgba(0, 0, 0, 0.5);
   }
 }
 
+/* Tag de sugerencia: ahora en la esquina superior derecha (en lugar de la izquierda) ***
+   se ajustó contraste y borde dorado suave.
+*/
+.suggested-tag {
+  position: absolute;
+  top: 12px;
+  right: 12px; /* movido a la esquina superior derecha *** */
+  left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(26, 26, 26, 0.6);
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(212, 175, 55, 0.16); /* dorado suave */
+  z-index: 6;
+
+  .tag-text {
+    font-weight: 700;
+    color: #F9F6EE;
+    font-size: 13px;
+  }
+
+  /* Reemplazamos el porcentaje por una estrellita animada *** */
+  .match-percentage {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: transparent;
+    color: #FFD666;
+    font-weight: 800;
+  }
+
+  /* estilos del icono de estrella (giro) *** */
+  .star-icon {
+    font-size: 16px;
+    color: #FFD666;
+    display: inline-block;
+    line-height: 1;
+    animation: spinStar 1.6s linear infinite;
+    transform-origin: 50% 50%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+}
+
+/* eliminamos las animaciones previas de respiración/goldenPulse (solo queremos neon en hover) */
+
+/* Keyframes de giro de estrella para la estrellita en el tag *** */
+@keyframes spinStar {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Mantener la tarjeta sugerida con un borde dorado delgado en estado normal (sin animación) *** */
+.session-card.suggested {
+  border: 2px solid #D4AF37;
+  box-shadow: 0 6px 18px rgba(212, 175, 55, 0.08);
+}
+
+/* resto de estilos existentes (sin cambios) */
 .session-content {
   flex: 1;
 }
@@ -60,11 +144,54 @@
   }
 }
 
+/* Badge para mostrar si la sesión es Premium o Gratuita */
+.session-type-badge {
+  padding: 0.3rem 0.8rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid;
+
+  &.premium {
+    background-color: rgba(255, 215, 0, 0.2);
+    color: #ffd700;
+    border-color: rgba(255, 215, 0, 0.4);
+
+    i {
+      font-size: 1rem;
+      color: #ffd700;
+    }
+  }
+
+  &.free {
+    background-color: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+    border-color: rgba(34, 197, 94, 0.4);
+
+    i {
+      font-size: 1rem;
+      color: #22c55e;
+    }
+  }
+}
+
 .session-description {
   font-size: 0.95rem;
   color: rgba(255, 255, 255, 0.7);
   line-height: 1.6;
   margin: 0 0 1rem 0;
+}
+
+.suggestion-reason {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.03);
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
 }
 
 .session-meta {

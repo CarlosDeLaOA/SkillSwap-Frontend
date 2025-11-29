@@ -1,5 +1,5 @@
 <div class="modal-glass-container">
-  <!-- Header -->
+  <!-- Cabecera -->
   <div class="modal-header">
     <h2 class="modal-title">{{ session.title }}</h2>
     <button type="button" class="btn-close" (click)="close()">
@@ -15,10 +15,12 @@
          [class.bx-calendar-check]="session.status === 'SCHEDULED'"></i>
       {{ getStatusLabel(session.status) }}
     </span>
+    <!-- Badge Premium con costo en SkillCoins -->
     <span class="tag tag-premium" *ngIf="session.isPremium">
-      <i class='bx bx-star'></i>
-      Premium
+      <i class='bx bx-crown'></i>
+      {{ session.skillcoinsCost }} SkillCoins
     </span>
+    <!-- Badge Gratuita -->
     <span class="tag tag-free" *ngIf="!session.isPremium">
       <i class='bx bx-gift'></i>
       Gratuita
@@ -29,12 +31,12 @@
     </span>
   </div>
 
-  <!-- Description -->
+  <!-- Descripción -->
   <div class="description-section" *ngIf="session.description">
     <p class="description-text">{{ session.description }}</p>
   </div>
 
-  <!-- Details Grid -->
+  <!-- Grid de Detalles -->
   <div class="details-grid">
     <!-- Instructor -->
     <div class="detail-item" *ngIf="session.instructor?.person?.fullName">
@@ -42,42 +44,48 @@
       <span>{{ session.instructor.person.fullName }}</span>
     </div>
 
-    <!-- Skill -->
+    <!-- Habilidad -->
     <div class="detail-item" *ngIf="session.skill?.name">
       <i class='bx bx-purchase-tag'></i>
       <span>{{ session.skill.name }}</span>
     </div>
 
-    <!-- Date -->
+    <!-- Fecha -->
     <div class="detail-item" *ngIf="session.scheduledDatetime">
       <i class='bx bx-calendar'></i>
       <span>{{ formatDate(session.scheduledDatetime) }}</span>
     </div>
 
-    <!-- Time -->
+    <!-- Hora -->
     <div class="detail-item" *ngIf="session.scheduledDatetime">
       <i class='bx bx-time-five'></i>
       <span>{{ formatTime(session.scheduledDatetime) }}</span>
     </div>
 
-    <!-- Duration -->
+    <!-- Duración -->
     <div class="detail-item" *ngIf="session.durationMinutes">
       <i class='bx bx-stopwatch'></i>
       <span>{{ session.durationMinutes }} minutos</span>
     </div>
 
-    <!-- Language -->
+    <!-- Idioma -->
     <div class="detail-item" *ngIf="session.language">
       <i class='bx bx-world'></i>
       <span>{{ getLanguageName(session.language) }}</span>
     </div>
 
-    <!-- Capacity -->
+    <!-- Capacidad -->
     <div class="detail-item">
       <i class='bx bx-group'></i>
       <span [class.text-warning]="!hasSpotsAvailable()">
         {{ getAvailableSpots() }} / {{ session.maxCapacity }} cupos
       </span>
+    </div>
+
+    <!-- Costo (si es premium) -->
+    <div class="detail-item" *ngIf="session.isPremium">
+      <i class='bx bx-coin'></i>
+      <span class="cost-value">{{ session.skillcoinsCost }} SkillCoins</span>
     </div>
   </div>
 </div>
