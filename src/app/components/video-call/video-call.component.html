@@ -92,8 +92,9 @@
         <i class='bx bxs-circle'></i>
       </button>
 
-      <button *ngIf="videoCallData?.isModerator" class="action-btn download-transcription-btn"
-        title="Descargar transcripción" (click)="downloadTranscription()"> <i class='bx bx-download'></i>
+      <button *ngIf="!videoCallData?.isModerator" class="action-btn leave-btn"
+        title="Abandonar sesión" (click)="leaveCall()">
+        <i class='bx bx-log-out'></i>
       </button>
 
     </div>

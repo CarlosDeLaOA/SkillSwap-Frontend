@@ -30,6 +30,7 @@ export class SessionHistoryComponent implements OnInit {
   selectedSession: ISessionDetail | null = null;
   showDetailModal: boolean = false;
   isLoadingDetail: boolean = false;
+  isTransitioning: boolean = false;
   //#endregion
 
   //#region Constructor
@@ -48,30 +49,47 @@ export class SessionHistoryComponent implements OnInit {
 
   //#region Public Methods
   
+
+  /**
+ * TrackBy para optimizar el rendering del *ngFor
+ */
+trackBySessionId(index: number, session: ISessionHistory): number {
+  return session.id;
+}
   /**
    * Carga el historial de sesiones
    */
-  loadSessionHistory(page: number = 0): void {
-    this.isLoading = true;
-    this.errorMessage = '';
+  
+/**
+ * Carga el historial de sesiones
+ */
+loadSessionHistory(page: number = 0): void {
+  this.isTransitioning = true;
+  this.errorMessage = '';
 
-    this.sessionHistoryService.getSessionHistory(page, this.pageSize).subscribe({
-      next: (response: ISessionHistoryResponse) => {
+  this.sessionHistoryService.getSessionHistory(page, this.pageSize).subscribe({
+    next: (response: ISessionHistoryResponse) => {
+      setTimeout(() => {
+        // Actualizar datos
         this.sessions = response.sessions;
         this.currentPage = response.currentPage;
         this.totalPages = response.totalPages;
         this.totalItems = response.totalItems;
         this.hasNext = response.hasNext;
         this.hasPrevious = response.hasPrevious;
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('❌ Error loading session history:', error);
-        this.errorMessage = 'Error al cargar el historial de sesiones. Por favor, intenta nuevamente.';
-        this.isLoading = false;
-      }
-    });
-  }
+        
+        setTimeout(() => {
+          this.isTransitioning = false;
+        }, 50);
+      }, 300); // Duración del fade-out
+    },
+    error: (error) => {
+      console.error('❌ Error loading session history:', error);
+      this.errorMessage = 'Error al cargar el historial de sesiones. Por favor, intenta nuevamente.';
+      this.isTransitioning = false;
+    }
+  });
+}
 
   /**
    * Navega a la página anterior
