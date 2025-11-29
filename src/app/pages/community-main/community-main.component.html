@@ -5,15 +5,21 @@
 </div>
 
 <!-- Main Content -->
-<div class="community-content" *ngIf="! isLoading">
+<div class="community-content" *ngIf="!isLoading">
   <!-- Header with Tabs -->
   <header class="community-header">
     <div class="tabs">
-      <button class="tab" [class.active]="activeTab === 'chat'" (click)="setActiveTab('chat')">
+      <button
+        class="tab"
+        [class.active]="activeTab === 'chat'"
+        (click)="setActiveTab('chat')">
         <i class='bx bx-message-square-dots'></i>
         Chat
       </button>
-      <button class="tab" [class.active]="activeTab === 'documents'" (click)="setActiveTab('documents')">
+      <button
+        class="tab"
+        [class.active]="activeTab === 'documents'"
+        (click)="setActiveTab('documents')">
         <i class='bx bx-folder'></i>
         Documentos
       </button>
@@ -21,195 +27,233 @@
   </header>
 
   <!-- Participants Toggle Button (Fixed Right) -->
-  <button class="participants-toggle-btn" [class.active]="showParticipants" (click)="toggleParticipants()"
+  <button
+    class="participants-toggle-btn"
+    [class.active]="showParticipants"
+    (click)="toggleParticipants()"
     title="Participantes">
     <i class='bx bx-group'></i>
     <span class="participant-count" *ngIf="participants.length > 0">{{ participants.length }}</span>
   </button>
 
   <!-- Achievements Toggle Button (Fixed Right) -->
-  <button class="achievements-toggle-btn" title="Logros" (click)="navigateToAchievements()">
+  <button
+    class="achievements-toggle-btn"
+    title="Logros" (click)="navigateToAchievements()">
     <i class='bx bx-trophy'></i>
   </button>
 
-  <!-- Chat Content -->
-  <div class="chat-container" *ngIf="activeTab === 'chat'">
-    <!-- Messages Area -->
-    <div class="messages-area" #messageContainer [class.with-sidebar]="showParticipants">
+    <!-- Chat Content -->
+    <div class="chat-container" *ngIf="activeTab === 'chat'">
+      <!-- Messages Area -->
+      <div 
+        class="messages-area" 
+        #messageContainer
+        [class.with-sidebar]="showParticipants">
+        
+        <!-- Loading Messages -->
+        <div class="loading-messages" *ngIf="isLoadingMessages">
+          <div class="spinner-small"></div>
+          <p>Cargando mensajes...</p>
+        </div>
 
-      <!-- Loading Messages -->
-      <div class="loading-messages" *ngIf="isLoadingMessages">
-        <div class="spinner-small"></div>
-        <p>Cargando mensajes... </p>
-      </div>
-
-      <!-- Messages List -->
-      <div class="messages-list" *ngIf="! isLoadingMessages">
-        <div *ngFor="let message of messages" class="message-wrapper"
-          [class.own-message]="isOwnMessage(message.sender. id)">
-
-          <div class="message">
-            <!-- Avatar for other users -->
-            <div class="message-avatar" *ngIf="! isOwnMessage(message.sender.id)">
-              <img *ngIf="getProfilePhotoUrl(message.sender.profilePhotoUrl)" [src]="message.sender.profilePhotoUrl"
-                [alt]="message.sender.fullName">
-              <div class="avatar-placeholder" [style.background]="getUserColor(message.sender.id)"
-                *ngIf="! getProfilePhotoUrl(message.sender.profilePhotoUrl)">
-                {{ getInitials(message. sender.fullName) }}
+        <!-- Messages List -->
+        <div class="messages-list" *ngIf="!isLoadingMessages">
+          <div 
+            *ngFor="let message of messages" 
+            class="message-wrapper"
+            [class.own-message]="isOwnMessage(message.sender.id)">
+            
+            <div class="message">
+              <!-- Avatar for other users -->
+              <div class="message-avatar" *ngIf="!isOwnMessage(message.sender.id)">
+                <img 
+                  *ngIf="getProfilePhotoUrl(message.sender.profilePhotoUrl)" 
+                  [src]="message.sender.profilePhotoUrl" 
+                  [alt]="message.sender.fullName">
+                <div 
+                  class="avatar-placeholder" 
+                  [style.background]="getUserColor(message.sender.id)"
+                  *ngIf="!getProfilePhotoUrl(message.sender.profilePhotoUrl)">
+                  {{ getInitials(message.sender.fullName) }}
+                </div>
               </div>
-            </div>
 
-            <!-- Message Content -->
-            <div class="message-content">
-              <div class="message-header" *ngIf="!isOwnMessage(message.sender. id)">
-                <span class="sender-name" [style.color]="getUserColor(message.sender.id)">
-                  {{ message. sender.fullName }}
-                </span>
-                <span class="message-time">{{ formatMessageDate(message.sentDate) }}</span>
+              <!-- Message Content -->
+              <div class="message-content">
+                <div class="message-header" *ngIf="!isOwnMessage(message.sender.id)">
+                  <span class="sender-name" [style.color]="getUserColor(message.sender.id)">
+                    {{ message.sender.fullName }}
+                  </span>
+                  <span class="message-time">{{ formatMessageDate(message.sentDate) }}</span>
+                </div>
+                <div 
+                  class="message-bubble" 
+                  [class.own-bubble]="isOwnMessage(message.sender.id)"
+                  [style.background]="getUserColor(message.sender.id) + (isOwnMessage(message.sender.id) ? '' : '15')"
+                  [style.border-color]="getUserColor(message.sender.id) + '40'">
+                  <p>{{ message.content }}</p>
+                </div>
+                <div class="message-footer" *ngIf="isOwnMessage(message.sender.id)">
+                  <span class="message-time">{{ formatMessageDate(message.sentDate) }}</span>
+                </div>
               </div>
-              <div class="message-bubble" [class.own-bubble]="isOwnMessage(message.sender.id)"
-                [style.background]="getUserColor(message.sender.id) + (isOwnMessage(message.sender.id) ? '' : '15')"
-                [style.border-color]="getUserColor(message.sender.id) + '40'">
-                <p>{{ message.content }}</p>
-              </div>
-              <div class="message-footer" *ngIf="isOwnMessage(message.sender.id)">
-                <span class="message-time">{{ formatMessageDate(message.sentDate) }}</span>
-              </div>
-            </div>
 
-            <!-- Own Avatar -->
-            <div class="message-avatar" *ngIf="isOwnMessage(message. sender.id)">
-              <img *ngIf="getProfilePhotoUrl(message.sender.profilePhotoUrl)" [src]="message.sender.profilePhotoUrl"
-                [alt]="message.sender.fullName">
-              <div class="avatar-placeholder" [style.background]="getUserColor(message.sender.id)"
-                *ngIf="!getProfilePhotoUrl(message.sender.profilePhotoUrl)">
-                {{ getInitials(message.sender.fullName) }}
+              <!-- Own Avatar -->
+              <div class="message-avatar" *ngIf="isOwnMessage(message.sender.id)">
+                <img 
+                  *ngIf="getProfilePhotoUrl(message.sender.profilePhotoUrl)" 
+                  [src]="message.sender.profilePhotoUrl" 
+                  [alt]="message.sender.fullName">
+                <div 
+                  class="avatar-placeholder" 
+                  [style.background]="getUserColor(message.sender.id)"
+                  *ngIf="!getProfilePhotoUrl(message.sender.profilePhotoUrl)">
+                  {{ getInitials(message.sender.fullName) }}
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Empty State -->
-        <div class="empty-state" *ngIf="messages.length === 0">
-          <i class='bx bx-message-square-dots'></i>
-          <p>No hay mensajes aún</p>
-          <span>Sé el primero en enviar un mensaje a la comunidad</span>
+          <!-- Empty State -->
+          <div class="empty-state" *ngIf="messages.length === 0">
+            <i class='bx bx-message-square-dots'></i>
+            <p>No hay mensajes aún</p>
+            <span>Sé el primero en enviar un mensaje a la comunidad</span>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Message Input -->
-    <div class="message-input-container">
-      <textarea [(ngModel)]="newMessageContent" (keypress)="onKeyPress($event)" placeholder="Escribe tu mensaje..."
-        rows="1" class="message-input"></textarea>
-      <button class="send-btn" (click)="sendMessage()" [disabled]="newMessageContent.trim() === ''">
-        <i class='bx bx-send'></i>
-      </button>
-    </div>
-  </div>
-
-  <!-- Documents Content -->
-  <div class="documents-wrapper" *ngIf="activeTab === 'documents'">
-    <app-group-documents [communityId]="communityId" [communityName]="communityName">
-    </app-group-documents>
-  </div>
-
-  <!-- Participants Sidebar -->
-  <div class="participants-sidebar" *ngIf="showParticipants">
-    <div class="sidebar-header">
-      <h3>
-        <i class='bx bx-group'></i>
-        Participantes
-      </h3>
-      <div class="header-actions">
-        <button class="close-btn" (click)="toggleParticipants()">
-          <i class='bx bx-x'></i>
+      <!-- Message Input -->
+      <div class="message-input-container">
+        <textarea
+          [(ngModel)]="newMessageContent"
+          (keypress)="onKeyPress($event)"
+          placeholder="Escribe tu mensaje..."
+          rows="1"
+          class="message-input"></textarea>
+        <button 
+          class="send-btn"
+          (click)="sendMessage()"
+          [disabled]="newMessageContent.trim() === ''">
+          <i class='bx bx-send'></i>
         </button>
       </div>
     </div>
 
-    <!-- Invite Button (Only for Creator) -->
-    <div class="invite-section" *ngIf="isCreator()">
-      <button class="invite-btn" (click)="openInviteModal()">
-        <i class='bx bx-user-plus'></i>
-        <span>Invitar miembros</span>
-      </button>
+    <!-- Documents Content (Placeholder) -->
+    <div class="documents-container" *ngIf="activeTab === 'documents'">
+      <div class="placeholder-content">
+        <i class='bx bx-folder'></i>
+        <p>Sección de documentos</p>
+        <span>Esta funcionalidad estará disponible próximamente</span>
+      </div>
     </div>
 
-    <!-- Loading Participants -->
-    <div class="loading-participants" *ngIf="isLoadingParticipants">
-      <div class="spinner-small"></div>
-      <p>Cargando... </p>
-    </div>
+    <!-- Participants Sidebar -->
+    <div class="participants-sidebar" *ngIf="showParticipants">
+      <div class="sidebar-header">
+        <h3>
+          <i class='bx bx-group'></i>
+          Participantes
+        </h3>
+        <div class="header-actions">
+          <button class="close-btn" (click)="toggleParticipants()">
+            <i class='bx bx-x'></i>
+          </button>
+        </div>
+      </div>
 
-    <!-- Participants List -->
-    <div class="participants-list" *ngIf="! isLoadingParticipants">
-      <div *ngFor="let participant of participants" class="participant-item">
-        <div class="participant-avatar">
-          <img *ngIf="getProfilePhotoUrl(participant.profilePhotoUrl)" [src]="participant. profilePhotoUrl"
-            [alt]="participant.fullName">
-          <div class="avatar-placeholder" [style.background]="getUserColor(participant.id)"
-            *ngIf="!getProfilePhotoUrl(participant.profilePhotoUrl)">
-            {{ getInitials(participant.fullName) }}
+      <!-- Invite Button (Only for Creator) -->
+      <div class="invite-section" *ngIf="isCreator()">
+        <button class="invite-btn" (click)="openInviteModal()">
+          <i class='bx bx-user-plus'></i>
+          <span>Invitar miembros</span>
+        </button>
+      </div>
+
+      <!-- Loading Participants -->
+      <div class="loading-participants" *ngIf="isLoadingParticipants">
+        <div class="spinner-small"></div>
+        <p>Cargando...</p>
+      </div>
+
+      <!-- Participants List -->
+      <div class="participants-list" *ngIf="!isLoadingParticipants">
+        <div 
+          *ngFor="let participant of participants" 
+          class="participant-item">
+          <div class="participant-avatar">
+            <img 
+              *ngIf="getProfilePhotoUrl(participant.profilePhotoUrl)" 
+              [src]="participant.profilePhotoUrl" 
+              [alt]="participant.fullName">
+            <div 
+              class="avatar-placeholder" 
+              [style.background]="getUserColor(participant.id)"
+              *ngIf="!getProfilePhotoUrl(participant.profilePhotoUrl)">
+              {{ getInitials(participant.fullName) }}
+            </div>
+          </div>
+          <div class="participant-info">
+            <p class="participant-name">{{ participant.fullName }}</p>
+            <span class="participant-role" [class.creator]="participant.role === 'CREATOR'">
+              {{ getRoleLabel(participant.role) }}
+            </span>
           </div>
         </div>
-        <div class="participant-info">
-          <p class="participant-name">{{ participant.fullName }}</p>
-          <span class="participant-role" [class.creator]="participant.role === 'CREATOR'">
-            {{ getRoleLabel(participant. role) }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Invite Modal -->
+  <div class="modal-overlay" *ngIf="showInviteModal" (click)="closeInviteModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>
+          <i class='bx bx-user-plus'></i>
+          Invitar Nuevos Miembros
+        </h2>
+        <button class="modal-close-btn" (click)="closeInviteModal()">
+          <i class='bx bx-x'></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-description">
+          Ingresa los correos electrónicos de las personas que deseas invitar, separados por comas.
+        </p>
+
+        <textarea
+          [(ngModel)]="newMemberEmails"
+          placeholder="ejemplo@email.com, otro@email.com"
+          class="email-input"
+          rows="4"
+          [disabled]="isSendingInvites"></textarea>
+
+        <!-- Result Message -->
+        <div class="invite-result" *ngIf="inviteResult">
+          <div class="alert" [class.success]="inviteResult.success" [class.error]="!inviteResult.success">
+            <i class='bx' [class.bx-check-circle]="inviteResult.success" [class.bx-error-circle]="!inviteResult.success"></i>
+            <span>{{ inviteResult.message }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeInviteModal()" [disabled]="isSendingInvites">
+          Cancelar
+        </button>
+        <button class="btn-primary" (click)="sendInvitations()" [disabled]="isSendingInvites || newMemberEmails.trim() === ''">
+          <span *ngIf="!isSendingInvites">
+            <i class='bx bx-send'></i>
+            Enviar Invitaciones
           </span>
-        </div>
+          <span *ngIf="isSendingInvites">
+            <i class='bx bx-loader-alt bx-spin'></i>
+            Enviando...
+          </span>
+        </button>
       </div>
     </div>
   </div>
-</div>
-
-<!-- Invite Modal -->
-<div class="modal-overlay" *ngIf="showInviteModal" (click)="closeInviteModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>
-        <i class='bx bx-user-plus'></i>
-        Invitar Nuevos Miembros
-      </h2>
-      <button class="modal-close-btn" (click)="closeInviteModal()">
-        <i class='bx bx-x'></i>
-      </button>
-    </div>
-
-    <div class="modal-body">
-      <p class="modal-description">
-        Ingresa los correos electrónicos de las personas que deseas invitar, separados por comas.
-      </p>
-
-      <textarea [(ngModel)]="newMemberEmails" placeholder="ejemplo@email.com, otro@email.com" class="email-input"
-        rows="4" [disabled]="isSendingInvites"></textarea>
-
-      <!-- Result Message -->
-      <div class="invite-result" *ngIf="inviteResult">
-        <div class="alert" [class.success]="inviteResult.success" [class.error]="! inviteResult.success">
-          <i class='bx' [class.bx-check-circle]="inviteResult.success"
-            [class.bx-error-circle]="!inviteResult.success"></i>
-          <span>{{ inviteResult.message }}</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn-secondary" (click)="closeInviteModal()" [disabled]="isSendingInvites">
-        Cancelar
-      </button>
-      <button class="btn-primary" (click)="sendInvitations()"
-        [disabled]="isSendingInvites || newMemberEmails. trim() === ''">
-        <span *ngIf="! isSendingInvites">
-          <i class='bx bx-send'></i>
-          Enviar Invitaciones
-        </span>
-        <span *ngIf="isSendingInvites">
-          <i class='bx bx-loader-alt bx-spin'></i>
-          Enviando...
-        </span>
-      </button>
-    </div>
-  </div>
-</div>

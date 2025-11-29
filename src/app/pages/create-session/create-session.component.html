@@ -28,7 +28,7 @@
     </button>
   </div>
 
-  <form class="session-form" (ngSubmit)="onSubmit()" *ngIf="! isLoadingProfile">
+  <form class="session-form" (ngSubmit)="onSubmit()" *ngIf="!isLoadingProfile">
     
     <div class="form-wrapper">
     
@@ -46,7 +46,7 @@
             [class.invalid]="!validation.title.isValid"
             placeholder="Ej: Introducción a Angular 17"
             maxlength="200">
-          <small *ngIf="! validation.title.isValid" class="error-text">
+          <small *ngIf="!validation.title.isValid" class="error-text">
             {{ validation.title.error }}
           </small>
         </div>
@@ -70,6 +70,7 @@
       <div class="form-section">
         <h2>Especificaciones de la sesión</h2>
         
+       
         <div class="form-row-two">
           
           <div class="form-group">
@@ -175,91 +176,7 @@
           </div>
           
         </div>
-
-        <!-- Sección de tipo de sesión (Premium/Gratuita) -->
-        <div class="form-section">
-          <h2>Tipo de sesión</h2>
-          
-          <div class="session-type-selector">
-            <div class="radio-option">
-              <input 
-                type="radio" 
-                id="freeSession" 
-                name="sessionType" 
-                [value]="false"
-                [(ngModel)]="sessionData.isPremium"
-                (change)="onSessionTypeChange()">
-              <label for="freeSession">
-                <i class='bx bx-gift'></i>
-                <div class="option-content">
-                  <span class="option-title">Gratuita</span>
-                  <span class="option-description">Sesión sin costo para los participantes</span>
-                </div>
-              </label>
-            </div>
-
-            <div class="radio-option">
-              <input 
-                type="radio" 
-                id="premiumSession" 
-                name="sessionType" 
-                [value]="true"
-                [(ngModel)]="sessionData.isPremium"
-                (change)="onSessionTypeChange()">
-              <label for="premiumSession">
-                <i class='bx bx-crown'></i>
-                <div class="option-content">
-                  <span class="option-title">Premium</span>
-                  <span class="option-description">Sesión con costo en SkillCoins</span>
-                </div>
-              </label>
-            </div>
-          </div>
-
-          <!-- Campo de costo en SkillCoins (solo visible si es Premium) -->
-          <div class="form-group cost-group" *ngIf="sessionData.isPremium">
-            <label for="skillcoinsCost">Costo en SkillCoins:</label>
-            <div class="cost-input-wrapper">
-              <input 
-                type="number" 
-                id="skillcoinsCost" 
-                name="skillcoinsCost"
-                [(ngModel)]="sessionData.skillcoinsCost"
-                (blur)="validateSkillcoinsCost()"
-                [class.invalid]="!validation.skillcoinsCost.isValid"
-                min="5"
-                max="50"
-                placeholder="5">
-              
-              <!-- Controles personalizados -->
-              <div class="cost-controls">
-                <button 
-                  type="button" 
-                  (click)="incrementCost()" 
-                  [disabled]="sessionData.skillcoinsCost >= 50"
-                  title="Aumentar">
-                  <i class='bx bx-chevron-up'></i>
-                </button>
-                <button 
-                  type="button" 
-                  (click)="decrementCost()" 
-                  [disabled]="sessionData.skillcoinsCost <= 5"
-                  title="Disminuir">
-                  <i class='bx bx-chevron-down'></i>
-                </button>
-              </div>
-              
-              <span class="cost-suffix">
-                <i class='bx bx-coin'></i>
-                SkillCoins
-              </span>
-            </div>
-            <small class="helper-text">Mínimo 5, máximo 50 SkillCoins</small>
-            <small *ngIf="! validation.skillcoinsCost.isValid" class="error-text">
-              {{ validation.skillcoinsCost.error }}
-            </small>
-          </div>
-        </div>
+     
 
         <input type="hidden" [(ngModel)]="sessionData.language" name="language" value="es">
         <input type="hidden" [(ngModel)]="sessionData.maxCapacity" name="maxCapacity" value="10">
@@ -267,7 +184,7 @@
       
       <div class="form-actions">
         <button type="submit" class="btn-submit" [disabled]="isLoading">
-          <span *ngIf="! isLoading">Vista Previa</span>
+          <span *ngIf="!isLoading">Vista Previa</span>
           <span *ngIf="isLoading">Creando...</span>
         </button>
       </div>

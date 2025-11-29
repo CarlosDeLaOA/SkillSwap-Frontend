@@ -16,7 +16,7 @@ import { ILearningSession } from '../../interfaces';
 export class SessionDetailModalComponent {
 
   //#region Input Properties
-  @Input() session! : ILearningSession;
+  @Input() session!: ILearningSession;
   //#endregion
 
   //#region Constants

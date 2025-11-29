@@ -59,7 +59,6 @@ export class LearningSessionService {
    * @returns Observable with session response
    */
   getSessionById(sessionId: number): Observable<any> {
-    console.log('📡 Cargando sesión desde:', `${this.apiUrl}/${sessionId}`); // *** Log para debug ***
     return this.http.get<any>(`${this.apiUrl}/${sessionId}`);
   }
   //#endregion
@@ -83,7 +82,7 @@ export class LearningSessionService {
    * @returns Observable with published session response
    */
   publishSession(sessionId: number, minorEdits?: { title?: string; description?: string }): Observable<any> {
-    return this.http.put<any>(`${this. apiUrl}/${sessionId}/publish`, minorEdits || {});
+    return this.http.put<any>(`${this.apiUrl}/${sessionId}/publish`, minorEdits || {});
   }
   //#endregion
 }

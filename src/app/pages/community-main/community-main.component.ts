@@ -6,7 +6,6 @@ import { CommunityWebsocketService } from '../../services/community-websocket.se
 import { CommunityMessageService } from '../../services/community-message.service';
 import { CommunityService } from '../../services/community.service';
 import { Subscription } from 'rxjs';
-import { GroupDocumentsComponent } from '../../components/group-documents/group-documents.component';
 
 /**
  * Componente principal de la comunidad con chat en tiempo real
@@ -14,19 +13,15 @@ import { GroupDocumentsComponent } from '../../components/group-documents/group-
 @Component({
   selector: 'app-community-main',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    GroupDocumentsComponent
-  ],
+  imports: [CommonModule, FormsModule],
   templateUrl: './community-main.component.html',
   styleUrls: ['./community-main.component.scss']
 })
 export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   //#region Fields
-  @ViewChild('messageContainer') private messageContainer! : ElementRef;
-
+  @ViewChild('messageContainer') private messageContainer!: ElementRef;
+  
   communityId: number = 0;
   currentUserId: number = 0;
   currentUserLearnerId: number = 0;
@@ -42,10 +37,10 @@ export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewCheck
   isSendingInvites: boolean = false;
   communityName: string = '';
   communityCreatorId: number = 0;
-
+  
   newMemberEmails: string = '';
   inviteResult: { success: boolean; message: string } | null = null;
-
+  
   private wsSubscription?: Subscription;
   private shouldScrollToBottom: boolean = false;
   private userColors: Map<number, string> = new Map();
@@ -70,7 +65,7 @@ export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewCheck
     if (authPersonStr) {
       const authPerson = JSON.parse(authPersonStr);
       this.currentUserId = authPerson.id;
-      if (authPerson. learner) {
+      if (authPerson.learner) {
         this.currentUserLearnerId = authPerson.learner.id;
       }
     }
@@ -78,9 +73,9 @@ export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewCheck
     this.route.params.subscribe(params => {
       this.communityId = +params['id'];
       if (this.communityId) {
-        this. loadCommunityData();
+        this.loadCommunityData();
         this.loadMessages();
-        this. loadParticipants();
+        this.loadParticipants(); // Cargar participantes para determinar el creador
         this.connectToWebSocket();
       }
     });
@@ -101,7 +96,7 @@ export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewCheck
    */
   ngOnDestroy(): void {
     if (this.wsSubscription) {
-      this.wsSubscription. unsubscribe();
+      this.wsSubscription.unsubscribe();
     }
     this.wsService.disconnect();
   }
@@ -113,7 +108,7 @@ export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewCheck
    * @param tab Tab a activar
    */
   public setActiveTab(tab: 'chat' | 'documents'): void {
-    this. activeTab = tab;
+    this.activeTab = tab;
   }
 
   /**
@@ -127,7 +122,7 @@ export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewCheck
    * Abre el modal de invitación
    */
   public openInviteModal(): void {
-    this. showInviteModal = true;
+    this.showInviteModal = true;
     this.newMemberEmails = '';
     this.inviteResult = null;
   }
@@ -136,7 +131,7 @@ export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewCheck
    * Cierra el modal de invitación
    */
   public closeInviteModal(): void {
-    this. showInviteModal = false;
+    this.showInviteModal = false;
     this.newMemberEmails = '';
     this.inviteResult = null;
   }
@@ -145,8 +140,9 @@ export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewCheck
    * Envía invitaciones a nuevos miembros
    */
   public sendInvitations(): void {
-    if (! this.isCreator()) {
-      this. inviteResult = {
+    // Verificar si el usuario es el creador de la comunidad
+    if (!this.isCreator()) {
+      this.inviteResult = {
         success: false,
         message: 'Solo el creador de la comunidad puede invitar nuevos miembros'
       };
@@ -164,7 +160,7 @@ export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewCheck
     const emails = this.newMemberEmails
       .split(',')
       .map(email => email.trim())
-      .filter(email => email. length > 0);
+      .filter(email => email.length > 0);
 
     if (emails.length === 0) {
       this.inviteResult = {
@@ -175,7 +171,7 @@ export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewCheck
     }
 
     this.isSendingInvites = true;
-    this.communityService.inviteNewMembers(this. communityId, emails).subscribe({
+    this.communityService.inviteNewMembers(this.communityId, emails).subscribe({
       next: (response) => {
         this.isSendingInvites = false;
         if (response.success) {
@@ -224,7 +220,7 @@ export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewCheck
     this.wsService.sendMessage(
       this.communityId,
       this.currentUserId,
-      this.newMessageContent. trim()
+      this.newMessageContent.trim()
     );
 
     this.newMessageContent = '';
@@ -255,7 +251,12 @@ export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewCheck
    * @returns true si es el creador
    */
   public isCreator(): boolean {
-    return this.currentUserId === this. communityCreatorId;
+    console.log('isCreator check:', {
+      currentUserId: this.currentUserId,
+      communityCreatorId: this.communityCreatorId,
+      match: this.currentUserId === this.communityCreatorId
+    });
+    return this.currentUserId === this.communityCreatorId;
   }
 
   /**
@@ -267,9 +268,9 @@ export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewCheck
     if (!fullName) return '?';
     const names = fullName.split(' ');
     if (names.length >= 2) {
-      return (names[0][0] + names[1][0]). toUpperCase();
+      return (names[0][0] + names[1][0]).toUpperCase();
     }
-    return names[0][0]. toUpperCase();
+    return names[0][0].toUpperCase();
   }
 
   /**
@@ -279,13 +280,17 @@ export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewCheck
    */
   public getUserColor(userId: number): string {
     if (!this.userColors.has(userId)) {
+      // Usar un multiplicador primo para mejor distribución de colores
       const goldenRatio = 137.508;
       const hue = (userId * goldenRatio) % 360;
-      const saturation = 70 + (userId % 20);
-      const lightness = 50 + (userId % 15);
-      this. userColors.set(userId, `hsl(${hue}, ${saturation}%, ${lightness}%)`);
+      
+      // Colores más vibrantes y saturados
+      const saturation = 70 + (userId % 20);  // 70-90%
+      const lightness = 50 + (userId % 15);   // 50-65%
+      
+      this.userColors.set(userId, `hsl(${hue}, ${saturation}%, ${lightness}%)`);
     }
-    return this. userColors.get(userId)!;
+    return this.userColors.get(userId)!;
   }
 
   /**
@@ -296,25 +301,25 @@ export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewCheck
   public formatMessageDate(date: string): string {
     const messageDate = new Date(date);
     const now = new Date();
-    const diffInHours = (now. getTime() - messageDate.getTime()) / (1000 * 60 * 60);
+    const diffInHours = (now.getTime() - messageDate.getTime()) / (1000 * 60 * 60);
 
     if (diffInHours < 24) {
-      return messageDate.toLocaleTimeString('es-ES', {
-        hour: '2-digit',
-        minute: '2-digit'
+      return messageDate.toLocaleTimeString('es-ES', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
       });
     } else if (diffInHours < 48) {
-      return 'Ayer ' + messageDate.toLocaleTimeString('es-ES', {
-        hour: '2-digit',
-        minute: '2-digit'
+      return 'Ayer ' + messageDate.toLocaleTimeString('es-ES', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
       });
     } else {
-      return messageDate.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit'
-      }) + ' ' + messageDate.toLocaleTimeString('es-ES', {
-        hour: '2-digit',
-        minute: '2-digit'
+      return messageDate.toLocaleDateString('es-ES', { 
+        day: '2-digit', 
+        month: '2-digit' 
+      }) + ' ' + messageDate.toLocaleTimeString('es-ES', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
       });
     }
   }
@@ -334,17 +339,10 @@ export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewCheck
    * @returns URL o null
    */
   public getProfilePhotoUrl(photoUrl: string | null | undefined): string | null {
-    if (!photoUrl || photoUrl. trim() === '') {
+    if (!photoUrl || photoUrl.trim() === '') {
       return null;
     }
     return photoUrl;
-  }
-
-  /**
-   * Navega a la página de logros de la comunidad
-   */
-  public navigateToAchievements(): void {
-    this.router.navigate(['/app/community', this.communityId, 'achievements']);
   }
   //#endregion
 
@@ -355,11 +353,11 @@ export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewCheck
   private loadCommunityData(): void {
     this.communityService.getMyCommunities().subscribe({
       next: (response) => {
-        const community = response.data. find(c => c.id === this. communityId);
+        const community = response.data.find(c => c.id === this.communityId);
         if (community) {
-          this. communityName = community.name;
+          this.communityName = community.name;
         }
-        this. isLoading = false;
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('Error loading community data:', error);
@@ -373,10 +371,10 @@ export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewCheck
    */
   private loadMessages(): void {
     this.isLoadingMessages = true;
-    this. messageService.getRecentMessages(this. communityId, 100).subscribe({
+    this.messageService.getRecentMessages(this.communityId, 100).subscribe({
       next: (response) => {
         if (response.success) {
-          this.messages = response. data;
+          this.messages = response.data;
           this.shouldScrollToBottom = true;
         }
         this.isLoadingMessages = false;
@@ -393,20 +391,23 @@ export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewCheck
    */
   private loadParticipants(): void {
     this.isLoadingParticipants = true;
-    this. messageService.getParticipants(this. communityId).subscribe({
+    this.messageService.getParticipants(this.communityId).subscribe({
       next: (response) => {
         if (response.success) {
           this.participants = response.data;
+
+          // Buscar el creador entre los participantes
           const creator = this.participants.find(p => p.role === 'CREATOR');
           if (creator) {
-            this.communityCreatorId = creator. id;
+            this.communityCreatorId = creator.id;
+            console.log('Set communityCreatorId from participants to:', this.communityCreatorId);
           }
         }
         this.isLoadingParticipants = false;
       },
       error: (error) => {
         console.error('Error loading participants:', error);
-        this. isLoadingParticipants = false;
+        this.isLoadingParticipants = false;
       }
     });
   }
@@ -415,7 +416,7 @@ export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewCheck
    * Conecta al WebSocket y escucha nuevos mensajes
    */
   private connectToWebSocket(): void {
-    this. wsSubscription = this.wsService.connect(this.communityId). subscribe({
+    this.wsSubscription = this.wsService.connect(this.communityId).subscribe({
       next: (message) => {
         if (message.success) {
           this.messages.push(message);
@@ -423,7 +424,7 @@ export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewCheck
         }
       },
       error: (error) => {
-        console. error('WebSocket error:', error);
+        console.error('WebSocket error:', error);
       }
     });
   }
@@ -434,12 +435,29 @@ export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewCheck
   private scrollToBottom(): void {
     try {
       if (this.messageContainer) {
-        this.messageContainer.nativeElement.scrollTop =
+        this.messageContainer.nativeElement.scrollTop = 
           this.messageContainer.nativeElement.scrollHeight;
       }
     } catch (err) {
       console.error('Error scrolling to bottom:', err);
     }
   }
+
+ /**
+ * Navega a la página de logros de la comunidad
+ */
+navigateToAchievements(): void {
+  console.log('🏆 Método navigateToAchievements() ejecutado');
+  console.log('Community ID:', this.communityId);
+  console.log('Ruta a navegar:', ['/app/community', this.communityId, 'achievements']);
+  
+  this.router.navigate(['/app/community', this.communityId, 'achievements'])
+    .then(success => {
+      console.log('Navegación exitosa:', success);
+    })
+    .catch(error => {
+      console.error('Error en navegación:', error);
+    });
+}
   //#endregion
 }
