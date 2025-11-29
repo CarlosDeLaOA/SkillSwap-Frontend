@@ -9,6 +9,7 @@
   position: relative;
   min-height: 500px;
 
+ 
   .loading-overlay {
     position: absolute;
     top: 0;
@@ -58,6 +59,7 @@
       font-weight: 700;
       color: #ffffff;
       margin: 0;
+      
 
       background: linear-gradient(90deg, #aae16b 0%, #6366F1 100%);
       -webkit-background-clip: text;
@@ -173,10 +175,12 @@
         text-transform: none;
       }
 
+  
       .full-width {
         margin-bottom: 20px;
       }
 
+     
       .form-row-two {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -188,6 +192,7 @@
         }
       }
 
+    
       .form-row-skills-time {
         display: grid;
         grid-template-columns: 2fr 0.6fr 0.6fr 1fr;
@@ -204,6 +209,7 @@
 
       .form-group {
         &.time-group {
+    
           label {
             white-space: nowrap;
           }
@@ -244,6 +250,7 @@
             border-color: #ef4444;
           }
 
+
           option {
             background-color: #1a1a1a;
             color: #ffffff;
@@ -265,6 +272,7 @@
           background-size: 20px;
           padding-right: 40px;
 
+        
           &:focus {
             option {
               background-color: #000000;
@@ -272,9 +280,11 @@
           }
         }
 
+        
         input[type="date"] {
           position: relative;
-
+          
+       
           &::-webkit-calendar-picker-indicator {
             opacity: 0;
             position: absolute;
@@ -284,6 +294,7 @@
             height: 20px;
           }
 
+          
           background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
           background-repeat: no-repeat;
           background-position: right 12px center;
@@ -308,173 +319,7 @@
       }
     }
 
-    /* Selector de tipo de sesión (Premium/Gratuita) */
-    .session-type-selector {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      margin-bottom: 24px;
-
-      @media (max-width: 768px) {
-        grid-template-columns: 1fr;
-      }
-
-      .radio-option {
-        position: relative;
-
-        input[type="radio"] {
-          position: absolute;
-          opacity: 0;
-          width: 0;
-          height: 0;
-        }
-
-        label {
-          display: flex;
-          align-items: center;
-          gap: 16px;
-          padding: 20px;
-          background-color: rgba(0, 0, 0, 0.4);
-          border: 2px solid rgba(255, 255, 255, 0.15);
-          border-radius: 12px;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          min-height: 80px;
-
-          &:hover {
-            border-color: #aae16b;
-            background-color: rgba(170, 225, 107, 0.05);
-          }
-
-          i {
-            font-size: 28px;
-            color: #aae16b;
-            flex-shrink: 0;
-          }
-
-          .option-content {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-
-            .option-title {
-              font-size: 16px;
-              font-weight: 600;
-              color: #ffffff;
-            }
-
-            .option-description {
-              font-size: 13px;
-              color: rgba(255, 255, 255, 0.6);
-            }
-          }
-        }
-
-        input[type="radio"]:checked + label {
-          border-color: #6366F1;
-          background-color: rgba(99, 102, 241, 0.1);
-          box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-
-          i {
-            color: #6366F1;
-          }
-
-          .option-content .option-title {
-            color: #6366F1;
-          }
-        }
-      }
-    }
-
-    /* Grupo de costo en SkillCoins */
-    .cost-group {
-      .cost-input-wrapper {
-        position: relative;
-        display: flex;
-        align-items: center;
-
-        input {
-          padding-right: 140px ! important;
-
-          /* Ocultar spinners nativos en Chrome, Safari, Edge */
-          &::-webkit-outer-spin-button,
-          &::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-          }
-
-          /* Ocultar spinners en Firefox */
-          -moz-appearance: textfield;
-        }
-
-        .cost-suffix {
-          position: absolute;
-          right: 16px;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          color: #aae16b;
-          font-size: 14px;
-          font-weight: 600;
-          pointer-events: none;
-
-          i {
-            font-size: 16px;
-            color: #ffd700;
-          }
-        }
-      }
-
-      /* Botones personalizados de incremento/decremento */
-      .cost-controls {
-        position: absolute;
-        right: 130px;
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-
-        button {
-          width: 24px;
-          height: 16px;
-          background-color: rgba(170, 225, 107, 0.15);
-          border: 1px solid rgba(170, 225, 107, 0.3);
-          border-radius: 4px;
-          color: #aae16b;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 0;
-          transition: all 0.2s ease;
-
-          i {
-            font-size: 14px;
-            line-height: 1;
-          }
-
-          &:hover {
-            background-color: rgba(170, 225, 107, 0.3);
-            border-color: #aae16b;
-          }
-
-          &:active {
-            background-color: rgba(170, 225, 107, 0.5);
-            transform: scale(0.95);
-          }
-
-          &:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-
-            &:hover {
-              background-color: rgba(170, 225, 107, 0.15);
-              border-color: rgba(170, 225, 107, 0.3);
-            }
-          }
-        }
-      }
-    }
-
+   
     .form-actions {
       display: flex;
       justify-content: center;
@@ -522,62 +367,69 @@
   }
 }
 
+
 select {
   option {
     background-color: #000000 !important;
-    color: #ffffff ! important;
+    color: #ffffff !important;
   }
-
+  
   option:checked {
-    background-color: #6366F1 ! important;
+    background-color: #6366F1 !important;
     color: #ffffff !important;
   }
 }
 
-::ng-deep {
 
+
+::ng-deep {
+  
   .custom-datepicker {
     width: 100%;
-
+    
     .mat-mdc-text-field-wrapper {
       background-color: rgba(0, 0, 0, 0.6) !important;
       border-radius: 10px !important;
-      padding: 0 !important;
+      padding: 0 !important; 
     }
 
     .mat-mdc-form-field-flex {
-      height: 48px !important;
-      align-items: center ! important;
+      height: 48px !important; 
+      align-items: center !important;
     }
 
     .mat-mdc-form-field-infix {
-      padding: 0 ! important;
+      padding: 0 !important;
       border: 0 !important;
       min-height: 48px !important;
       display: flex !important;
       align-items: center !important;
     }
 
+   
     .mat-mdc-input-element {
       color: #ffffff !important;
       font-family: 'Epilogue', sans-serif !important;
       font-size: 14px !important;
       padding: 14px 16px !important;
-      height: 48px ! important;
+      height: 48px !important;
       line-height: normal !important;
       box-sizing: border-box !important;
     }
 
+   
     .mat-mdc-input-element::placeholder {
       color: rgba(255, 255, 255, 0.3) !important;
     }
 
+    
     .mdc-notched-outline__leading,
     .mdc-notched-outline__notch,
     .mdc-notched-outline__trailing {
       border-color: rgba(255, 255, 255, 0.15) !important;
     }
 
+    
     &.mat-focused {
       .mdc-notched-outline__leading,
       .mdc-notched-outline__notch,
@@ -587,20 +439,23 @@ select {
       }
     }
 
+    
     .mat-datepicker-toggle {
       button {
         color: rgba(255, 255, 255, 0.7) !important;
-
+        
         &:hover {
           color: #aae16b !important;
         }
       }
     }
 
+    
     .mat-mdc-form-field-label {
       display: none !important;
     }
 
+  
     .mat-mdc-form-field-subscript-wrapper {
       display: none !important;
     }
@@ -610,6 +465,7 @@ select {
     }
   }
 
+ 
   .mat-datepicker-content {
     background-color: #39434b !important;
     border-radius: 12px !important;
@@ -617,104 +473,112 @@ select {
   }
 
   .mat-calendar {
-    background-color: #39434b !important;
-    color: #ffffff !important;
-    font-family: 'Epilogue', sans-serif !important;
-  }
+  background-color: #39434b !important;
+  color: #ffffff !important;
+  font-family: 'Epilogue', sans-serif !important;
+}
 
-  .mat-calendar-header {
-    background-color: #2a3239 !important;
-    color: #ffffff !important;
-    padding: 16px !important;
-    border-radius: 12px 12px 0 0 !important;
-  }
+.mat-calendar-header {
+  background-color: #2a3239 !important;
+  color: #ffffff !important;
+  padding: 16px !important;
+  border-radius: 12px 12px 0 0 !important;
+}
 
-  .mat-calendar-period-button {
-    color: #ffffff !important;
+.mat-calendar-period-button {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+}
+
+.mat-calendar-arrow {
+  fill: #ffffff !important;
+}
+
+.mat-calendar-previous-button,
+.mat-calendar-next-button {
+  color: #ffffff !important;
+  
+  &:hover {
+    background-color: rgba(170, 225, 107, 0.1) !important;
+  }
+}
+
+.mat-calendar-content {
+  padding: 0 8px 0px 8px !important; 
+  background-color: #39434b !important;
+}
+
+.mat-calendar-table-header {
+  th {
+    color: rgba(255, 255, 255, 0.5) !important;
     font-weight: 600 !important;
-    font-size: 16px !important;
+    font-size: 12px !important;
+    padding: 8px 0 !important;
   }
+}
 
-  .mat-calendar-arrow {
-    fill: #ffffff !important;
-  }
-
-  .mat-calendar-previous-button,
-  .mat-calendar-next-button {
-    color: #ffffff !important;
-
-    &:hover {
-      background-color: rgba(170, 225, 107, 0.1) !important;
-    }
-  }
-
-  .mat-calendar-content {
-    padding: 0 8px 0px 8px !important;
-    background-color: #39434b !important;
-  }
-
-  .mat-calendar-table-header {
-    th {
-      color: rgba(255, 255, 255, 0.5) !important;
-      font-weight: 600 !important;
-      font-size: 12px !important;
-      padding: 8px 0 !important;
-    }
-  }
-
+ 
   .mat-calendar-body-cell-content {
     color: #ffffff !important;
     border-radius: 8px !important;
-    font-weight: 500 ! important;
+    font-weight: 500 !important;
   }
 
+ 
   .mat-calendar-body-today:not(.mat-calendar-body-selected) {
     border-color: #aae16b !important;
     border-width: 2px !important;
-
+    
     .mat-calendar-body-cell-content {
       color: #aae16b !important;
     }
   }
 
+  
   .mat-calendar-body-selected {
     background-color: #504ab7 !important;
-
+    
     .mat-calendar-body-cell-content {
       background-color: #504ab7 !important;
-      color: #ffffff ! important;
+      color: #ffffff !important;
       font-weight: 700 !important;
     }
   }
 
+ 
   .mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover {
     .mat-calendar-body-cell-content {
       background-color: rgba(170, 225, 107, 0.15) !important;
     }
   }
 
+  
   .mat-calendar-body-disabled {
     .mat-calendar-body-cell-content {
       color: rgba(255, 255, 255, 0.3) !important;
-      cursor: not-allowed ! important;
+      cursor: not-allowed !important;
     }
   }
 
+  
   .mat-calendar-body-label {
     color: rgba(255, 255, 255, 0.4) !important;
   }
 
+
   .mat-datepicker-actions {
-    background-color: #2a3239 ! important;
+    background-color: #2a3239 !important;
     padding: 12px !important;
     border-radius: 0 0 12px 12px !important;
-
+    
     button {
       color: #aae16b !important;
       font-weight: 600 !important;
     }
   }
 
+ 
   .mat-datepicker-toggle-default-icon {
     display: none !important;
   }
@@ -722,4 +586,4 @@ select {
   .bx-calendar {
     font-size: 20px !important;
   }
-}
+} 

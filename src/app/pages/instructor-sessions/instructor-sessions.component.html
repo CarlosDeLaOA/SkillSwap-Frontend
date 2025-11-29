@@ -57,26 +57,17 @@
     </div>
 
     <!-- Sin sesiones -->
-    <div *ngIf="!isLoading && !errorMessage && (!  filteredSessions || filteredSessions.length === 0)" class="no-sessions">
+    <div *ngIf="!isLoading && !errorMessage && (!filteredSessions || filteredSessions.length === 0)" class="no-sessions">
       <i class='bx bx-calendar-x'></i>
       <h3>No hay sesiones {{ getStatusText(selectedStatus).toLowerCase() }}</h3>
       <p>Aún no tienes sesiones en este estado</p>
     </div>
 
     <!-- Lista de sesiones -->
-    <div *ngIf="!  isLoading && !errorMessage && filteredSessions && filteredSessions.length > 0" class="sessions-list">
+    <div *ngIf="!isLoading && !errorMessage && filteredSessions && filteredSessions.length > 0" class="sessions-list">
       <div *ngFor="let session of filteredSessions" class="session-item">
         <div class="session-content">
-          <!-- Header con título y badge de tipo -->
-          <div class="session-header">
-            <h3 class="session-title">{{ session.title }}</h3>
-            <!-- Badge Premium/Gratuita -->
-            <span class="session-type-badge" [class.premium]="session.isPremium" [class.free]="!session.isPremium">
-              <i class='bx' [class.bx-crown]="session.isPremium" [class.bx-gift]="! session.isPremium"></i>
-              <span *ngIf="session.isPremium">{{ session.skillcoinsCost }} SkillCoins</span>
-              <span *ngIf="!session.isPremium">Gratuita</span>
-            </span>
-          </div>
+          <h3 class="session-title">{{ session.title }}</h3>
           <p class="session-description">{{ session.description }}</p>
         </div>
         
@@ -196,7 +187,7 @@
           {{ editErrors.durationMinutes }}
         </span>
         <small *ngIf="editingSession && editingSession.currentBookings > 0" class="warning-text">
-          Esta sesión tiene {{ editingSession.currentBookings }} participante(s).
+          Esta sesión tiene {{ editingSession.currentBookings }} participante(s). 
           No podrás cambiar la duración.
         </small>
       </div>
