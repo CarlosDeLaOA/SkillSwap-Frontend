@@ -1,15 +1,4 @@
-<div class="session-card" [class.suggested]="isSuggested">
-
-  <!-- Tag movido a la esquina superior derecha y porcentaje reemplazado con icono de estrella giratorio ***
-       aria-label mantenido para lectores de pantalla -->
-  <div *ngIf="isSuggested" class="suggested-tag" role="status" aria-label="Recomendado para ti">
-    <span class="tag-text">Para ti</span>
-    <span class="match-percentage" aria-hidden="true">
-      <!-- Usando clase de estrella de boxicons; si no tienes boxicons, reemplaza con un SVG inline ★ -->
-      <i class="bx bx-star star-icon" aria-hidden="true"></i>
-    </span>
-  </div>
-
+<div class="session-card">
   <div class="session-content">
     <div class="session-header">
       <h3 class="session-title clickable" (click)="onViewDetails()">
@@ -19,19 +8,9 @@
         <i class='bx bx-category-alt me-1'></i>
         {{ session.skill.knowledgeArea.name }}
       </span>
-      <!-- Badge para indicar si es Premium o Gratuita -->
-      <span class="session-type-badge" [class.premium]="session.isPremium" [class.free]="! session.isPremium">
-        <i class='bx' [class.bx-crown]="session.isPremium" [class.bx-gift]="! session.isPremium"></i>
-        <span *ngIf="session.isPremium">{{ session.skillcoinsCost }} SkillCoins</span>
-        <span *ngIf="!session.isPremium">Gratuita</span>
-      </span>
     </div>
     <p class="session-description">{{ session.description }}</p>
     
-    <div *ngIf="isSuggested && reason" class="suggestion-reason">
-      {{ reason }}
-    </div>
-
     <div class="session-meta">
       <span class="meta-item" *ngIf="session.instructor?.person?.fullName">
         <i class='bx bx-user-circle'></i>
@@ -83,7 +62,7 @@
       [disabled]="getAvailableSpots() === 0">
       <i class='bx bx-check-circle me-1' *ngIf="getAvailableSpots() > 0"></i>
       <i class='bx bx-x-circle me-1' *ngIf="getAvailableSpots() === 0"></i>
-      {{ getAvailableSpots() === 0 ? 'Lleno' : 'Registrarme' }}
+      Registrarme
     </button>
   </div>
 </div>

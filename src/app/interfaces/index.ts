@@ -1,11 +1,11 @@
 export interface ILoginResponse {
   accessToken: string;
-  expiresIn: number;
+  expiresIn: number
 }
 
 export interface IResponse<T> {
   data: T;
-  message: string;
+  message: string,
   meta: T;
 }
 
@@ -19,7 +19,7 @@ export interface IUser {
   createdAt?: string;
   updatedAt?: string;
   authorities?: IAuthority[];
-  role?: IRole;
+  role?: IRole
 }
 
 export interface IAuthority {
@@ -34,20 +34,20 @@ export interface IFeedBackMessage {
 export enum IFeedbackStatus {
   success = "SUCCESS",
   error = "ERROR",
-  default = ""
+  default = ''
 }
 
 export enum IRoleType {
   admin = "ROLE_ADMIN",
   user = "ROLE_USER",
-  superAdmin = "ROLE_SUPER_ADMIN"
+  superAdmin = 'ROLE_SUPER_ADMIN'
 }
 
 export interface IRole {
   createdAt: string;
   description: string;
   id: number;
-  name: string;
+  name : string;
   updatedAt: string;
 }
 
@@ -57,24 +57,33 @@ export interface ISearch {
   pageNumber?: number;
   pageSize?: number;
   totalElements?: number;
-  totalPages?: number;
+  totalPages?:number;
 }
 
 //#region Register Interfaces
 
+/**
+ * Datos temporales de registro guardados en el primer paso del onboarding
+ */
 export interface IRegisterData {
   email: string;
   password: string;
   fullName: string;
-  role: "LEARNER" | "INSTRUCTOR";
+  role: 'LEARNER' | 'INSTRUCTOR';
 }
 
+/**
+ * Request completo para el registro final con categorías incluidas
+ */
 export interface IRegisterRequest extends IRegisterData {
   categories: string[];
   profilePhotoUrl?: string;
   preferredLanguage?: string;
 }
 
+/**
+ * Response del backend después del registro exitoso
+ */
 export interface IRegisterResponse {
   message: string;
   userId: number;
@@ -83,6 +92,9 @@ export interface IRegisterResponse {
   emailVerified?: boolean;
 }
 
+/**
+ * Response del endpoint de verificación de disponibilidad de email
+ */
 export interface IEmailCheckResponse {
   email: string;
   available: boolean;
@@ -91,6 +103,9 @@ export interface IEmailCheckResponse {
 
 //#endregion
 
+/**
+ * Interfaz para Skill (Habilidad)
+ */
 export interface ISkill {
   id: number;
   name: string;
@@ -99,6 +114,9 @@ export interface ISkill {
   knowledgeArea?: IKnowledgeArea;
 }
 
+/**
+ * Interfaz para UserSkill (Habilidad del Usuario)
+ */
 export interface IUserSkill {
   id: number;
   person: IPerson;
@@ -107,6 +125,9 @@ export interface IUserSkill {
   active: boolean;
 }
 
+/**
+ * Entidad Person del sistema SkillSwap
+ */
 export interface IPerson {
   id?: number;
   email?: string;
@@ -124,6 +145,9 @@ export interface IPerson {
   userSkills?: IUserSkill[];
 }
 
+/**
+ * Perfil de Instructor (SkillSwapper)
+ */
 export interface IInstructor {
   id?: number;
   personId?: number;
@@ -136,6 +160,9 @@ export interface IInstructor {
   biography?: string;
 }
 
+/**
+ * Perfil de Learner (SkillSeeker)
+ */
 export interface ILearner {
   id?: number;
   personId?: number;
@@ -144,18 +171,27 @@ export interface ILearner {
   credentialsObtained?: number;
 }
 
+/**
+ * Respuesta de login de SkillSwap
+ */
 export interface ILoginResponseSkillSwap {
   token: string;
   expiresIn: number;
   authPerson: IPerson;
 }
 
+/** 
+ * Respuesta del endpoint de horas de aprendizaje
+ */
 export interface ILearningHoursResponse {
   totalMinutes: number;
   totalHours: number;
-  role: "INSTRUCTOR" | "LEARNER";
+  role: 'INSTRUCTOR' | 'LEARNER';
 }
 
+/**
+ * Entidad UpcomingSession para sesiones próximas
+ */
 export interface IUpcomingSession {
   id: number;
   title: string;
@@ -165,11 +201,14 @@ export interface IUpcomingSession {
   status: string;
   videoCallLink: string;
   skillName: string;
-  bookingId?: number;
-  bookingType?: "INDIVIDUAL" | "GROUP";
-  currentParticipants?: number;
+  bookingId?: number;  // ← NUEVO - ID del booking del usuario
+  bookingType?: 'INDIVIDUAL' | 'GROUP';  // ← NUEVO - Tipo de registro
+  currentParticipants?: number;  // ← NUEVO - Para instructores
 }
 
+/**
+ * Entidad Credential para certificaciones obtenidas
+ */
 export interface ICredential {
   id: number;
   skillName: string;
@@ -178,6 +217,9 @@ export interface ICredential {
   obtainedDate: string;
 }
 
+/** 
+ * Entidad Feedback para valoraciones de sesiones
+ */
 export interface IFeedback {
   id: number;
   rating: number;
@@ -187,7 +229,10 @@ export interface IFeedback {
   sessionTitle: string;
 }
 
-// Dashboard interfaces
+// ========================================
+// INTERFACES DE DASHBOARD
+// ========================================
+
 export interface IAccountBalance {
   skillCoins: number;
 }
@@ -210,17 +255,17 @@ export interface IMonthlyAttendance {
   registrados: number;
 }
 
-// Learning sessions
+// ========================================
+// INTERFACES DE LEARNING SESSIONS
+// ========================================
 export interface ICreateSessionRequest {
   skill: { id: number };
   title: string;
   description: string;
-  scheduledDatetime: string; // ISO string
+  scheduledDatetime: string; // ISO string de fecha y hora
   durationMinutes: number;
   language: string;
   maxCapacity: number;
-  isPremium: boolean;
-  skillcoinsCost: number;
 }
 
 export interface ILearningSession {
@@ -237,7 +282,7 @@ export interface ILearningSession {
   status: string;
   videoCallLink?: string;
   creationDate: string;
-
+  
   instructor: {
     id: number;
     person: {
@@ -247,7 +292,7 @@ export interface ILearningSession {
       email: string;
     };
   };
-
+  
   skill: {
     id: number;
     name: string;
@@ -257,9 +302,9 @@ export interface ILearningSession {
       iconUrl?: string;
     };
   };
-
+  
   bookings: any[];
-
+  
   currentBookings?: number;
   availableSpots?: number;
 }
@@ -270,7 +315,7 @@ export interface IKnowledgeArea {
   description?: string;
   iconUrl?: string;
   active: boolean;
-  skills?: ISkill[];
+  skills?: ISkill[];  
 }
 
 export interface ISessionFilters {
@@ -278,37 +323,14 @@ export interface ISessionFilters {
   language?: string;
 }
 
+/**
+ * Request para guardar habilidades del usuario
+ */
 export interface ISaveUserSkillsRequest {
   skillIds: number[];
 }
 
-// Interfaces agregadas para soporte de sugerencias
-export interface ILearningSessionWithSuggestion extends ILearningSession {
-  isSuggested?: boolean;
-  matchScore?: number;
-  reason?: string;
-  suggestionId?: number;
-}
 
-export interface ISessionSuggestion {
-  id: number;
-  person: IPerson;
-  learningSession: ILearningSession;
-  matchScore: number;
-  reason: string;
-  viewed: boolean;
-  createdAt: string;
-  viewedAt?: string;
-}
-
-export interface ISuggestionResponse {
-  success: boolean;
-  message: string;
-  count: number;
-  data: ISessionSuggestion[];
-}
-
-// Dashboard export types
 export interface IDashboardExportData {
   balance: IBalanceData;
   learningHours: ILearningHoursData;
@@ -355,22 +377,34 @@ export interface IUpcomingSessionData {
 
 export interface IReviewData {
   title: string;
-  type: "FEEDBACK" | "CREDENTIAL";
+  type: 'FEEDBACK' | 'CREDENTIAL';
   items: any[];
 }
 
-// Booking interfaces
+// ========================================
+// INTERFACES DE BOOKING
+// ========================================
+
+/**
+ * Tipos de booking
+ */
 export enum BookingType {
-  INDIVIDUAL = "INDIVIDUAL",
-  GROUP = "GROUP"
+  INDIVIDUAL = 'INDIVIDUAL',
+  GROUP = 'GROUP'
 }
 
+/**
+ * Estados de un booking
+ */
 export enum BookingStatus {
-  CONFIRMED = "CONFIRMED",
-  WAITING = "WAITING",
-  CANCELLED = "CANCELLED"
+  CONFIRMED = 'CONFIRMED',
+  WAITING = 'WAITING',
+  CANCELLED = 'CANCELLED'
 }
 
+/**
+ * Entidad Booking completa
+ */
 export interface IBooking {
   id: number;
   learningSession: ILearningSession;
@@ -385,28 +419,46 @@ export interface IBooking {
   community?: any;
 }
 
+/**
+ * Request para crear un booking
+ */
 export interface ICreateBookingRequest {
   learningSessionId: number;
 }
 
+/**
+ * Response del servidor al crear/obtener bookings
+ */
 export interface IBookingResponse {
   success: boolean;
   message: string;
   data: IBooking;
 }
 
+/**
+ * Response del servidor al obtener lista de bookings
+ */
 export interface IBookingsListResponse {
   success: boolean;
   data: IBooking[];
   count: number;
 }
 
-// Communities
+// ========================================
+// INTERFACES DE COMUNIDADES
+// ========================================
+
+/**
+ * Roles de miembro en una comunidad
+ */
 export enum MemberRole {
-  CREATOR = "CREATOR",
-  MEMBER = "MEMBER"
+  CREATOR = 'CREATOR',
+  MEMBER = 'MEMBER'
 }
 
+/**
+ * Entidad LearningCommunity
+ */
 export interface ILearningCommunity {
   id: number;
   name: string;
@@ -419,6 +471,9 @@ export interface ILearningCommunity {
   members?: ICommunityMember[];
 }
 
+/**
+ * Entidad CommunityMember
+ */
 export interface ICommunityMember {
   id: number;
   learningCommunity?: ILearningCommunity;
@@ -428,17 +483,26 @@ export interface ICommunityMember {
   active: boolean;
 }
 
+/**
+ * Response del servidor al obtener comunidades
+ */
 export interface ICommunitiesResponse {
   success: boolean;
   data: ILearningCommunity[];
   count: number;
 }
 
+/**
+ * Request para crear booking grupal
+ */
 export interface ICreateGroupBookingRequest {
   learningSessionId: number;
   communityId: number;
 }
 
+/**
+ * Response del servidor al crear booking grupal
+ */
 export interface IGroupBookingResponse {
   success: boolean;
   message: string;
@@ -471,28 +535,39 @@ export interface ISessionValidation {
     isValid: boolean;
     error: string;
   };
-  skillcoinsCost: {
-    isValid: boolean;
-    error: string;
-  };
 }
 
+/**
+ * Request para unirse a lista de espera
+ */
 export interface IJoinWaitlistRequest {
   learningSessionId: number;
 }
 
+/**
+ * Response al unirse a lista de espera
+ */
 export interface IWaitlistResponse {
   success: boolean;
   message: string;
   data: IBooking;
 }
 
+/**
+ * Response al salir de lista de espera
+ */
 export interface ILeaveWaitlistResponse {
   success: boolean;
   message: string;
 }
 
-// Video call interfaces
+// ========================================
+// INTERFACES DE VIDEOLLAMADAS
+// ========================================
+
+/**
+ * Configuración de videollamada
+ */
 export interface IVideoCallConfig {
   sessionId: number;
   joinLink: string;
@@ -500,6 +575,9 @@ export interface IVideoCallConfig {
   microphoneEnabled?: boolean;
 }
 
+/**
+ * Datos de videollamada recibidos del backend
+ */
 export interface IVideoCallData {
   sessionId: number;
   roomName: string;
@@ -514,6 +592,9 @@ export interface IVideoCallData {
   microphoneEnabled: boolean;
 }
 
+/**
+ * Información de videollamada
+ */
 export interface IVideoCallInfo {
   sessionId: number;
   title: string;
@@ -526,6 +607,9 @@ export interface IVideoCallInfo {
   currentBookings: number;
 }
 
+/**
+ * Opciones de configuración de Jitsi Meet
+ */
 export interface IJitsiOptions {
   roomName: string;
   width: string | number;
@@ -553,13 +637,21 @@ export interface IJitsiOptions {
   };
 }
 
+/**
+ * Estado de compartición de pantalla
+ */
 export interface IScreenShareStatus {
   canShareScreen: boolean;
   isSharing: boolean;
   personId?: number;
 }
+// ========================================
+// INTERFACES DE INVITACIONES A COMUNIDADES
+// ========================================
 
-// Community invitations
+/**
+ * Request para crear una comunidad
+ */
 export interface ICreateCommunityRequest {
   name: string;
   description?: string;
@@ -567,6 +659,9 @@ export interface ICreateCommunityRequest {
   memberEmails: string[];
 }
 
+/**
+ * Response al crear una comunidad
+ */
 export interface ICreateCommunityResponse {
   success: boolean;
   message: string;
@@ -574,29 +669,41 @@ export interface ICreateCommunityResponse {
   invitationsSummary?: IInvitationsSummary;
 }
 
+/**
+ * Resumen de invitaciones enviadas
+ */
 export interface IInvitationsSummary {
   successfulInvitations: string[];
   failedInvitations: string[];
 }
 
+/**
+ * Response al aceptar una invitación
+ */
 export interface IAcceptInvitationResponse {
   success: boolean;
   message: string;
   status: InvitationStatus;
 }
 
+/**
+ * Estados de invitación
+ */
 export enum InvitationStatus {
-  SUCCESS = "SUCCESS",
-  INVALID_TOKEN = "INVALID_TOKEN",
-  EXPIRED_TOKEN = "EXPIRED_TOKEN",
-  ALREADY_ACCEPTED = "ALREADY_ACCEPTED",
-  ALREADY_MEMBER = "ALREADY_MEMBER",
-  COMMUNITY_FULL = "COMMUNITY_FULL",
-  USER_NOT_FOUND = "USER_NOT_FOUND",
-  EMAIL_MISMATCH = "EMAIL_MISMATCH",
-  NOT_LEARNER = "NOT_LEARNER"
+  SUCCESS = 'SUCCESS',
+  INVALID_TOKEN = 'INVALID_TOKEN',
+  EXPIRED_TOKEN = 'EXPIRED_TOKEN',
+  ALREADY_ACCEPTED = 'ALREADY_ACCEPTED',
+  ALREADY_MEMBER = 'ALREADY_MEMBER',
+  COMMUNITY_FULL = 'COMMUNITY_FULL',
+  USER_NOT_FOUND = 'USER_NOT_FOUND',
+  EMAIL_MISMATCH = 'EMAIL_MISMATCH',
+  NOT_LEARNER = 'NOT_LEARNER'
 }
 
+/**
+ * Validación de formulario de comunidad
+ */
 export interface ICommunityValidation {
   name: {
     isValid: boolean;
@@ -612,7 +719,13 @@ export interface ICommunityValidation {
   };
 }
 
-// Community messages
+// ========================================
+// INTERFACES DE MENSAJES DE COMUNIDAD
+// ========================================
+
+/**
+ * Entidad CommunityMessage para mensajes del chat
+ */
 export interface ICommunityMessage {
   id: number;
   content: string;
@@ -621,31 +734,46 @@ export interface ICommunityMessage {
   sender: ICommunityParticipant;
 }
 
+/**
+ * Participante de una comunidad
+ */
 export interface ICommunityParticipant {
   id: number;
   fullName: string;
   profilePhotoUrl?: string;
   email: string;
-  role: "CREATOR" | "MEMBER";
+  role: 'CREATOR' | 'MEMBER';
 }
 
+/**
+ * Response al obtener mensajes
+ */
 export interface ICommunityMessagesResponse {
   success: boolean;
   data: ICommunityMessage[];
   count: number;
 }
 
+/**
+ * Response al obtener participantes
+ */
 export interface ICommunityParticipantsResponse {
   success: boolean;
   data: ICommunityParticipant[];
   count: number;
 }
 
+/**
+ * Request para enviar un mensaje
+ */
 export interface ISendMessageRequest {
   senderId: number;
   content: string;
 }
 
+/**
+ * Mensaje WebSocket recibido
+ */
 export interface IWebSocketMessage {
   id?: number;
   content: string;
@@ -788,12 +916,10 @@ export interface ICoinTransaction {
   paymentMethod: string;
   paypalReference: string;
   transactionDate: string;
-}
-
 // ========================================
 // INTERFACES DE SESSION HISTORY
 // ========================================
-
+}
 /**
  * Sesión histórica del dashboard
  */
@@ -848,102 +974,4 @@ export interface ISessionHistoryResponse {
 export interface ISessionDetail {
   session: ISessionHistory;
   participantCount?: number;
-}
-
-// ========================================
-// INTERFACES DE DOCUMENTOS DE GRUPO
-// ========================================
-
-/**
- * Documento de sesión grupal
- */
-export interface IGroupSessionDocument {
-  id: number;
-  fileName: string;
-  originalFileName: string;
-  filePath: string;
-  fileSize: number;
-  contentType: string;
-  sessionDate: string;
-  uploadDate: string;
-  description?: string;
-  active: boolean;
-  formattedFileSize?: string;
-  learningCommunity: {
-    id: number;
-    name: string;
-  };
-  learningSession: {
-    id: number;
-    title: string;
-  } | null;
-  uploadedBy: {
-    id: number;
-    fullName: string;
-    profilePhotoUrl?: string;
-  };
-  // Campos para historial de borrado
-  deletedAt?: string;
-  deletedBy?: {
-    id: number;
-    fullName: string;
-    profilePhotoUrl?: string;
-  };
-  deletionReason?: string;
-}
-
-/**
- * Response al subir documento
- */
-export interface IDocumentUploadResponse {
-  success: boolean;
-  message: string;
-  data: IGroupSessionDocument;
-}
-
-/**
- * Response con lista de documentos
- */
-export interface IDocumentListResponse {
-  success: boolean;
-  data: IGroupSessionDocument[];
-  count: number;
-}
-
-/**
- * Response con documentos agrupados por sesión
- */
-export interface IDocumentGroupedBySessionResponse {
-  success: boolean;
-  data: { [sessionId: number]: IGroupSessionDocument[] };
-}
-
-/**
- * Response con documentos agrupados por fecha
- */
-export interface IDocumentGroupedByDateResponse {
-  success: boolean;
-  data: { [date: string]: IGroupSessionDocument[] };
-}
-
-/**
- * Estadísticas de almacenamiento del grupo
- */
-export interface IStorageStats {
-  usedBytes: number;
-  availableBytes: number;
-  maxBytes: number;
-  usedFormatted: string;
-  availableFormatted: string;
-  maxFormatted: string;
-  usagePercentage: number;
-  documentCount: number;
-}
-
-/**
- * Response de estadísticas de almacenamiento
- */
-export interface IStorageStatsResponse {
-  success: boolean;
-  data: IStorageStats;
 }

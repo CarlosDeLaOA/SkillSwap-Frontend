@@ -37,10 +37,10 @@
       <i class='bx bx-check-circle me-2'></i>
       <strong>¡Registro exitoso!</strong> 
       <span *ngIf="registrationType === 'individual'">
-        Te has registrado correctamente en la sesión.Revisa tu correo electrónico para más detalles.
+        Te has registrado correctamente en la sesión. Revisa tu correo electrónico para más detalles.
       </span>
       <span *ngIf="registrationType === 'group'">
-        Tu comunidad se ha registrado correctamente.Todos los miembros recibirán un correo con los detalles.
+        Tu comunidad se ha registrado correctamente. Todos los miembros recibirán un correo con los detalles.
       </span>
     </div>
 
@@ -54,7 +54,7 @@
     <!-- Success Message para Leave Waitlist -->
     <div *ngIf="showLeaveSuccess" class="alert alert-warning alert-dismissible fade show" role="alert">
       <i class='bx bx-check-circle me-2'></i>
-      <strong>¡Has salido de la lista de espera! </strong> 
+      <strong>¡Has salido de la lista de espera!</strong> 
       Ya no recibirás notificaciones sobre esta sesión.
     </div>
 
@@ -69,15 +69,6 @@
       <!-- Left Side - Session Info -->
       <div class="session-info">
         <h2 class="session-name">{{ session.title }}</h2>
-        
-        <!-- Badges de tipo de sesión (Premium/Gratuita) -->
-        <div class="session-badges">
-          <span class="session-type-badge" [class.premium]="session.isPremium" [class.free]="!session.isPremium">
-            <i class='bx' [class.bx-crown]="session.isPremium" [class.bx-gift]="! session.isPremium"></i>
-            <span *ngIf="session.isPremium">{{ session.skillcoinsCost }} SkillCoins</span>
-            <span *ngIf="!session.isPremium">Gratuita</span>
-          </span>
-        </div>
         
         <p class="session-description">{{ session.description }}</p>
 
@@ -97,12 +88,6 @@
             <span>{{ session.skill?.knowledgeArea?.name || 'Categoría' }}</span>
           </div>
 
-          <!-- Costo en SkillCoins (solo si es Premium) -->
-          <div class="detail-item" *ngIf="session.isPremium">
-            <strong>Costo:</strong>
-            <span class="cost-highlight">{{ session.skillcoinsCost }} SkillCoins</span>
-          </div>
-
           <div class="detail-item" *ngIf="!isSessionFull">
             <strong>Cupos disponibles:</strong>
             <span class="cupos-badge">{{ getAvailableSpots() }}</span>
@@ -118,7 +103,7 @@
       <!-- Right Side - Registration -->
       <div class="registration-section">
         <!-- Solo mostrar opciones de registro si NO está llena -->
-        <div class="registration-type" *ngIf="! isSessionFull">
+        <div class="registration-type" *ngIf="!isSessionFull">
           <h3>Tipo de registro:</h3>
           
           <div class="radio-group">
@@ -156,7 +141,7 @@
           </div>
 
           <select 
-            *ngIf="! isLoadingCommunities && communities.length > 0"
+            *ngIf="!isLoadingCommunities && communities.length > 0"
             class="form-select community-select"
             [(ngModel)]="selectedCommunityId">
             <option [value]="null">Selecciona una comunidad</option>
@@ -165,7 +150,7 @@
             </option>
           </select>
 
-          <div *ngIf="! isLoadingCommunities && communities.length === 0" class="no-communities">
+          <div *ngIf="!isLoadingCommunities && communities.length === 0" class="no-communities">
             <i class='bx bx-info-circle'></i>
             <p>No tienes comunidades disponibles para registro grupal.</p>
           </div>
@@ -194,7 +179,7 @@
             <line x1="140" y1="150" x2="230" y2="150" stroke="#aae16b" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
             
             <!-- Checkmark circular o Lista (según estado) -->
-            <g *ngIf="! isSessionFull">
+            <g *ngIf="!isSessionFull">
               <circle cx="200" cy="190" r="25" fill="#aae16b"/>
               <path d="M 190 190 L 197 197 L 210 180" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
             </g>
@@ -236,7 +221,7 @@
           class="btn-register" 
           (click)="registerToSession()"
           [disabled]="isRegistering || registrationSuccess || (registrationType === 'group' && !selectedCommunityId)">
-          <span *ngIf="! isRegistering && !registrationSuccess">Registrarme</span>
+          <span *ngIf="!isRegistering && !registrationSuccess">Registrarme</span>
           <span *ngIf="isRegistering">
             <i class='bx bx-loader-alt bx-spin'></i> Registrando...
           </span>
@@ -266,7 +251,7 @@
         <!-- Mensaje cuando está en lista de espera -->
         <div *ngIf="userWaitlistBooking" class="alert alert-info">
           <i class='bx bx-info-circle me-2'></i>
-          Estás en la lista de espera.Te notificaremos cuando se libere un cupo.
+          Estás en la lista de espera. Te notificaremos cuando se libere un cupo.
         </div>
 
         <!-- Leave Waitlist Button (cuando YA está en lista de espera) -->
@@ -275,7 +260,7 @@
           class="btn-leave-waitlist" 
           (click)="showLeaveConfirmation()"
           [disabled]="isLeavingWaitlist">
-          <span *ngIf="! isLeavingWaitlist">
+          <span *ngIf="!isLeavingWaitlist">
             <i class='bx bx-x-circle me-2'></i>
             Salir de lista de espera
           </span>
@@ -292,7 +277,7 @@
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <i class='bx bx-error-circle'></i>
-        <h3>¿Estás seguro? </h3>
+        <h3>¿Estás seguro?</h3>
       </div>
       <div class="modal-body">
         <p>¿Estás seguro que deseas salir de la lista de espera?</p>
