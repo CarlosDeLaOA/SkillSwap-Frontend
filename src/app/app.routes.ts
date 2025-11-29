@@ -27,6 +27,8 @@ import { AcceptInvitationComponent } from './components/accept-invitation/accept
 import { CommunityMainComponent } from './pages/community-main/community-main.component';
 import { CommunityAchievementsComponent } from './pages/community-achievements/community-achievements';
 import { CoinPurchaseComponent } from './components/coin-purchase/coin-purchase.component';
+import { ReviewsPageComponent } from './pages/reviews/reviews-page.component';
+import { FeedbackPageComponent } from './pages/feedback-page/feedback-page.component';
 
 export const routes: Routes = [
   {
@@ -124,7 +126,7 @@ export const routes: Routes = [
         component: SessionDetailComponent,
         data: {
           authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
-          name: 'Detalle de Sesión',
+          name: 'Detalle de Sesion',
           showInSidebar: false
         },
       },
@@ -133,7 +135,7 @@ export const routes: Routes = [
         component: CreateSessionComponent,
         data: {
           authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
-          name: 'Crear Sesión',
+          name: 'Crear Sesion',
           showInSidebar: false
         }
       },
@@ -165,6 +167,15 @@ export const routes: Routes = [
         }
       },
       {
+        path: 'feedback/:sessionId',
+        component: FeedbackPageComponent,
+        data: {
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+          name: 'Dejar Reseña',
+          showInSidebar: false
+        }
+      },
+      {
         path: 'community/:id',
         component: CommunityMainComponent,
         data: {
@@ -174,23 +185,32 @@ export const routes: Routes = [
         }
       },
       {
-      path: 'community/:id/achievements',
-      component: CommunityAchievementsComponent,
-      data: {
-        authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
-        name: 'Logros de la Comunidad',
-        showInSidebar: false
-      }
-    },
-    {
-  path: 'coins/purchase',
-  component: CoinPurchaseComponent,  // ← Agregar esta ruta
-  data: {
-    authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
-    name: 'Comprar SkillCoins',
-    showInSidebar: false
-  }
-},
+        path: 'community/:id/achievements',
+        component: CommunityAchievementsComponent,
+        data: {
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+          name: 'Logros de la Comunidad',
+          showInSidebar: false
+        }
+      },
+      {
+        path: 'coins/purchase',
+        component: CoinPurchaseComponent,
+        data: {
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+          name: 'Comprar SkillCoins',
+          showInSidebar: false
+        }
+      },
+      {
+        path: 'reviews',
+        component: ReviewsPageComponent,
+        data: {
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+          name: 'Reseñas',
+          showInSidebar: false
+        }
+      },
     ],
   },
   { path: '**', redirectTo: 'login' }

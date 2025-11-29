@@ -1,0 +1,60 @@
+<div class="recorder-container">
+  <div class="recorder-header">
+    <h3>Graba tu reseña</h3>
+    <p class="subtitle">Maximo 2 minutos de audio</p>
+  </div>
+
+  <div class="recording-display">
+    <div class="time-display" [class.warning]="isRecordingTimeExpiring()">
+      {{ recordingTime }}
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="getRecordingPercentage()"></div>
+    </div>
+
+    <p class="time-info">
+      {{ recordingDuration }} / {{ maxDuration }} segundos
+    </p>
+  </div>
+
+  <div class="button-group">
+    <!-- Estado inicializando -->
+    <button *ngIf="isInitializing"
+            class="btn btn-secondary"
+            disabled>
+      Inicializando microfono...
+    </button>
+
+    <!-- Grabando -->
+    <button *ngIf="isRecording"
+            class="btn btn-danger"
+            (click)="stopRecording()">
+      Detener grabacion
+    </button>
+
+    <!-- Primera grabacion o listo para grabar -->
+    <button *ngIf="!isRecording && !isInitializing && !hasRecording"
+            class="btn btn-primary"
+            (click)="startRecording()">
+      Comenzar grabacion
+    </button>
+
+    <!-- Despues de grabar: opcion de usar o grabar de nuevo -->
+    <button *ngIf="!isRecording && !isInitializing && hasRecording"
+            class="btn btn-success"
+            (click)="confirmRecording()">
+      Usar esta grabacion
+    </button>
+
+    <button *ngIf="!isRecording && !isInitializing && hasRecording"
+            class="btn btn-secondary"
+            (click)="discardRecording()">
+      Grabar de nuevo
+    </button>
+  </div>
+
+  <div *ngIf="hasRecording && !isRecording" class="recording-saved">
+    <p>Grabacion guardada: {{ recordingTime }}</p>
+  </div>
+</div>
