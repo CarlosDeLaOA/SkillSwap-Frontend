@@ -27,6 +27,7 @@
     "@popperjs/core": "^2.11.8",
     "@stomp/stompjs": "^7.0.0",
     "boxicons": "^2.1.4",
+    "cloudinary": "^2.8.0",
     "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
     "html2canvas": "^1.4.1",

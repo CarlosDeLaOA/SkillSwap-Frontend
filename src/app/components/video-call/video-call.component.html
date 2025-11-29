@@ -131,20 +131,21 @@
       </button>
     </div>
     <div class="modal-body">
-      <p>¿Qué deseas hacer?</p>
+      <p *ngIf="videoCallData?.isModerator">¿Qué deseas hacer?</p>
+      <p *ngIf="!videoCallData?.isModerator">Abandonando la sesión...</p>
       <p *ngIf="isRecording" class="warning-text">
         <i class='bx bx-error-circle'></i>
         La grabación se detendrá automáticamente
       </p>
     </div>
     <div class="modal-actions">
-      <button class="modal-btn btn-danger" (click)="endSessionForEveryone()">
+      <button *ngIf="videoCallData?.isModerator" class="modal-btn btn-danger" (click)="endSessionForEveryone()">
         <i class='bx bx-stop-circle'></i>
         Finalizar para todos
       </button>
       <button class="modal-btn btn-secondary" (click)="leaveSessionOnly()">
         <i class='bx bx-exit'></i>
-        Solo abandonar
+        {{ videoCallData?.isModerator ?  'Solo abandonar' : 'Abandonar sesión' }}
       </button>
       <button class="modal-btn btn-cancel" (click)="closeEndSessionModal()">
         Cancelar
