@@ -31,7 +31,7 @@
         <div class="storage-info">
             <i class='bx bx-data'></i>
             <span>{{ storageStats.usedFormatted }} de {{ storageStats.maxFormatted }} usados</span>
-            <span class="doc-count">({{ storageStats. documentCount }} documentos)</span>
+            <span class="doc-count">({{ storageStats.documentCount }} documentos)</span>
         </div>
         <div class="storage-bar">
             <div class="storage-fill" [style.width.%]="storageStats.usagePercentage"
@@ -63,18 +63,18 @@
     <!-- Loading State -->
     <div class="loading-state" *ngIf="isLoading">
         <div class="spinner"></div>
-        <p>Cargando documentos... </p>
+        <p>Cargando documentos...</p>
     </div>
 
     <!-- Empty State -->
-    <div class="empty-state" *ngIf="! isLoading && documents.length === 0 && viewMode !== 'deleted'">
+    <div class="empty-state" *ngIf="!isLoading && documents.length === 0 && viewMode !== 'deleted'">
         <i class='bx bx-folder-open'></i>
         <h4>No hay documentos</h4>
         <p>Sube el primer documento PDF de la comunidad</p>
     </div>
 
     <!-- Empty State for Deleted -->
-    <div class="empty-state" *ngIf="! isLoading && documents.length === 0 && viewMode === 'deleted'">
+    <div class="empty-state" *ngIf="!isLoading && documents.length === 0 && viewMode === 'deleted'">
         <i class='bx bx-check-circle'></i>
         <h4>No hay documentos eliminados</h4>
         <p>El historial de documentos borrados aparecerá aquí</p>
@@ -102,7 +102,7 @@
                         {{ getDocumentTypeLabel(doc) }}
                     </span>
                 </div>
-                <div class="doc-uploader">
+                <div class="doc-uploader" *ngIf="doc.uploadedBy">
                     <div class="uploader-avatar" [style.background]="getUserColor(doc.uploadedBy.id)">
                         <img *ngIf="doc.uploadedBy.profilePhotoUrl" [src]="doc.uploadedBy.profilePhotoUrl"
                             [alt]="doc.uploadedBy.fullName">
@@ -119,21 +119,21 @@
                     <div class="deletion-header">
                         <i class='bx bx-trash'></i>
                         <span>Eliminado por: <strong>{{ doc.deletedBy.fullName }}</strong></span>
-                        <span class="deletion-date">{{ doc.deletedAt ? formatDate(doc.deletedAt) : 'N/A' }}</span>
+                        <span class="deletion-date">{{ doc.deletedAt ?  formatDate(doc.deletedAt) : 'N/A' }}</span>
                     </div>
                     <p class="deletion-reason" *ngIf="doc.deletionReason">
                         <i class='bx bx-message-detail'></i>
                         Razón: {{ doc.deletionReason }}
                     </p>
                 </div>
-                </div>
-                <div class="doc-actions" *ngIf="viewMode !== 'deleted'">
-                    <button class="btn-action btn-view" (click)="viewDocument(doc)" title="Visualizar">
-                        <i class='bx bx-show'></i>
-                    </button>
-                    <button class="btn-action btn-download" (click)="downloadDocument(doc)" title="Descargar">
-                        <i class='bx bx-download'></i>
-                    </button>
+            </div>
+            <div class="doc-actions" *ngIf="viewMode !== 'deleted'">
+                <button class="btn-action btn-view" (click)="viewDocument(doc)" title="Visualizar">
+                    <i class='bx bx-show'></i>
+                </button>
+                <button class="btn-action btn-download" (click)="downloadDocument(doc)" title="Descargar">
+                    <i class='bx bx-download'></i>
+                </button>
                 <button class="btn-action btn-delete" (click)="deleteDocument(doc)" title="Eliminar">
                     <i class='bx bx-trash'></i>
                 </button>
@@ -146,7 +146,7 @@
         <div class="group-section" *ngFor="let groupKey of getGroupKeys()">
             <div class="group-header">
                 <i class='bx'
-                    [ngClass]="viewMode === 'byDate' ?  'bx-calendar' : (groupKey.includes('Apoyo') ? 'bx-book' : 'bx-video')"></i>
+                    [ngClass]="viewMode === 'byDate' ? 'bx-calendar' : (groupKey.includes('Apoyo') ? 'bx-book' : 'bx-video')"></i>
                 <h4>{{ viewMode === 'byDate' ?  formatGroupDate(groupKey) : groupKey }}</h4>
                 <span class="group-count">{{ groupedDocuments[groupKey].length }} documentos</span>
             </div>
@@ -167,7 +167,7 @@
                                 {{ doc.formattedFileSize || formatFileSize(doc.fileSize) }}
                             </span>
                         </div>
-                        <div class="doc-uploader">
+                        <div class="doc-uploader" *ngIf="doc.uploadedBy">
                             <div class="uploader-avatar" [style.background]="getUserColor(doc.uploadedBy.id)">
                                 <img *ngIf="doc.uploadedBy.profilePhotoUrl" [src]="doc.uploadedBy.profilePhotoUrl"
                                     [alt]="doc.uploadedBy.fullName">
@@ -227,7 +227,7 @@
                         #fileInput hidden>
                     <button class="btn-select-file" (click)="fileInput.click()">
                         <i class='bx bx-file'></i>
-                        {{ selectedFile ?  selectedFile.name : 'Seleccionar archivo PDF' }}
+                        {{ selectedFile ? selectedFile.name : 'Seleccionar archivo PDF' }}
                     </button>
                     <span class="file-hint">Solo archivos PDF, máximo 100MB</span>
                 </div>
@@ -238,7 +238,7 @@
                 <label class="form-label">Tipo de Documento</label>
                 <div class="document-type-options">
                     <label *ngFor="let type of documentTypes" class="type-option"
-                        [class.active]="selectedDocumentType === type. id">
+                        [class.active]="selectedDocumentType === type.id">
                         <input type="radio" name="documentType" [value]="type.id" [(ngModel)]="selectedDocumentType"
                             hidden>
                         <span class="radio-circle">
@@ -262,7 +262,7 @@
                     </option>
                 </select>
                 <span class="form-hint" *ngIf="availableSessions.length === 0">
-                    No hay sesiones disponibles.  Puedes subir como Material de Apoyo.
+                    No hay sesiones disponibles. Puedes subir como Material de Apoyo.
                 </span>
             </div>
 
@@ -280,7 +280,7 @@
             </div>
 
             <!-- Storage Warning -->
-            <div class="storage-warning" *ngIf="storageStats && storageStats. usagePercentage > 80">
+            <div class="storage-warning" *ngIf="storageStats && storageStats.usagePercentage > 80">
                 <i class='bx bx-error'></i>
                 <span>Almacenamiento casi lleno: {{ storageStats.availableFormatted }} disponible</span>
             </div>
@@ -292,7 +292,7 @@
             </button>
             <button class="btn-primary" (click)="uploadDocument()"
                 [disabled]="isUploading || !selectedFile || (selectedDocumentType === 'session' && !uploadSessionId)">
-                <span *ngIf="! isUploading">
+                <span *ngIf="!isUploading">
                     <i class='bx bx-upload'></i>
                     Subir Documento
                 </span>
@@ -332,7 +332,7 @@
 
             <div class="delete-warning">
                 <i class='bx bx-error-circle'></i>
-                <p>Esta acción moverá el documento al historial de borrados.  Podrás ver quién lo eliminó y por qué.</p>
+                <p>Esta acción moverá el documento al historial de borrados. Podrás ver quién lo eliminó y por qué.</p>
             </div>
 
             <!-- Razón de eliminación -->
@@ -358,8 +358,8 @@
             <button class="btn-secondary" (click)="closeDeleteModal()" [disabled]="isDeleting">
                 Cancelar
             </button>
-            <button class="btn-danger" (click)="confirmDelete()" [disabled]="isDeleting || !deleteReason. trim()">
-                <span *ngIf="! isDeleting">
+            <button class="btn-danger" (click)="confirmDelete()" [disabled]="isDeleting || !deleteReason.trim()">
+                <span *ngIf="!isDeleting">
                     <i class='bx bx-trash'></i>
                     Eliminar Documento
                 </span>
