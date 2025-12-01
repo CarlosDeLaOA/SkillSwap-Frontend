@@ -149,7 +149,7 @@ export class AuthCallbackComponent implements OnInit {
       const code = params['code'];
       const error = params['error'];
 
-      console.log('🔵 [Callback] Recibido:', { code: code?.substring(0, 20) + '...', error });
+      console.log('[Callback] Recibido:', { code: code?.substring(0, 20) + '...', error });
 
       if (error) {
         this.handleError('Autenticación cancelada o rechazada', error);
@@ -172,11 +172,11 @@ export class AuthCallbackComponent implements OnInit {
 
   this.googleAuthService.checkGoogleUser(code).subscribe({
     next: (response) => {
-      console.log('🔵 [Callback] Estado del usuario:', response);
+      console.log('[Callback] Estado del usuario:', response);
 
       if (response.needsRoleSelection) {
       
-        console.log('➡️ Redirigiendo a selección de rol...');
+        console.log(' Redirigiendo a selección de rol...');
         
         const googleUserData = {
           email: response.email || response.userInfo?.email,

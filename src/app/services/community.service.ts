@@ -56,13 +56,13 @@ export class CommunityService {
    * @returns Observable con la respuesta
    */
   public acceptInvitation(token: string): Observable<IAcceptInvitationResponse> {
-    console.log('🔵 CommunityService.acceptInvitation - Token:', token);
+    console.log(' CommunityService.acceptInvitation - Token:', token);
     
     const authToken = localStorage.getItem('authToken');
-    console.log('🔑 Auth Token presente:', !!authToken);
+    console.log(' Auth Token presente:', !!authToken);
     
     if (!authToken) {
-      console.error('❌ No hay token de autenticación en localStorage');
+      console.error(' No hay token de autenticación en localStorage');
     }
 
     const params = new HttpParams().set('token', token);
@@ -93,7 +93,7 @@ export class CommunityService {
    * @returns Observable con la respuesta
    */
   public inviteNewMembers(communityId: number, memberEmails: string[]): Observable<any> {
-    console.log('🔵 CommunityService.inviteNewMembers - Community:', communityId, 'Emails:', memberEmails);
+    console.log(' CommunityService.inviteNewMembers - Community:', communityId, 'Emails:', memberEmails);
     
     return this.http.post<any>(
       `${this.apiUrl}/${communityId}/invite`,

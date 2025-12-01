@@ -36,13 +36,13 @@ export class AcceptInvitationComponent implements OnInit, OnDestroy {
 
   //#region Lifecycle Hooks
   ngOnInit(): void {
-    console.log('🔵 AcceptInvitationComponent initialized');
+    console.log(' AcceptInvitationComponent initialized');
     
     this.route.queryParams.subscribe(params => {
       this.token = params['token'];
       
       if (!this.token) {
-        console.error('❌ No token provided in URL');
+        console.error(' No token provided in URL');
         this.isLoading = false;
         this.acceptSuccess = false;
         this.acceptMessage = 'No se proporcionó un token de invitación válido.';
@@ -50,17 +50,17 @@ export class AcceptInvitationComponent implements OnInit, OnDestroy {
         return;
       }
 
-      console.log('🎫 Token from URL:', this.token);
+      console.log(' Token from URL:', this.token);
 
       // Verificar si el usuario está autenticado
       if (!this.isUserAuthenticated()) {
-        console.log('🔐 User not authenticated, redirecting to login...');
+        console.log(' User not authenticated, redirecting to login...');
         this.handleUnauthenticatedUser();
         return;
       }
 
       // Usuario está autenticado, procesar invitación
-      console.log('✅ User is authenticated, processing invitation...');
+      console.log(' User is authenticated, processing invitation...');
       this.acceptInvitation(this.token);
     });
   }
@@ -80,7 +80,7 @@ export class AcceptInvitationComponent implements OnInit, OnDestroy {
     const authToken = localStorage.getItem('authToken');
     const authPerson = localStorage.getItem('authPerson');
     
-    console.log('🔍 Checking authentication:');
+    console.log(' Checking authentication:');
     console.log('  - authToken present:', !!authToken);
     console.log('  - authPerson present:', !!authPerson);
     
@@ -111,7 +111,7 @@ export class AcceptInvitationComponent implements OnInit, OnDestroy {
   private handleUnauthenticatedUser(): void {
     // Guardar el token de invitación en sessionStorage para usarlo después del login
     sessionStorage.setItem('pendingInvitationToken', this.token);
-    console.log('💾 Saved invitation token to sessionStorage');
+    console.log(' Saved invitation token to sessionStorage');
     
     // Mostrar mensaje temporal
     this.isLoading = false;
@@ -121,7 +121,7 @@ export class AcceptInvitationComponent implements OnInit, OnDestroy {
 
     // Redirigir a login después de 2 segundos
     setTimeout(() => {
-      console.log('🔄 Redirecting to login...');
+      console.log(' Redirecting to login...');
       this.router.navigate(['/login'], {
         queryParams: { returnUrl: `/accept-community-invitation?token=${this.token}` }
       });
@@ -132,27 +132,27 @@ export class AcceptInvitationComponent implements OnInit, OnDestroy {
    * Procesa la aceptación de la invitación
    */
   private acceptInvitation(token: string): void {
-    console.log('📤 Sending accept invitation request...');
+    console.log(' Sending accept invitation request...');
     
     this.communityService.acceptInvitation(token).subscribe({
       next: (response: IAcceptInvitationResponse) => {
-        console.log('📥 Response received:', response);
+        console.log(' Response received:', response);
         this.isLoading = false;
         this.acceptSuccess = response.success;
         this.acceptMessage = response.message;
         this.invitationStatus = response.status;
 
         if (response.success) {
-          console.log('✅ Invitation accepted successfully');
+          console.log(' Invitation accepted successfully');
           // Limpiar el token pendiente de sessionStorage
           sessionStorage.removeItem('pendingInvitationToken');
           this.startCountdown();
         } else {
-          console.warn('⚠️ Invitation acceptance failed:', response.message);
+          console.warn(' Invitation acceptance failed:', response.message);
         }
       },
       error: (error) => {
-        console.error('❌ Error accepting invitation:', error);
+        console.error(' Error accepting invitation:', error);
         this.isLoading = false;
         this.acceptSuccess = false;
         
@@ -199,12 +199,12 @@ export class AcceptInvitationComponent implements OnInit, OnDestroy {
 
   //#region Public Methods
   navigateToDashboard(): void {
-    console.log('🏠 Navigating to dashboard...');
+    console.log(' Navigating to dashboard...');
     this.router.navigate(['/app/dashboard']);
   }
 
   navigateToLogin(): void {
-    console.log('🔐 Navigating to login...');
+    console.log(' Navigating to login...');
     // Guardar el token para después del login
     if (this.token) {
       sessionStorage.setItem('pendingInvitationToken', this.token);

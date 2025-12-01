@@ -73,7 +73,7 @@ export class VideoCallService {
     const formData = new FormData();
     formData.append('file', file);
     
-    console.log('📤 Subiendo grabación de Jitsi...');
+    console.log(' Subiendo grabación de Jitsi...');
     console.log('   Archivo:', file.name);
     console.log('   Tamaño:', this.formatBytes(file.size));
     
@@ -90,7 +90,7 @@ export class VideoCallService {
   async startNativeAudioRecording(sessionId: number): Promise<boolean> {
     try {
       console.log('========================================');
-      console.log('🎙️ INICIANDO GRABACIÓN DE AUDIO');
+      console.log(' INICIANDO GRABACIÓN DE AUDIO');
       console.log('   Método: Audio directo de Jitsi + Micrófono');
       console.log('========================================');
 
@@ -196,7 +196,7 @@ export class VideoCallService {
       };
 
       this.mediaRecorder.onstart = () => {
-        console.log('▶ MediaRecorder iniciado');
+        console.log(' MediaRecorder iniciado');
         console.log('   Estado:', this.mediaRecorder?.state);
       };
 
@@ -599,7 +599,7 @@ export class VideoCallService {
       });
       
       if (hiddenCount > 0) {
-        console.log(`🔒 ${hiddenCount} elementos ocultados (filmstrip + título)`);
+        console.log(` ${hiddenCount} elementos ocultados (filmstrip + título)`);
       }
     };
 

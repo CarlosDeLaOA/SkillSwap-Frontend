@@ -59,7 +59,7 @@ export class DashboardComponent {
     
     if (user) {
       this.isLearner = !!user.learner;
-      console.log('👤 User role - isLearner:', this.isLearner);
+      console.log(' User role - isLearner:', this.isLearner);
     }
   }
 
@@ -87,9 +87,9 @@ export class DashboardComponent {
     try {
       const dashboardData = this.collectDashboardData();
       await this.pdfExportService.exportDashboard(dashboardData);
-      console.log('✅ PDF generado exitosamente');
+      console.log(' PDF generado exitosamente');
     } catch (error) {
-      console.error('❌ Error al generar PDF:', error);
+      console.error(' Error al generar PDF:', error);
       alert('Error al generar el reporte PDF. Por favor, intenta nuevamente.');
     } finally {
       this.isExporting = false;
@@ -106,9 +106,9 @@ export class DashboardComponent {
     try {
       const dashboardData = this.collectDashboardData();
       await this.excelExportService.exportToExcel(dashboardData);
-      console.log('✅ Excel generado exitosamente');
+      console.log(' Excel generado exitosamente');
     } catch (error) {
-      console.error('❌ Error al generar Excel:', error);
+      console.error(' Error al generar Excel:', error);
       alert('Error al generar el reporte Excel. Por favor, intenta nuevamente.');
     } finally {
       this.isExporting = false;

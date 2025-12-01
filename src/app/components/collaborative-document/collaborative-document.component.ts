@@ -237,13 +237,13 @@ export class CollaborativeDocumentComponent implements OnInit, OnDestroy {
         generatedBy: this.currentUser.name
       };
 
-      // Llama al servicio - ¡Una sola línea! 🎉
+      // Llama al servicio - ¡Una sola línea! 
       await this.pdfExportService.exportCollaborativeDocument(documentData);
       
-      console.log('✅ PDF exportado correctamente');
+      console.log(' PDF exportado correctamente');
       
     } catch (error) {
-      console.error('❌ Error al exportar PDF:', error);
+      console.error(' Error al exportar PDF:', error);
       alert('Error al exportar el documento. Por favor, inténtalo de nuevo.');
     }
   }

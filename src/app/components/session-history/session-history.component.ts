@@ -84,7 +84,7 @@ loadSessionHistory(page: number = 0): void {
       }, 300); // Duración del fade-out
     },
     error: (error) => {
-      console.error('❌ Error loading session history:', error);
+      console.error(' Error loading session history:', error);
       this.errorMessage = 'Error al cargar el historial de sesiones. Por favor, intenta nuevamente.';
       this.isTransitioning = false;
     }
@@ -122,7 +122,7 @@ loadSessionHistory(page: number = 0): void {
         this.isLoadingDetail = false;
       },
       error: (error) => {
-        console.error('❌ Error loading session details:', error);
+        console.error(' Error loading session details:', error);
         this.isLoadingDetail = false;
         this.closeDetailModal();
       }

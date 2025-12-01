@@ -58,10 +58,10 @@ export class CommunityAchievementsComponent implements OnInit {
       next: (data) => {
         this.credentials = data;
         this.loading = false;
-        console.log('✅ Credenciales cargadas:', data);
+        console.log(' Credenciales cargadas:', data);
       },
       error: (err) => {
-        console.error('❌ Error al cargar credenciales:', err);
+        console.error(' Error al cargar credenciales:', err);
         this.error = true;
         this.loading = false;
       }

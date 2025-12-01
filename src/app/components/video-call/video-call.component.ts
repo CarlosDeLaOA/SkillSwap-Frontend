@@ -260,7 +260,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
 
   private async joinVideoCall(config: IVideoCallConfig): Promise<void> {
     try {
-      console.log('📡 Conectando al backend...');
+      console.log(' Conectando al backend...');
 
       const response = await this.videoCallService.joinVideoCall(config).toPromise();
       
@@ -281,7 +281,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
 
       await this.delay(100);
 
-      console.log('🎬 Inicializando Jitsi...');
+      console.log(' Inicializando Jitsi...');
 
       const initialized = await this.videoCallService.initializeJitsi('jitsi-container', this.videoCallData);
 
@@ -299,7 +299,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     } catch (error: any) {
       if (this.retryCount < this.maxRetries) {
         this.retryCount++;
-        console.log(`🔄 Reintento ${this.retryCount}/${this.maxRetries}...`);
+        console.log(` Reintento ${this.retryCount}/${this.maxRetries}...`);
         await this.delay(2000);
         await this.joinVideoCall(config);
       } else {
@@ -490,7 +490,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
                 element.className.includes('subject') ||
                 element.className.includes('conference') ||
                 element.className.includes('filmstrip')) {
-              console.log('🗑️ Eliminando elemento nuevo:', text || element.className);
+              console.log(' Eliminando elemento nuevo:', text || element.className);
               element.remove();
             }
           }
@@ -659,7 +659,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     const index = this.jitsiParticipants.findIndex(p => p.id === participantId);
     if (index !== -1) {
       const removed = this.jitsiParticipants.splice(index, 1)[0];
-      console.log('🗑 Participante removido:', removed.displayName);
+      console.log(' Participante removido:', removed.displayName);
     }
   }
 
@@ -667,7 +667,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     const participant = this.jitsiParticipants.find(p => p.id === participantId);
     if (participant) {
       participant.hasVideo = hasVideo;
-      console.log(`📹 ${participant.displayName} - Video: ${hasVideo ? 'ON' : 'OFF'}`);
+      console.log(` ${participant.displayName} - Video: ${hasVideo ? 'ON' : 'OFF'}`);
     }
   }
 
@@ -675,7 +675,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     const participant = this.jitsiParticipants.find(p => p.id === participantId);
     if (participant) {
       participant.hasAudio = hasAudio;
-      console.log(`🎤 ${participant.displayName} - Audio: ${hasAudio ? 'ON' : 'OFF'}`);
+      console.log(` ${participant.displayName} - Audio: ${hasAudio ? 'ON' : 'OFF'}`);
     }
   }
 
