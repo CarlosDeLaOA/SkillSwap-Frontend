@@ -39,8 +39,8 @@ export class GoogleAuthService {
       `access_type=offline&` +
       `prompt=consent`;
 
-    console.log('🔵 Iniciando autenticación con Google...');
-    console.log('🔵 Redirect URI:', this.redirectUri);
+    console.log(' Iniciando autenticación con Google...');
+    console.log(' Redirect URI:', this.redirectUri);
 
     // Redirigir a Google OAuth
     window.location.href = authUrl;
@@ -76,7 +76,7 @@ export class GoogleAuthService {
    * sin selección de rol para usuarios que YA tienen roles creados.
    */
   public authenticateWithGoogle(code: string): Observable<any> {
-    console.log('🔵 Autenticando usuario existente con Google...');
+    console.log(' Autenticando usuario existente con Google...');
 
     return this.http.post(`${this.apiUrl}/auth/google`, {
       code: code,
@@ -108,7 +108,7 @@ export class GoogleAuthService {
  * @returns Observable con información del usuario
  */
 public checkGoogleUser(code: string): Observable<any> {
-  console.log('🔵 [GoogleAuthService] Verificando usuario existente...');
+  console.log(' [GoogleAuthService] Verificando usuario existente...');
   
   return this.http.post(`${this.apiUrl}/auth/google/check-user`, {
     code: code,

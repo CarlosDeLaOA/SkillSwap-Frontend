@@ -65,13 +65,13 @@ export class SkillOnboardingComponent implements OnInit, OnDestroy {
   //#region Lifecycle Hooks
   ngOnInit(): void {
 
-    // 🔍 Detectar si viene de Google o del registro normal
+    //  Detectar si viene de Google o del registro normal
     this.route.queryParams.subscribe(params => {
       const mode = params['mode'];
       const roleParam = params['role'];
 
       if (mode === 'google') {
-        // 👉 Flujo Google
+        //  Flujo Google
         this.onboardingMode = 'google';
         this.googleRole = roleParam === 'INSTRUCTOR' ? 'INSTRUCTOR' : 'LEARNER';
 
@@ -81,7 +81,7 @@ export class SkillOnboardingComponent implements OnInit, OnDestroy {
         this.loadKnowledgeAreas();
 
       } else {
-        // 👉 Flujo de registro normal
+        //  Flujo de registro normal
         this.onboardingMode = 'register';
         this.registerData = this.registerService.getTemporaryData();
 
@@ -153,13 +153,13 @@ export class SkillOnboardingComponent implements OnInit, OnDestroy {
   this.errorMessage = '';
 
   if (this.onboardingMode === 'google') {
-    // ✅ Modo Google: Solo guardar skills
+    //  Modo Google: Solo guardar skills
     this.userSkillService
       .addUserSkills(skillIds)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          console.log('✅ Skills guardadas:', response);
+          console.log(' Skills guardadas:', response);
 
           // Refrescar perfil
           this.profileService.getUserProfile();
@@ -174,13 +174,13 @@ export class SkillOnboardingComponent implements OnInit, OnDestroy {
           this.isLoading = false;
         },
         error: (error) => {
-          console.error('❌ Error guardando skills:', error);
+          console.error(' Error guardando skills:', error);
           this.errorMessage = error.error?.message || 'Error al guardar habilidades';
           this.isLoading = false;
         }
       });
   } else {
-    // ✅ Modo registro normal: Registrar persona completa
+    //  Modo registro normal: Registrar persona completa
     const registerRequest: any = {
       email: this.registerData!.email,
       password: this.registerData!.password,

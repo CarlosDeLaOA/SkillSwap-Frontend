@@ -128,8 +128,8 @@ export class CreateSessionComponent implements OnInit, OnDestroy {
   //#region Private Methods - Initialization
   private initializeComponent(): void {
     const person = this.profileService.person$();
-
-    console.log('Verificando datos del usuario:', {
+    
+    console.log(' Verificando datos del usuario:', {
       hasId: !!person.id,
       hasUserSkills: !!person.userSkills,
       userSkillsCount: person.userSkills?.length || 0,

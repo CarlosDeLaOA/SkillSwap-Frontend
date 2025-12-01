@@ -8,10 +8,10 @@ import { ProfileService } from './profile.service';
   providedIn: 'root',
 })
 export class AuthService {
- 
+
   private accessToken!: string;
   private expiresIn!: number;
-  private user: IUser | null = null; 
+    private user: IUser | null = null;
   private http: HttpClient = inject(HttpClient);
   private profileService: ProfileService = inject(ProfileService);
   
@@ -56,10 +56,10 @@ export class AuthService {
    * @param user Datos del usuario (IPerson)
    */
   public setUser(user: any): void {
-    console.log('🔵 Setting user:', user);
+    console.log(' Setting user:', user);
 
     if (!user) {
-      console.error('⚠️ Attempting to set undefined/null user');
+      console.error(' Attempting to set undefined/null user');
       return;
     }
 
@@ -67,7 +67,7 @@ export class AuthService {
     this.user = user;
 
     localStorage.setItem('authPerson', JSON.stringify(this.user));
-    console.log('✅ User set successfully:', this.user);
+    console.log(' User set successfully:', this.user);
   }
 
   /**
@@ -146,7 +146,7 @@ export class AuthService {
    * Limpia tokens, datos de usuario y perfil cargado
    */
   public logout(): void {
-    console.log('🚪 Cerrando sesión...');
+    console.log(' Cerrando sesión...');
 
     // Limpiar datos de autenticación
     this.accessToken = '';
@@ -160,7 +160,7 @@ export class AuthService {
     // IMPORTANTE: Limpiar el perfil del ProfileService
     this.profileService.clearProfile();
 
-    console.log('✅ Sesión cerrada correctamente');
+    console.log(' Sesión cerrada correctamente');
   }
 
   /**

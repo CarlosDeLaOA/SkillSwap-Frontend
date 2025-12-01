@@ -340,14 +340,7 @@ export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewCheck
     return photoUrl;
   }
 
-  /**
-   * Navega a la página de logros de la comunidad
-   */
-  public navigateToAchievements(): void {
-    this.router.navigate(['/app/community', this.communityId, 'achievements']);
-  }
-  //#endregion
-
+ 
   //#region Private Methods
   /**
    * Carga los datos de la comunidad
@@ -441,5 +434,22 @@ export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewCheck
       console.error('Error scrolling to bottom:', err);
     }
   }
+
+ /**
+ * Navega a la página de logros de la comunidad
+ */
+navigateToAchievements(): void {
+  console.log(' Método navigateToAchievements() ejecutado');
+  console.log('Community ID:', this.communityId);
+  console.log('Ruta a navegar:', ['/app/community', this.communityId, 'achievements']);
+  
+  this.router.navigate(['/app/community', this.communityId, 'achievements'])
+    .then(success => {
+      console.log('Navegación exitosa:', success);
+    })
+    .catch(error => {
+      console.error('Error en navegación:', error);
+    });
+}
   //#endregion
 }
