@@ -29,6 +29,7 @@ import { CommunityAchievementsComponent } from './pages/community-achievements/c
 import { CoinPurchaseComponent } from './components/coin-purchase/coin-purchase.component';
 import { ReviewsPageComponent } from './pages/reviews/reviews-page.component';
 import { FeedbackPageComponent } from './pages/feedback-page/feedback-page.component';
+import { InstructorPaypalWithdrawalComponent } from './components/instructor-paypal-withdrawal/instructor-paypal-withdrawal.component';
 
 export const routes: Routes = [
   {
@@ -199,6 +200,16 @@ export const routes: Routes = [
         data: {
           authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
           name: 'Comprar SkillCoins',
+          showInSidebar: false
+        }
+      },
+      
+      {
+        path: 'instructor/paypal',
+        component: InstructorPaypalWithdrawalComponent,
+        data: {
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+          name: 'Retiros PayPal',
           showInSidebar: false
         }
       },
