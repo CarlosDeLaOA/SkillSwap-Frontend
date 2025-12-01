@@ -37,34 +37,47 @@ export class InstructorPaypalWithdrawalComponent implements OnInit {
   constructor(private instructorPayPalService: InstructorPayPalService) { }
 
   ngOnInit(): void {
-    this.loadPayPalInfo();
-  }
+  console.log(' [INSTRUCTOR-PAYPAL] Componente iniciado');
+  this.loadPayPalInfo();
+}
 
   loadPayPalInfo(): void {
-    this.isLoading = true;
-    
-    this.instructorPayPalService.getInstructorBalance().subscribe({
-      next: (balance) => {
-        this.instructorPayPalService.getPayPalInfo().subscribe({
-          next: (info) => {
-            this.paypalInfo = {
-              ...info,
-              currentBalance: balance.balance || 0
-            };
-            this.isLoading = false;
-          },
-          error: () => this.isLoading = false
-        });
-      },
-      error: () => this.isLoading = false
-    });
-  }
+  console.log(' [INSTRUCTOR-PAYPAL] Cargando info de PayPal...');
+  this.isLoading = true;
+  
+  this.instructorPayPalService.getInstructorBalance().subscribe({
+    next: (balance) => {
+      console.log(' [INSTRUCTOR-PAYPAL] Balance recibido:', balance);
+      this.instructorPayPalService.getPayPalInfo().subscribe({
+        next: (info) => {
+          console.log(' [INSTRUCTOR-PAYPAL] Info PayPal recibida:', info);
+          this.paypalInfo = {
+            ...info,
+            currentBalance: balance.balance || 0
+          };
+          console.log(' [INSTRUCTOR-PAYPAL] paypalInfo final:', this.paypalInfo);
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error(' [INSTRUCTOR-PAYPAL] Error cargando info:', error);
+          this.isLoading = false;
+        }
+      });
+    },
+    error: (error) => {
+      console.error(' [INSTRUCTOR-PAYPAL] Error cargando balance:', error);
+      this.isLoading = false;
+    }
+  });
+}
 
-  openLinkModal(): void {
-    this.showLinkModal = true;
-    this.paypalEmailInput = this.paypalInfo?.paypalEmail || '';
-    this.linkError = null;
-  }
+ openLinkModal(): void {
+  console.log(' [MODAL] Abriendo modal de vinculación');
+  this.showLinkModal = true;
+  this.paypalEmailInput = this.paypalInfo?.paypalEmail || '';
+  this.linkError = null;
+  console.log(' [MODAL] showLinkModal:', this.showLinkModal);
+}
 
   closeLinkModal(): void {
     this.showLinkModal = false;
@@ -98,10 +111,12 @@ export class InstructorPaypalWithdrawalComponent implements OnInit {
   }
 
   openWithdrawalModal(): void {
-    this.showWithdrawalModal = true;
-    this.withdrawalAmount = 0;
-    this.withdrawalError = null;
-  }
+  console.log(' [MODAL] Abriendo modal de retiro');
+  this.showWithdrawalModal = true;
+  this.withdrawalAmount = 0;
+  this.withdrawalError = null;
+  console.log(' [MODAL] showWithdrawalModal:', this.showWithdrawalModal);
+}
 
   closeWithdrawalModal(): void {
     this.showWithdrawalModal = false;
@@ -109,42 +124,47 @@ export class InstructorPaypalWithdrawalComponent implements OnInit {
     this.withdrawalError = null;
   }
 
-  processWithdrawal(): void {
-    if (!this.withdrawalAmount || this.withdrawalAmount < (this.paypalInfo?.minWithdrawal || 10)) {
-      this.withdrawalError = `El retiro mínimo es de ${this.paypalInfo?.minWithdrawal || 10} SkillCoins`;
-      return;
-    }
-
-    if (this.withdrawalAmount > (this.paypalInfo?.currentBalance || 0)) {
-      this.withdrawalError = 'Balance insuficiente';
-      return;
-    }
-
-    this.isWithdrawing = true;
-    this.withdrawalError = null;
-
-    this.instructorPayPalService.withdrawToPayPal(this.withdrawalAmount).subscribe({
-      next: () => {
-        this.isWithdrawing = false;
-        this.closeWithdrawalModal();
-        this.loadPayPalInfo();
-        
-        const usdAmount = this.calculateUsdAmount(this.withdrawalAmount);
-        this.successMessage = `¡Retiro procesado exitosamente! Recibirás $${usdAmount} USD en tu cuenta PayPal en 1-3 días hábiles.`;
-        
-        this.successDetails = {
-          amount: this.withdrawalAmount,
-          usdAmount: usdAmount
-        };
-        
-        this.showSuccessModal = true;
-      },
-      error: (error) => {
-        this.withdrawalError = error.error?.error || 'Error al procesar el retiro';
-        this.isWithdrawing = false;
-      }
-    });
+ processWithdrawal(): void {
+  if (!this.withdrawalAmount || this.withdrawalAmount < (this.paypalInfo?.minWithdrawal || 10)) {
+    this.withdrawalError = `El retiro mínimo es de ${this.paypalInfo?.minWithdrawal || 10} SkillCoins`;
+    return;
   }
+
+  if (this.withdrawalAmount > (this.paypalInfo?.currentBalance || 0)) {
+    this.withdrawalError = 'Balance insuficiente';
+    return;
+  }
+
+  this.isWithdrawing = true;
+  this.withdrawalError = null;
+
+  this.instructorPayPalService.withdrawToPayPal(this.withdrawalAmount).subscribe({
+    next: (response) => {
+      this.isWithdrawing = false;
+      
+      // Guardar detalles ANTES de cerrar modal
+      const usdAmount = this.calculateUsdAmount(this.withdrawalAmount);
+      this.successDetails = {
+        amount: this.withdrawalAmount,
+        usdAmount: usdAmount
+      };
+      
+      this.successMessage = `¡Retiro procesado exitosamente! Recibirás $${usdAmount} USD en tu cuenta PayPal en 1-3 días hábiles.`;
+      
+      console.log(' [RETIRO] SkillCoins:', this.withdrawalAmount);
+      console.log(' [RETIRO] USD:', usdAmount);
+      console.log(' [RETIRO] successDetails:', this.successDetails);
+      
+      this.closeWithdrawalModal();
+      this.loadPayPalInfo();
+      this.showSuccessModal = true;
+    },
+    error: (error) => {
+      this.withdrawalError = error.error?.error || 'Error al procesar el retiro';
+      this.isWithdrawing = false;
+    }
+  });
+}
 
   calculateUsdAmount(skillCoins: number): string {
     if (!skillCoins || !this.paypalInfo?.conversionRate) {

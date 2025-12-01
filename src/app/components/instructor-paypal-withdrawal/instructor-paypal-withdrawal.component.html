@@ -156,8 +156,8 @@
   </div>
 
   <!-- MODAL: Link PayPal Account -->
-  <div *ngIf="showLinkModal" class="modal-overlay" (click)="closeLinkModal()">
-    <div class="modal" (click)="$event.stopPropagation()">
+  <div *ngIf="showLinkModal" class="modal-overlay" (click)="closeLinkModal()" style="display: flex !important; align-items: center !important; justify-content: center !important;">
+  <div class="modal" (click)="$event.stopPropagation()" style="display: block !important; width: 90%; max-width: 520px; background: #2A3440 !important; border: 2px solid #AAE16B !important;">
       
       <div class="modal-header">
         <h2>{{ paypalInfo?.hasLinkedAccount ? 'Cambiar Cuenta PayPal' : 'Vincular Cuenta PayPal' }}</h2>
@@ -203,8 +203,8 @@
   </div>
 
   <!-- MODAL: Withdrawal -->
-  <div *ngIf="showWithdrawalModal" class="modal-overlay" (click)="closeWithdrawalModal()">
-    <div class="modal" (click)="$event.stopPropagation()">
+  <div *ngIf="showWithdrawalModal" class="modal-overlay" (click)="closeWithdrawalModal()" style="display: flex !important; align-items: center !important; justify-content: center !important;">
+  <div class="modal" (click)="$event.stopPropagation()" style="display: block !important; width: 90%; max-width: 520px; background: #2A3440 !important; border: 2px solid #AAE16B !important;">
       
       <div class="modal-header">
         <h2>Retirar a PayPal</h2>
@@ -276,44 +276,47 @@
     </div>
   </div>
 
-  <!-- MODAL: Success -->
-  <div *ngIf="showSuccessModal" class="modal-overlay" (click)="closeSuccessModal()">
-    <div class="modal success-modal" (click)="$event.stopPropagation()">
+
+<div *ngIf="showSuccessModal" class="modal-overlay" (click)="closeSuccessModal()" style="display: flex !important; align-items: center !important; justify-content: center !important;">
+  <div class="modal success-modal" (click)="$event.stopPropagation()" style="display: block !important; width: 90%; max-width: 520px; background: #2A3440 !important; border: 2px solid #AAE16B !important;">
+    
+    <div class="modal-body">
+      <div class="success-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
       
-      <div class="modal-body">
-        <div class="success-icon">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-        </div>
-        <h3>¡Retiro Exitoso!</h3>
-        <p>{{ successMessage }}</p>
+      
+      <h3>{{ successDetails ? '¡Retiro Exitoso!' : '¡Operación Exitosa!' }}</h3>
+      <p>{{ successMessage }}</p>
 
-        <div *ngIf="successDetails" class="details">
-          <div class="detail-row">
-            <span class="label">Monto retirado</span>
-            <span class="value">{{ successDetails.amount }} SkillCoins</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">Recibirás</span>
-            <span class="value">${{ successDetails.usdAmount }} USD</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">Cuenta PayPal</span>
-            <span class="value">{{ paypalInfo?.paypalEmail }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">Tiempo estimado</span>
-            <span class="value">1-3 días hábiles</span>
-          </div>
+   >
+      <div *ngIf="successDetails" class="details">
+        <div class="detail-row">
+          <span class="label">Monto retirado</span>
+          <span class="value">{{ successDetails.amount }} SkillCoins</span>
         </div>
-
-        <button class="success-button" (click)="closeSuccessModal()">
-          Entendido
-        </button>
+        <div class="detail-row">
+          <span class="label">Recibirás</span>
+          <span class="value">${{ successDetails.usdAmount }} USD</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Cuenta PayPal</span>
+          <span class="value">{{ paypalInfo?.paypalEmail }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Tiempo estimado</span>
+          <span class="value">1-3 días hábiles</span>
+        </div>
       </div>
 
+      <button class="success-button" (click)="closeSuccessModal()">
+        Entendido
+      </button>
     </div>
+
   </div>
+</div>
 
 </div>
