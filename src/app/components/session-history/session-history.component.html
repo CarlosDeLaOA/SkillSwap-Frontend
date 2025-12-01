@@ -2,13 +2,13 @@
   <!-- Header centrado -->
   <div class="history-header">
     <h2 class="header-title">Historial de Sesiones</h2>
-    <div class="header-subtitle" *ngIf="totalItems > 0">
+    <div class="header-subtitle" *ngIf="totalItems > 0 && !isLoading">
       {{ totalItems }} {{ totalItems === 1 ? 'sesión' : 'sesiones' }} en total
     </div>
   </div>
 
   <!-- Loading State -->
-  <div class="loading-container" *ngIf="isLoading">
+  <div class="loading-container" *ngIf="isLoading && sessions.length === 0">
     <i class='bx bx-loader-alt bx-spin loading-icon'></i>
     <p class="loading-text">Cargando historial...</p>
   </div>
@@ -31,10 +31,15 @@
   </div>
 
   <!-- Sessions Grid -->
-  <div class="sessions-grid" *ngIf="sessions.length > 0 && !isLoading">
+  <div 
+    class="sessions-grid" 
+    *ngIf="sessions.length > 0"
+    [class.fade-out]="isTransitioning"
+    [class.fade-in]="!isTransitioning">
+    
     <div 
       class="session-card" 
-      *ngFor="let session of sessions"
+      *ngFor="let session of sessions; trackBy: trackBySessionId"
       (click)="openSessionDetail(session)">
       
       <!-- Status Badge -->
@@ -82,10 +87,10 @@
   </div>
 
   <!-- Pagination -->
-  <div class="pagination-container" *ngIf="totalPages > 1 && !isLoading">
+  <div class="pagination-container" *ngIf="totalPages > 1 && sessions.length > 0">
     <button 
       class="pagination-button prev"
-      [disabled]="!hasPrevious"
+      [disabled]="!hasPrevious || isTransitioning"
       (click)="previousPage()">
       <i class='bx bx-chevron-left'></i>
       Anterior
@@ -97,7 +102,7 @@
 
     <button 
       class="pagination-button next"
-      [disabled]="!hasNext"
+      [disabled]="!hasNext || isTransitioning"
       (click)="nextPage()">
       Siguiente
       <i class='bx bx-chevron-right'></i>
@@ -105,7 +110,7 @@
   </div>
 </div>
 
-<!-- Modal simplificado -->
+<!-- Modal de detalles -->
 <div class="modal-overlay" *ngIf="showDetailModal" (click)="closeDetailModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     
