@@ -1,0 +1,42 @@
+<div class="result-dialog">
+  <div class="result-icon" [class.passed]="data.passed" [class.failed]="!data.passed">
+    <div class="icon-circle">
+      <span *ngIf="data.passed">✓</span>
+      <span *ngIf="!data.passed">✕</span>
+    </div>
+  </div>
+
+  <h2 class="result-title">{{ getResultMessage() }}</h2>
+  <p class="result-subtitle">{{ getResultSubMessage() }}</p>
+
+  <div class="result-stats">
+    <div class="stat-item">
+      <div class="stat-value">{{ data.score }} / {{ data.totalQuestions }}</div>
+      <div class="stat-label">Respuestas correctas</div>
+    </div>
+    
+    <div class="stat-divider"></div>
+    
+    <div class="stat-item">
+      <div class="stat-value">{{ data.percentage | number:'1.0-0' }}%</div>
+      <div class="stat-label">Puntuación obtenida</div>
+    </div>
+  </div>
+
+  <div class="result-bar">
+    <div 
+      class="result-bar-fill" 
+      [class.passed]="data.passed"
+      [style.width.%]="data.percentage">
+    </div>
+  </div>
+
+  <div class="result-actions">
+    <button 
+      class="btn-close" 
+      (click)="close()"
+      type="button">
+      Volver al Dashboard
+    </button>
+  </div>
+</div>

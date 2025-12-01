@@ -975,3 +975,94 @@ export interface ISessionDetail {
   session: ISessionHistory;
   participantCount?: number;
 }
+
+/**
+ * Estados posibles de un cuestionario
+ */
+export enum QuizStatus {
+  IN_PROGRESS = 'IN_PROGRESS',
+  SUBMITTED = 'SUBMITTED',
+  GRADED = 'GRADED'
+}
+
+/**
+ * Entidad Question para preguntas del cuestionario
+ */
+export interface IQuestion {
+  id?: number;
+  number: number;
+  text: string;
+  correctAnswer: string;
+  userAnswer?: string;
+  isCorrect?: boolean;
+}
+
+/**
+ * Entidad Quiz para cuestionarios
+ */
+export interface IQuiz {
+  id: number;
+  learningSession?: ILearningSession;
+  skill: ISkill;
+  learner: ILearner;
+  attemptNumber: number;
+  status: QuizStatus;
+  scoreObtained?: number;
+  optionsJson: string;
+  passed?: boolean;
+  creationDate: string;
+  lastUpdated: string;
+  completionDate?: string;
+  questions: IQuestion[];
+}
+
+/**
+ * Request para guardar una respuesta parcial
+ */
+export interface ISaveAnswerRequest {
+  questionNumber: number;
+  userAnswer: string;
+}
+
+/**
+ * Response al obtener o crear un cuestionario
+ */
+export interface IQuizResponse {
+  success: boolean;
+  message: string;
+  data: IQuiz;
+}
+
+/**
+ * Response al enviar el cuestionario
+ */
+export interface ISubmitQuizResponse {
+  success: boolean;
+  message: string;
+  data: IQuiz;
+}
+
+/**
+ * Response para intentos restantes
+ */
+export interface IRemainingAttemptsResponse {
+  success: boolean;
+  remainingAttempts: number;
+  maxAttempts: number;
+}
+
+/**
+ * Estado de drag and drop
+ */
+export interface IDragDropState {
+  draggedOption: string | null;
+  dropZoneQuestion: number | null;
+}
+
+/**
+ * Opciones disponibles para arrastrar
+ */
+export interface IQuizOptions {
+  available: string[];
+  used: Map<number, string>;
+}

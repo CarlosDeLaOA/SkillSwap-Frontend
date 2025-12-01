@@ -26,7 +26,7 @@ import { VideoCallComponent } from './components/video-call/video-call.component
 import { AcceptInvitationComponent } from './components/accept-invitation/accept-invitation.component';
 import { CommunityMainComponent } from './pages/community-main/community-main.component';
 import { CommunityAchievementsComponent } from './pages/community-achievements/community-achievements';
-import { CoinPurchaseComponent } from './components/coin-purchase/coin-purchase.component';
+import { QuizComponent } from './pages/quiz/quiz.component';
 
 export const routes: Routes = [
   {
@@ -174,23 +174,23 @@ export const routes: Routes = [
         }
       },
       {
-      path: 'community/:id/achievements',
-      component: CommunityAchievementsComponent,
-      data: {
-        authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
-        name: 'Logros de la Comunidad',
-        showInSidebar: false
-      }
-    },
-    {
-  path: 'coins/purchase',
-  component: CoinPurchaseComponent,  // ← Agregar esta ruta
-  data: {
-    authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
-    name: 'Comprar SkillCoins',
-    showInSidebar: false
-  }
-},
+        path: 'community/:id/achievements',
+        component: CommunityAchievementsComponent,
+        data: {
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+          name: 'Logros de la Comunidad',
+          showInSidebar: false
+        }
+      },
+      {
+        path: 'quiz',
+        component: QuizComponent,
+        data: {
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+          name: 'Cuestionario',
+          showInSidebar: false
+        }
+      },
     ],
   },
   { path: '**', redirectTo: 'login' }
