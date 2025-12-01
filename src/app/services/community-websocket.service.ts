@@ -30,25 +30,25 @@ export class CommunityWebsocketService {
 
     this.stompClient = Stomp.over(() => socket);
 
-    // 🔥 FIX ERROR (debug no es call signature)
+    //  FIX ERROR (debug no es call signature)
     (this.stompClient as any).debug = () => {};
 
     this.stompClient.onConnect = () => {
       this.connected = true;
-      console.log('✅ Connected WebSocket');
+      console.log(' Connected WebSocket');
 
       this.stompClient?.subscribe(
         `/topic/community/${communityId}`,
         (message: Message) => {
           const payload = JSON.parse(message.body);
-          console.log('📩 Message:', payload);
+          console.log(' Message:', payload);
           this.messageSubject.next(payload);
         }
       );
     };
 
     this.stompClient.onStompError = (frame) => {
-      console.error('❌ STOMP Error:', frame);
+      console.error(' STOMP Error:', frame);
       this.connected = false;
     };
 
@@ -59,13 +59,13 @@ export class CommunityWebsocketService {
 
   public sendMessage(communityId: number, senderId: number, content: string): void {
     if (!this.stompClient || !this.connected) {
-      console.error('❌ Not connected');
+      console.error(' Not connected');
       return;
     }
 
     const message = { senderId, content };
 
-    // 🔥 FIX: send() ya no existe → usar publish()
+    //  FIX: send() ya no existe → usar publish()
     this.stompClient.publish({
       destination: `/app/chat/${communityId}`,
       body: JSON.stringify(message)
@@ -75,10 +75,10 @@ export class CommunityWebsocketService {
   public disconnect(): void {
     if (this.stompClient && this.connected) {
 
-      // 🔥 FIX: disconnect(callback) YA NO EXISTE
+      //  FIX: disconnect(callback) YA NO EXISTE
       this.stompClient.deactivate();
 
-      console.log('👋 Disconnected');
+      console.log(' Disconnected');
       this.connected = false;
       this.currentCommunityId = null;
     }

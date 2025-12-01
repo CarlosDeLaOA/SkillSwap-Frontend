@@ -11,7 +11,7 @@ export const baseUrlInterceptor: HttpInterceptorFn = (req, next) => {
     url: `${environment.apiUrl}/${cleanUrl}`
   });
 
-  console.log('🔵 Base URL Interceptor:', {
+  console.log(' Base URL Interceptor:', {
     original: req.url,
     final: apiReq.url
   });

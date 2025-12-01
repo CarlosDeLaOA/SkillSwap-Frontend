@@ -192,7 +192,7 @@ export class SkillsProgressComponent implements OnInit {
         this.selectedSkill = 0;
         this.updateTooltipData();
         
-        console.log('📊 Estadísticas procesadas:', this.skillsData);
+        console.log(' Estadísticas procesadas:', this.skillsData);
         this.isLoading = false;
       },
       error: (error) => {

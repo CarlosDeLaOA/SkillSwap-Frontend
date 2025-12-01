@@ -29,10 +29,10 @@ export class AttendanceChartComponent implements OnInit {
     effect(() => {
       const profile = this.profileService.person$();
       
-      console.log('🔍 Effect ejecutado. Profile:', profile);
+      console.log(' Effect ejecutado. Profile:', profile);
       
       if (profile && (profile.instructor !== undefined || profile.learner !== undefined)) {
-        console.log('🔄 Signal actualizado con datos reales, recalculando rol...');
+        console.log(' Signal actualizado con datos reales, recalculando rol...');
         
         this.dataLoaded = false;
         this.monthlyData = [];
@@ -46,16 +46,16 @@ export class AttendanceChartComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('🚀 Componente inicializado');
+    console.log(' Componente inicializado');
     
     const profile = this.profileService.person$();
-    console.log('🔍 Profile en ngOnInit:', profile);
+    console.log(' Profile en ngOnInit:', profile);
     
     if (!profile || (!profile.instructor && !profile.learner && !profile.id)) {
-      console.log('📥 Cargando perfil del usuario...');
+      console.log(' Cargando perfil del usuario...');
       this.profileService.getUserProfile();
     } else {
-      console.log('✅ Perfil ya cargado, usando datos existentes');
+      console.log(' Perfil ya cargado, usando datos existentes');
       this.determineUserRole();
       
       this.monthlyData = this.generateLast4Months([]);
@@ -95,12 +95,12 @@ export class AttendanceChartComponent implements OnInit {
       this.chartTitle = 'Asistentes';
       this.legend1Label = 'Presentes';
       this.legend2Label = 'Registrados';
-      console.log('👨‍🏫 ROL: INSTRUCTOR - Mostrando Asistentes');
+      console.log('‍ ROL: INSTRUCTOR - Mostrando Asistentes');
     } else {
       this.chartTitle = 'Logros obtenidos';
       this.legend1Label = 'Credenciales';
       this.legend2Label = 'Certificados';
-      console.log('👨‍🎓 ROL: LEARNER - Mostrando Logros');
+      console.log('‍ ROL: LEARNER - Mostrando Logros');
     }
   }
 
@@ -108,10 +108,10 @@ export class AttendanceChartComponent implements OnInit {
     this.isLoading = true;
 
     if (this.isInstructor) {
-      console.log('📊 Cargando ASISTENCIA para instructor...');
+      console.log(' Cargando ASISTENCIA para instructor...');
       this.loadMonthlyAttendance();
     } else {
-      console.log('📊 Cargando LOGROS para learner...');
+      console.log(' Cargando LOGROS para learner...');
       this.loadMonthlyAchievements();
     }
   }
@@ -119,7 +119,7 @@ export class AttendanceChartComponent implements OnInit {
   private loadMonthlyAttendance(): void {
     this.dashboardService.getMonthlyAttendance().subscribe({
       next: (data: any) => {
-        console.log('✅ Datos de asistencia mensual recibidos:', data);
+        console.log(' Datos de asistencia mensual recibidos:', data);
         
         let attendanceData: IMonthlyAttendance[] = [];
         
@@ -137,12 +137,12 @@ export class AttendanceChartComponent implements OnInit {
         
         this.monthlyData = this.generateLast4Months(mappedData);
         this.calculateMaxValue();
-        console.log('📊 Datos finales de asistencia:', this.monthlyData);
+        console.log(' Datos finales de asistencia:', this.monthlyData);
         this.isLoading = false;
       },
       error: (error: any) => {
-        console.error('❌ Error cargando asistencia:', error);
-        console.warn('⚠️ Mostrando datos vacíos debido a error');
+        console.error(' Error cargando asistencia:', error);
+        console.warn(' Mostrando datos vacíos debido a error');
         
         this.monthlyData = this.generateLast4Months([]);
         this.calculateMaxValue();
@@ -154,7 +154,7 @@ export class AttendanceChartComponent implements OnInit {
   private loadMonthlyAchievements(): void {
     this.dashboardService.getMonthlyAchievements().subscribe({
       next: (data: any) => {
-        console.log('✅ Datos de logros mensuales recibidos:', data);
+        console.log(' Datos de logros mensuales recibidos:', data);
         
         let logrosData: IMonthlyAchievement[] = [];
         
@@ -173,12 +173,12 @@ export class AttendanceChartComponent implements OnInit {
         this.monthlyData = this.generateLast4Months(safeLogrosData);
         this.calculateMaxValue();
         
-        console.log('📊 Datos finales de logros:', this.monthlyData);
+        console.log(' Datos finales de logros:', this.monthlyData);
         this.isLoading = false;
       },
       error: (error: any) => {
-        console.error('❌ Error cargando logros mensuales:', error);
-        console.warn('⚠️ Mostrando datos vacíos debido a error');
+        console.error(' Error cargando logros mensuales:', error);
+        console.warn(' Mostrando datos vacíos debido a error');
         
         this.monthlyData = this.generateLast4Months([]);
         this.calculateMaxValue();
@@ -225,6 +225,6 @@ export class AttendanceChartComponent implements OnInit {
     });
 
     this.maxValue = max > 0 ? max : 10;
-    console.log('📈 Valor máximo calculado:', this.maxValue);
+    console.log(' Valor máximo calculado:', this.maxValue);
   }
 }

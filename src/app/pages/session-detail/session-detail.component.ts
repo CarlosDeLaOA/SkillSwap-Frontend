@@ -110,10 +110,10 @@ export class SessionDetailComponent implements OnInit {
           (b: any) => b.learningSession?.id === this.sessionId && b.status === 'WAITING'
         ) || null;
         
-        console.log('✅ Usuario en lista de espera:', this.userWaitlistBooking);
+        console.log(' Usuario en lista de espera:', this.userWaitlistBooking);
       },
       error: (error) => {
-        console.error('❌ Error al verificar estado de lista de espera:', error);
+        console.error(' Error al verificar estado de lista de espera:', error);
       }
     });
   }
@@ -139,20 +139,20 @@ export class SessionDetailComponent implements OnInit {
     this.registrationError = '';
 
     const token = localStorage.getItem('authToken');
-    console.log('🔑 Verificando token:', token ? 'Existe' : 'No existe');
+    console.log(' Verificando token:', token ? 'Existe' : 'No existe');
     
     if (!token) {
       this.isLoadingCommunities = false;
       this.registrationError = 'No hay sesión activa. Por favor, inicia sesión nuevamente.';
-      console.error('❌ No hay token');
+      console.error(' No hay token');
       return;
     }
     
-    console.log('📡 Haciendo petición a comunidades...');
+    console.log(' Haciendo petición a comunidades...');
     
     this.communityService.getMyCommunities().subscribe({
       next: (response) => {
-        console.log('✅ Comunidades cargadas:', response);
+        console.log(' Comunidades cargadas:', response);
         this.communities = response.data || [];
         this.isLoadingCommunities = false;
         
@@ -161,7 +161,7 @@ export class SessionDetailComponent implements OnInit {
         }
       },
       error: (error) => {
-        console.error('❌ Error loading communities:', error);
+        console.error(' Error loading communities:', error);
         this.isLoadingCommunities = false;
         this.registrationError = 'Error al cargar comunidades: ' + (error.error?.message || error.message);
       }
@@ -202,7 +202,7 @@ export class SessionDetailComponent implements OnInit {
       learningSessionId: this.session.id 
     }).subscribe({
       next: (response) => {
-        console.log('✅ Booking individual creado:', response);
+        console.log(' Booking individual creado:', response);
         this.isRegistering = false;
         this.registrationSuccess = true;
         
@@ -212,7 +212,7 @@ export class SessionDetailComponent implements OnInit {
         }, 3000);
       },
       error: (error) => {
-        console.error('❌ Error al crear booking individual:', error);
+        console.error(' Error al crear booking individual:', error);
         this.isRegistering = false;
         this.handleRegistrationError(error);
       }
@@ -232,7 +232,7 @@ export class SessionDetailComponent implements OnInit {
       communityId: this.selectedCommunityId
     }).subscribe({
       next: (response) => {
-        console.log('✅ Booking grupal creado:', response);
+        console.log(' Booking grupal creado:', response);
         this.isRegistering = false;
         this.registrationSuccess = true;
         
@@ -242,7 +242,7 @@ export class SessionDetailComponent implements OnInit {
         }, 5000);
       },
       error: (error) => {
-        console.error('❌ Error al crear booking grupal:', error);
+        console.error(' Error al crear booking grupal:', error);
         this.isRegistering = false;
         this.handleRegistrationError(error);
       }
@@ -263,7 +263,7 @@ export class SessionDetailComponent implements OnInit {
       learningSessionId: this.session.id 
     }).subscribe({
       next: (response) => {
-        console.log('✅ Unido a lista de espera:', response);
+        console.log(' Unido a lista de espera:', response);
         this.isJoiningWaitlist = false;
         this.waitlistSuccess = true;
         
@@ -275,7 +275,7 @@ export class SessionDetailComponent implements OnInit {
         }, 4000);
       },
       error: (error) => {
-        console.error('❌ Error al unirse a lista de espera:', error);
+        console.error(' Error al unirse a lista de espera:', error);
         this.isJoiningWaitlist = false;
         this.handleRegistrationError(error);
       }
@@ -308,7 +308,7 @@ export class SessionDetailComponent implements OnInit {
 
     this.bookingService.leaveWaitlist(this.userWaitlistBooking.id).subscribe({
       next: (response) => {
-        console.log('✅ Salida de lista de espera exitosa:', response);
+        console.log(' Salida de lista de espera exitosa:', response);
         this.isLeavingWaitlist = false;
         
         // Limpiar el estado
@@ -325,7 +325,7 @@ export class SessionDetailComponent implements OnInit {
         this.loadSession();
       },
       error: (error) => {
-        console.error('❌ Error al salir de lista de espera:', error);
+        console.error(' Error al salir de lista de espera:', error);
         this.isLeavingWaitlist = false;
         this.handleRegistrationError(error);
       }

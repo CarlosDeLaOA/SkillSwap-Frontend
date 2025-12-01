@@ -96,7 +96,7 @@ export class InstructorSessionsComponent implements OnInit {
 
     this.http.get<PageResponse>(`${this.apiUrl}`, { headers, params }).subscribe({
       next: (response) => {
-        console.log('✅ Sesiones cargadas:', response);
+        console.log(' Sesiones cargadas:', response);
         
         this.sessions = response.content;
         this.totalPages = response.totalPages;
@@ -107,7 +107,7 @@ export class InstructorSessionsComponent implements OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('❌ Error cargando sesiones:', error);
+        console.error(' Error cargando sesiones:', error);
         this.errorMessage = 'Error al cargar las sesiones. Por favor, intenta nuevamente.';
         this.isLoading = false;
       }
@@ -270,7 +270,7 @@ saveChanges(): void {
     { headers }
   ).subscribe({
     next: (response) => {
-      console.log('✅ Sesión actualizada:', response);
+      console.log(' Sesión actualizada:', response);
       
       // Preparar información para el modal de éxito
       const changesApplied: string[] = [];
@@ -292,7 +292,7 @@ saveChanges(): void {
         changesApplied: changesApplied
       };
 
-      console.log('📊 Datos del modal:', this.successEditInfo); // ← AGREGAR ESTO
+      console.log(' Datos del modal:', this.successEditInfo); // ← AGREGAR ESTO
 
       // Cerrar modal de edición
       this.closeEditModal();
@@ -300,7 +300,7 @@ saveChanges(): void {
       // Mostrar modal de éxito
       this.showSuccessModal = true;
       
-      console.log('🎉 Modal de éxito activado:', this.showSuccessModal); // ← AGREGAR ESTO
+      console.log(' Modal de éxito activado:', this.showSuccessModal); // ← AGREGAR ESTO
       
       // Recargar sesiones después de 3 segundos
       setTimeout(() => {
@@ -310,7 +310,7 @@ saveChanges(): void {
       this.isLoading = false;
     },
     error: (error) => {
-      console.error('❌ Error:', error);
+      console.error(' Error:', error);
       const errorMsg = error.error?.message || 'Error al actualizar';
       
       if (errorMsg.includes('participantes')) {

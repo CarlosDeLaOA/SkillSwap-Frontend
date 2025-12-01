@@ -68,7 +68,7 @@ export class CoinPurchaseComponent implements OnInit {
     script.src = 'https://www.paypal.com/sdk/js?client-id=ATxzD9rHTPnWSn9LvKdBdiVXMdBVysCJdloAKWXKTqxRIEgYRUaiMtBrxuTApVE4d6-Ea0YBr0wolXpF&currency=USD';
     script.async = true;
     script.onload = () => {
-      console.log('✅ PayPal SDK cargado');
+      console.log(' PayPal SDK cargado');
     };
     document.body.appendChild(script);
   }
@@ -110,7 +110,7 @@ export class CoinPurchaseComponent implements OnInit {
           if (!orderId) {
             throw new Error('No se pudo crear la orden de PayPal');
           }
-          console.log('✅ Orden creada:', orderId);
+          console.log(' Orden creada:', orderId);
           return orderId;
         });
       },
@@ -122,21 +122,21 @@ export class CoinPurchaseComponent implements OnInit {
           paypalOrderId: data.orderID
         }).toPromise().then((response: ICoinPurchaseResponse | undefined) => {
           if (response) {
-            console.log('✅ Compra exitosa:', response);
+            console.log(' Compra exitosa:', response);
             this.handlePurchaseSuccess(response);
           }
         }).catch((error: any) => {
-          console.error('❌ Compra fallida:', error);
+          console.error(' Compra fallida:', error);
           this.handlePurchaseError(error);
         });
       },
       onError: (err: any) => {
-        console.error('❌ Error de PayPal:', err);
+        console.error(' Error de PayPal:', err);
         this.purchaseError = 'El pago falló. Por favor intenta de nuevo.';
         this.isPurchasing = false;
       },
       onCancel: () => {
-        console.log('⚠️ Pago cancelado');
+        console.log(' Pago cancelado');
         this.selectedPackage = null;
       }
     }).render('#paypal-button-container');

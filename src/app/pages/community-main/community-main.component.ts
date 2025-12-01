@@ -447,7 +447,7 @@ export class CommunityMainComponent implements OnInit, OnDestroy, AfterViewCheck
  * Navega a la página de logros de la comunidad
  */
 navigateToAchievements(): void {
-  console.log('🏆 Método navigateToAchievements() ejecutado');
+  console.log(' Método navigateToAchievements() ejecutado');
   console.log('Community ID:', this.communityId);
   console.log('Ruta a navegar:', ['/app/community', this.communityId, 'achievements']);
   

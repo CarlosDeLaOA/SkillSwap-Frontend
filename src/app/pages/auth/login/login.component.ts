@@ -64,7 +64,7 @@ export class LoginComponent implements OnInit {
         // Verificar si hay una invitación pendiente
         const pendingToken = sessionStorage.getItem('pendingInvitationToken');
         if (pendingToken) {
-          console.log('🎫 Procesando invitación pendiente...');
+          console.log(' Procesando invitación pendiente...');
           sessionStorage.removeItem('pendingInvitationToken');
           this.router.navigate(['/accept-community-invitation'], {
             queryParams: { token: pendingToken }
@@ -179,7 +179,7 @@ export class LoginComponent implements OnInit {
   if (this.emailModel.valid && this.passwordModel.valid && isPasswordValid) {
     this.authService.login(this.loginForm).subscribe({
       next: () => {
-        console.log('✅ Login exitoso');
+        console.log(' Login exitoso');
 
         // El AuthService ya guardó el token y usuario automáticamente
 
@@ -187,7 +187,7 @@ export class LoginComponent implements OnInit {
         const pendingInvitationToken = sessionStorage.getItem('pendingInvitationToken');
 
         if (pendingInvitationToken) {
-          console.log('🎫 Hay una invitación pendiente, redirigiendo...');
+          console.log(' Hay una invitación pendiente, redirigiendo...');
           sessionStorage.removeItem('pendingInvitationToken');
           this.router.navigate(['/accept-community-invitation'], {
             queryParams: { token: pendingInvitationToken }
@@ -199,11 +199,11 @@ export class LoginComponent implements OnInit {
         this.route.queryParams.subscribe(params => {
           const returnUrl = params['returnUrl'];
           if (returnUrl) {
-            console.log('🔄 Redirigiendo a returnUrl:', returnUrl);
+            console.log(' Redirigiendo a returnUrl:', returnUrl);
             this.router.navigateByUrl(returnUrl);
           } else {
             // Redirección normal al dashboard
-            console.log('🏠 Redirigiendo al dashboard');
+            console.log(' Redirigiendo al dashboard');
             this.router.navigate(['/app/dashboard']);
           }
         });
