@@ -17,6 +17,7 @@ interface Session {
   currentBookings: number;
   availableSpots: number;
   isPremium: boolean;
+  skillcoinsCost: number;
   creationDate: string;
 }
 
@@ -127,7 +128,7 @@ export class InstructorSessionsComponent implements OnInit {
    * Maneja la búsqueda
    */
   onSearch(): void {
-    if (!this.searchTerm.trim()) {
+    if (! this.searchTerm.trim()) {
       this.filteredSessions = [...this.sessions];
     } else {
       const term = this.searchTerm.toLowerCase();
@@ -288,7 +289,7 @@ saveChanges(): void {
       }
 
       this.successEditInfo = {
-        sessionTitle: this.editingSession!.title,
+        sessionTitle: this.editingSession! .title,
         changesApplied: changesApplied
       };
 

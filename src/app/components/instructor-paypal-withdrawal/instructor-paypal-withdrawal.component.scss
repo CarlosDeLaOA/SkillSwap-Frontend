@@ -1,0 +1,772 @@
+@import url('https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;600;700&display=swap');
+
+// Variables del tema
+$primary-color: #504AB7;
+$secondary-color: #AAE16B;
+$background-dark: #141414;
+$surface-dark: #39434B;
+$surface-lighter: #4A545C;
+$text-primary: #FFFFFF;
+$text-secondary: #B0B8C0;
+$border-color: #39434B;
+$error-color: #C53131;
+$success-color: #36C531;
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin card-shadow {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+@mixin button-base {
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Epilogue', sans-serif;
+  letter-spacing: 0.3px;
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+@mixin gradient-border {
+  position: relative;
+  background: $surface-dark;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(135deg, $secondary-color 0%, $primary-color 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+}
+
+// Container principal
+.paypal-withdrawal-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px;
+  background-color: $background-dark;
+  min-height: 100vh;
+  font-family: 'Epilogue', sans-serif;
+}
+
+// Header
+.page-header {
+  margin-bottom: 48px;
+  
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: $text-primary;
+    margin: 0 0 12px 0;
+    letter-spacing: -0.5px;
+  }
+  
+  p {
+    font-size: 16px;
+    color: $text-secondary;
+    margin: 0;
+    font-weight: 400;
+  }
+}
+
+// Loading state
+.loading-state {
+  @include flex-center;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 400px;
+  
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid $surface-dark;
+    border-top-color: $secondary-color;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  
+  p {
+    color: $text-secondary;
+    font-size: 15px;
+    font-weight: 500;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// Dashboard Grid
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+// Balance Card
+.balance-card {
+  @include card-shadow;
+  background: linear-gradient(135deg, $primary-color 0%, #3d3789 100%);
+  border-radius: 20px;
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba($secondary-color, 0.1) 0%, transparent 70%);
+  }
+  
+  .balance-content {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .balance-label {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba($text-primary, 0.8);
+    margin-bottom: 12px;
+  }
+  
+  .balance-amount {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 16px;
+    
+    .amount {
+      font-size: 48px;
+      font-weight: 700;
+      color: $text-primary;
+      line-height: 1;
+    }
+    
+    .currency {
+      font-size: 20px;
+      font-weight: 600;
+      color: $secondary-color;
+    }
+  }
+  
+  .usd-equivalent {
+    font-size: 16px;
+    color: rgba($text-primary, 0.7);
+    font-weight: 500;
+    
+    .usd-amount {
+      color: $secondary-color;
+      font-weight: 600;
+    }
+  }
+}
+
+// Account Status Card
+.account-status-card {
+  @include card-shadow;
+  background: $surface-dark;
+  border-radius: 20px;
+  padding: 32px;
+  border: 1px solid $border-color;
+  
+  .status-header {
+    margin-bottom: 24px;
+    
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: $text-primary;
+      margin: 0 0 8px 0;
+    }
+    
+    p {
+      font-size: 14px;
+      color: $text-secondary;
+      margin: 0;
+    }
+  }
+  
+  .status-info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      background: rgba($background-dark, 0.5);
+      border-radius: 12px;
+      border: 1px solid rgba($border-color, 0.5);
+      
+      .label {
+        font-size: 14px;
+        color: $text-secondary;
+        font-weight: 500;
+      }
+      
+      .value {
+        font-size: 14px;
+        font-weight: 600;
+        color: $text-primary;
+      }
+      
+      .status-badge {
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        
+        &.verified {
+          background: rgba($success-color, 0.15);
+          color: $success-color;
+          border: 1px solid rgba($success-color, 0.3);
+        }
+        
+        &.not-linked {
+          background: rgba($text-secondary, 0.15);
+          color: $text-secondary;
+          border: 1px solid rgba($text-secondary, 0.3);
+        }
+      }
+    }
+  }
+}
+
+// Actions Section
+.actions-section {
+  margin-bottom: 40px;
+  
+  .actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+  }
+  
+  .action-button {
+    @include button-base;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    
+    &.primary {
+      background: linear-gradient(135deg, $secondary-color 0%, #8ec756 100%);
+      color: $background-dark;
+      
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba($secondary-color, 0.3);
+      }
+    }
+    
+    &.secondary {
+      background: $surface-dark;
+      color: $text-primary;
+      border: 2px solid $border-color;
+      
+      &:hover:not(:disabled) {
+        border-color: $primary-color;
+        background: rgba($primary-color, 0.1);
+      }
+    }
+    
+    &.outline {
+      background: transparent;
+      color: $text-secondary;
+      border: 2px solid $border-color;
+      
+      &:hover:not(:disabled) {
+        border-color: $text-secondary;
+        color: $text-primary;
+      }
+    }
+  }
+}
+
+// Info Cards
+.info-cards-section {
+  .section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 24px;
+  }
+  
+  .info-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  
+  .info-card {
+    background: $surface-dark;
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid $border-color;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      border-color: $primary-color;
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba($primary-color, 0.2);
+    }
+    
+    .icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      @include flex-center;
+      margin-bottom: 16px;
+      font-size: 24px;
+      
+      &.minimum {
+        background: linear-gradient(135deg, rgba($secondary-color, 0.2) 0%, rgba($secondary-color, 0.05) 100%);
+        color: $secondary-color;
+      }
+      
+      &.time {
+        background: linear-gradient(135deg, rgba($primary-color, 0.2) 0%, rgba($primary-color, 0.05) 100%);
+        color: $primary-color;
+      }
+      
+      &.fee {
+        background: linear-gradient(135deg, rgba(#FFA500, 0.2) 0%, rgba(#FFA500, 0.05) 100%);
+        color: #FFA500;
+      }
+    }
+    
+    h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: $text-secondary;
+      margin: 0 0 8px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .value {
+      font-size: 24px;
+      font-weight: 700;
+      color: $text-primary;
+      margin: 0;
+    }
+  }
+}
+
+// Modal Overlay
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+ background: rgba(0, 0, 0, 0.95); 
+  backdrop-filter: blur(8px);
+  @include flex-center;
+   z-index: 9999; 
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+// Modal
+.modal {
+  background: #2A3440;
+  border-radius: 24px;
+  max-width: 520px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 2px solid $secondary-color;  
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.3s ease;
+  position: relative;  
+  z-index: 10000;
+  
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: $background-dark;
+    border-radius: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: $surface-lighter;
+    border-radius: 4px;
+    
+    &:hover {
+      background: lighten($surface-lighter, 10%);
+    }
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Modal Header
+.modal-header {
+  padding: 32px 32px 24px;
+  border-bottom: 1px solid $border-color;
+  
+  h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: $text-primary;
+    margin: 0;
+    letter-spacing: -0.3px;
+  }
+}
+
+// Modal Body
+.modal-body {
+  padding: 32px;
+  
+  .form-group {
+    margin-bottom: 24px;
+    
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: $text-primary;
+      margin-bottom: 8px;
+      letter-spacing: 0.2px;
+    }
+    
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      background: $background-dark;
+      border: 2px solid $border-color;
+      border-radius: 12px;
+      color: $text-primary;
+      font-size: 15px;
+      font-family: 'Epilogue', sans-serif;
+      transition: all 0.2s ease;
+      
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+        box-shadow: 0 0 0 4px rgba($primary-color, 0.1);
+      }
+      
+      &::placeholder {
+        color: $text-secondary;
+      }
+    }
+    
+    .helper-text {
+      font-size: 13px;
+      color: $text-secondary;
+      margin-top: 8px;
+    }
+  }
+  
+  .conversion-preview {
+    background: rgba($primary-color, 0.1);
+    border: 2px solid rgba($primary-color, 0.3);
+    border-radius: 16px;
+    padding: 24px;
+    margin-top: 24px;
+    
+    h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: $text-secondary;
+      margin: 0 0 16px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .breakdown {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      
+      .breakdown-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba($border-color, 0.3);
+        
+        &:last-child {
+          border-bottom: none;
+          padding-top: 16px;
+          margin-top: 8px;
+          border-top: 2px solid $primary-color;
+        }
+        
+        .label {
+          font-size: 14px;
+          color: $text-secondary;
+          font-weight: 500;
+        }
+        
+        .value {
+          font-size: 16px;
+          font-weight: 600;
+          color: $text-primary;
+          
+          &.highlight {
+            font-size: 20px;
+            color: $secondary-color;
+          }
+          
+          &.negative {
+            color: #FF6B6B;
+          }
+        }
+      }
+    }
+  }
+  
+  .error-message {
+    background: rgba($error-color, 0.1);
+    border: 1px solid rgba($error-color, 0.3);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    
+    .icon {
+      font-size: 20px;
+      color: $error-color;
+    }
+    
+    .text {
+      font-size: 14px;
+      color: $error-color;
+      font-weight: 500;
+    }
+  }
+}
+
+// Modal Footer
+.modal-footer {
+  padding: 24px 32px 32px;
+  border-top: 1px solid $border-color;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  
+  .modal-button {
+    @include button-base;
+    min-width: 120px;
+    
+    &.cancel {
+      background: transparent;
+      color: $text-secondary;
+      border: 2px solid $border-color;
+      
+      &:hover {
+        color: $text-primary;
+        border-color: $text-primary;
+      }
+    }
+    
+    &.confirm {
+      background: linear-gradient(135deg, $secondary-color 0%, #8ec756 100%);
+      color: $background-dark;
+      
+      &:hover:not(:disabled) {
+        box-shadow: 0 8px 24px rgba($secondary-color, 0.3);
+      }
+    }
+  }
+}
+
+// Success Modal
+.success-modal {
+  .success-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, $secondary-color 0%, #8ec756 100%);
+    @include flex-center;
+    font-size: 40px;
+    color: $background-dark;
+    animation: scaleIn 0.4s ease;
+  }
+  
+  h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: $text-primary;
+    text-align: center;
+    margin: 0 0 12px 0;
+  }
+  
+  p {
+    font-size: 15px;
+    color: $text-secondary;
+    text-align: center;
+    margin: 0 0 24px 0;
+    line-height: 1.6;
+  }
+  
+  .details {
+    background: $background-dark;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+    
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid $border-color;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      .label {
+        font-size: 14px;
+        color: $text-secondary;
+      }
+      
+      .value {
+        font-size: 14px;
+        font-weight: 600;
+        color: $text-primary;
+      }
+    }
+  }
+  
+  .success-button {
+    @include button-base;
+    width: 100%;
+    background: linear-gradient(135deg, $secondary-color 0%, #8ec756 100%);
+    color: $background-dark;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .paypal-withdrawal-container {
+    padding: 24px 16px;
+  }
+  
+  .page-header h1 {
+    font-size: 24px;
+  }
+  
+  .balance-card {
+    padding: 24px;
+    
+    .balance-amount .amount {
+      font-size: 36px;
+    }
+  }
+  
+  .dashboard-grid,
+  .info-cards-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .modal {
+    width: 95%;
+    max-height: 95vh;
+  }
+  
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 24px;
+  }
+}
+
+// SVG Icons
+svg {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.header-icon {
+  width: 32px;
+  height: 32px;
+  margin-right: 12px;
+  color: $secondary-color;
+}
+
+.button-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.badge-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+}
+
+.error-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.info-card .icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.success-icon svg {
+  width: 48px;
+  height: 48px;
+}

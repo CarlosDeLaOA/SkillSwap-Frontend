@@ -28,6 +28,11 @@ import { CommunityMainComponent } from './pages/community-main/community-main.co
 import { CommunityAchievementsComponent } from './pages/community-achievements/community-achievements';
 import { QuizComponent } from './pages/quiz/quiz.component';
 import { CoinPurchaseComponent } from './components/coin-purchase/coin-purchase.component';
+import { ReviewsPageComponent } from './pages/reviews/reviews-page.component';
+import { FeedbackPageComponent } from './pages/feedback-page/feedback-page.component';
+import { InstructorPaypalWithdrawalComponent } from './components/instructor-paypal-withdrawal/instructor-paypal-withdrawal.component';
+
+
 
 export const routes: Routes = [
   {
@@ -191,12 +196,31 @@ export const routes: Routes = [
         name: 'Comprar SkillCoins',
         showInSidebar: false
       }},
+
       {
         path: 'quiz',
         component: QuizComponent,
         data: {
           authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
           name: 'Cuestionario',
+          showInSidebar: false
+        }
+      },
+   {
+        path: 'instructor/paypal',
+        component: InstructorPaypalWithdrawalComponent,
+        data: {
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+          name: 'Retiros PayPal',
+          showInSidebar: false
+        }
+      },
+      {
+        path: 'reviews',
+        component: ReviewsPageComponent,
+        data: {
+          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+          name: 'Reseñas',
           showInSidebar: false
         }
       },

@@ -99,8 +99,6 @@ export class VideoCallComponent implements OnInit, OnDestroy {
       this.sessionId = +params['sessionId'];
       this.requestMediaPermissions();
     });
-
-    this.setupHangupInterceptor();
   }
 
   ngOnDestroy(): void {
@@ -111,7 +109,6 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     }
     this.leaveCall();
     
-    // Limpiar toast timeout
     if (this.toastTimeout) {
       clearTimeout(this.toastTimeout);
     }
@@ -143,7 +140,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   }
   //#endregion
 
-  //#region Custom Alert System (Para confirmaciones)
+  //#region Custom Alert System
   private showAlert(
     title: string, 
     message: string, 
@@ -206,19 +203,19 @@ export class VideoCallComponent implements OnInit, OnDestroy {
       this.isLoading = true;
       this.errorMessage = '';
 
-      console.log(' MODO DESARROLLO: Iniciando sin verificar dispositivos...');
+      console.log('MODO DESARROLLO: Iniciando sin verificar dispositivos...');
 
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: true,
           audio: true
         });
-        console.log(' Dispositivos disponibles');
+        console.log('Dispositivos disponibles');
         stream.getTracks().forEach(track => track.stop());
         this.cameraEnabled = true;
         this.microphoneEnabled = true;
       } catch (error: any) {
-        console.warn(' No hay dispositivos, continuando de todos modos...');
+        console.warn('No hay dispositivos, continuando de todos modos...');
         this.cameraEnabled = false;
         this.microphoneEnabled = false;
       }
@@ -227,7 +224,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
       await this.initializeVideoCall();
 
     } catch (error: any) {
-      console.error(' Error:', error);
+      console.error('Error:', error);
       this.showPermissionDialog = false;
       this.cameraEnabled = false;
       this.microphoneEnabled = false;
@@ -242,7 +239,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
       this.isLoading = true;
       this.errorMessage = '';
 
-      console.log(' Iniciando videollamada para sesión:', this.sessionId);
+      console.log('Iniciando videollamada para sesión:', this.sessionId);
 
       const config: IVideoCallConfig = {
         sessionId: this.sessionId,
@@ -260,7 +257,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
 
   private async joinVideoCall(config: IVideoCallConfig): Promise<void> {
     try {
-      console.log(' Conectando al backend...');
+      console.log('Conectando al backend...');
 
       const response = await this.videoCallService.joinVideoCall(config).toPromise();
       
@@ -269,7 +266,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
       }
       
       this.videoCallData = response;
-      console.log(' Datos recibidos:', this.videoCallData);
+      console.log('Datos recibidos:', this.videoCallData);
 
       if (this.videoCallData.isModerator) {
         const shareStatus = await this.videoCallService.validateScreenShare(this.sessionId).toPromise();
@@ -281,7 +278,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
 
       await this.delay(100);
 
-      console.log(' Inicializando Jitsi...');
+      console.log('Inicializando Jitsi...');
 
       const initialized = await this.videoCallService.initializeJitsi('jitsi-container', this.videoCallData);
 
@@ -289,9 +286,10 @@ export class VideoCallComponent implements OnInit, OnDestroy {
         throw new Error('No se pudo inicializar Jitsi');
       }
 
-      console.log(' Jitsi inicializado correctamente');
+      console.log('Jitsi inicializado correctamente');
       
       this.setupJitsiParticipantListeners();
+      this.setupHangupInterceptor();
       this.startTimer();
       
       this.retryCount = 0;
@@ -299,7 +297,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     } catch (error: any) {
       if (this.retryCount < this.maxRetries) {
         this.retryCount++;
-        console.log(` Reintento ${this.retryCount}/${this.maxRetries}...`);
+        console.log(`Reintento ${this.retryCount}/${this.maxRetries}...`);
         await this.delay(2000);
         await this.joinVideoCall(config);
       } else {
@@ -314,10 +312,10 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     const jitsiApi = this.videoCallService.jitsiApi;
     if (!jitsiApi) return;
 
-    console.log(' Configurando listeners de participantes...');
+    console.log('Configurando listeners de participantes...');
 
     jitsiApi.addEventListener('videoConferenceJoined', async (participant: any) => {
-      console.log(' Usuario local unido:', participant);
+      console.log('Usuario local unido:', participant);
       this.addLocalParticipant(participant);
       
       setTimeout(() => {
@@ -329,23 +327,23 @@ export class VideoCallComponent implements OnInit, OnDestroy {
         if (!isVideoMuted) {
           await this.attachLocalVideoToSidebar();
         } else {
-          console.log(' Cámara apagada al unirse, esperando que se encienda...');
+          console.log('Cámara apagada al unirse, esperando que se encienda...');
         }
       }, 1500);
     });
 
     jitsiApi.addEventListener('participantJoined', (participant: any) => {
-      console.log(' Participante se unió:', participant);
+      console.log('Participante se unió:', participant);
       this.addRemoteParticipant(participant);
     });
 
     jitsiApi.addEventListener('participantLeft', (participant: any) => {
-      console.log(' Participante salió:', participant);
+      console.log('Participante salió:', participant);
       this.removeParticipant(participant.id);
     });
 
     jitsiApi.addEventListener('videoMuteStatusChanged', async (data: any) => {
-      console.log(' Estado de video cambió:', data);
+      console.log('Estado de video cambió:', data);
       
       if (data.id === undefined || data.id === jitsiApi.getMyUserId()) {
         this.updateParticipantVideoStatus('local', !data.muted);
@@ -358,7 +356,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
           const localParticipantContainer = document.getElementById('participant-video-local');
           if (localParticipantContainer) {
             localParticipantContainer.innerHTML = '';
-            console.log(' Video removido del sidebar (cámara apagada)');
+            console.log('Video removido del sidebar (cámara apagada)');
           }
         }
       } else {
@@ -367,7 +365,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     });
 
     jitsiApi.addEventListener('audioMuteStatusChanged', (data: any) => {
-      console.log(' Estado de audio cambió:', data);
+      console.log('Estado de audio cambió:', data);
       
       if (data.id === undefined || data.id === jitsiApi.getMyUserId()) {
         this.updateParticipantAudioStatus('local', !data.muted);
@@ -459,12 +457,12 @@ export class VideoCallComponent implements OnInit, OnDestroy {
             }
           });
           
-          console.log(' Eliminados elementos con texto:', text);
+          console.log('Eliminados elementos con texto:', text);
         }
       });
 
       if (removedCount > 0) {
-        console.log(` ${removedCount} elementos eliminados del DOM`);
+        console.log(`${removedCount} elementos eliminados del DOM`);
       }
     };
 
@@ -490,7 +488,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
                 element.className.includes('subject') ||
                 element.className.includes('conference') ||
                 element.className.includes('filmstrip')) {
-              console.log(' Eliminando elemento nuevo:', text || element.className);
+              console.log('Eliminando elemento nuevo:', text || element.className);
               element.remove();
             }
           }
@@ -504,35 +502,35 @@ export class VideoCallComponent implements OnInit, OnDestroy {
         childList: true,
         subtree: true
       });
-      console.log(' MutationObserver activo - eliminará títulos automáticamente');
+      console.log('MutationObserver activo - eliminará títulos automáticamente');
     }
   }
 
   private async attachLocalVideoToSidebar(): Promise<void> {
     try {
       console.log('========================================');
-      console.log(' INICIANDO CAPTURA DE VIDEO LOCAL');
+      console.log('INICIANDO CAPTURA DE VIDEO LOCAL');
       console.log('========================================');
       
       const jitsiApi = this.videoCallService.jitsiApi;
       if (!jitsiApi) {
-        console.warn(' Jitsi API no disponible');
+        console.warn('Jitsi API no disponible');
         return;
       }
 
       const localParticipant = this.jitsiParticipants.find(p => p.id === 'local');
-      console.log(' Participante local en array:', localParticipant ? 'SÍ' : 'NO');
+      console.log('Participante local en array:', localParticipant ?'SI' : 'NO');
       
       if (!localParticipant) {
-        console.error(' Participante local no existe en el array');
+        console.error('Participante local no existe en el array');
         return;
       }
 
       const isVideoMuted = await jitsiApi.isVideoMuted();
-      console.log(' Estado de video:', isVideoMuted ? 'APAGADO' : 'ENCENDIDO');
+      console.log('Estado de video:', isVideoMuted ?'APAGADO' : 'ENCENDIDO');
 
       if (isVideoMuted) {
-        console.warn(' La cámara está apagada, no hay video para capturar');
+        console.warn('La cámara está apagada, no hay video para capturar');
         localParticipant.hasVideo = false;
         return;
       }
@@ -543,22 +541,22 @@ export class VideoCallComponent implements OnInit, OnDestroy {
           audio: false 
         });
 
-        console.log(' Stream de video obtenido');
+        console.log('Stream de video obtenido');
         console.log('   Tracks de video:', stream.getVideoTracks().length);
 
         if (stream.getVideoTracks().length === 0) {
-          console.error(' No hay tracks de video en el stream');
+          console.error('No hay tracks de video en el stream');
           return;
         }
 
         const containerId = 'participant-video-local';
         const localParticipantContainer = document.getElementById(containerId);
         
-        console.log(' Buscando contenedor:', containerId);
-        console.log('   Encontrado:', localParticipantContainer ? 'SÍ' : 'NO');
+        console.log('Buscando contenedor:', containerId);
+        console.log('   Encontrado:', localParticipantContainer ?'SI' : 'NO');
 
         if (!localParticipantContainer) {
-          console.error(' Contenedor del participante local no encontrado');
+          console.error('Contenedor del participante local no encontrado');
           
           const allContainers = document.querySelectorAll('[id^="participant-video-"]');
           console.log('   Contenedores en DOM:', allContainers.length);
@@ -570,10 +568,10 @@ export class VideoCallComponent implements OnInit, OnDestroy {
           return;
         }
 
-        console.log(' Contenedor encontrado:', localParticipantContainer.id);
+        console.log('Contenedor encontrado:', localParticipantContainer.id);
 
         localParticipantContainer.innerHTML = '';
-        console.log(' Contenedor limpiado');
+        console.log('Contenedor limpiado');
 
         const sidebarVideo = document.createElement('video');
         sidebarVideo.srcObject = stream;
@@ -587,20 +585,20 @@ export class VideoCallComponent implements OnInit, OnDestroy {
 
         localParticipantContainer.appendChild(sidebarVideo);
 
-        console.log(' Video agregado al contenedor');
+        console.log('Video agregado al contenedor');
 
         await sidebarVideo.play();
-        console.log(' Video reproduciéndose en sidebar');
+        console.log('Video reproduciéndose en sidebar');
 
         localParticipant.hasVideo = true;
-        console.log(' Estado del participante actualizado - hasVideo: true');
+        console.log('Estado del participante actualizado - hasVideo: true');
 
         console.log('========================================');
-        console.log(' CAPTURA COMPLETADA EXITOSAMENTE');
+        console.log('CAPTURA COMPLETADA EXITOSAMENTE');
         console.log('========================================');
 
       } catch (mediaError: any) {
-        console.error(' Error al obtener stream de video:', mediaError);
+        console.error('Error al obtener stream de video:', mediaError);
         
         if (mediaError.name === 'NotAllowedError') {
           console.error('   El usuario denegó el permiso de la cámara');
@@ -611,7 +609,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
 
     } catch (error) {
       console.error('========================================');
-      console.error(' ERROR AL CAPTURAR VIDEO LOCAL');
+      console.error('ERROR AL CAPTURAR VIDEO LOCAL');
       console.error('   Error:', error);
       console.error('========================================');
     }
@@ -632,7 +630,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     const exists = this.jitsiParticipants.find(p => p.id === 'local');
     if (!exists) {
       this.jitsiParticipants.unshift(localParticipant);
-      console.log(' Participante local agregado');
+      console.log('Participante local agregado');
     }
   }
 
@@ -651,7 +649,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     const exists = this.jitsiParticipants.find(p => p.id === data.id);
     if (!exists) {
       this.jitsiParticipants.push(remoteParticipant);
-      console.log(' Participante remoto agregado:', displayName);
+      console.log('Participante remoto agregado:', displayName);
     }
   }
 
@@ -659,7 +657,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     const index = this.jitsiParticipants.findIndex(p => p.id === participantId);
     if (index !== -1) {
       const removed = this.jitsiParticipants.splice(index, 1)[0];
-      console.log(' Participante removido:', removed.displayName);
+      console.log('Participante removido:', removed.displayName);
     }
   }
 
@@ -667,7 +665,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     const participant = this.jitsiParticipants.find(p => p.id === participantId);
     if (participant) {
       participant.hasVideo = hasVideo;
-      console.log(` ${participant.displayName} - Video: ${hasVideo ? 'ON' : 'OFF'}`);
+      console.log(`Video ${participant.displayName}: ${hasVideo ?'ON' : 'OFF'}`);
     }
   }
 
@@ -675,7 +673,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     const participant = this.jitsiParticipants.find(p => p.id === participantId);
     if (participant) {
       participant.hasAudio = hasAudio;
-      console.log(` ${participant.displayName} - Audio: ${hasAudio ? 'ON' : 'OFF'}`);
+      console.log(`Audio ${participant.displayName}: ${hasAudio ?'ON' : 'OFF'}`);
     }
   }
 
@@ -696,7 +694,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   }
   //#endregion
 
-  //#region  Recording Management
+  //#region Recording Management
   async startRecording(): Promise<void> {
     if (!this.videoCallData?.isModerator) {
       this.showAlert(
@@ -709,30 +707,30 @@ export class VideoCallComponent implements OnInit, OnDestroy {
 
     this.showAlert(
       'Iniciar Grabación',
-      '¿Deseas comenzar a grabar el audio de esta sesión?\n\n' +
+      'Deseas comenzar a grabar el audio de esta sesión?\n\n' +
       'Se capturará:\n' +
-      '• Tu micrófono\n' +
-      '• Audio de todos los participantes\n' +
-      '• Todo el contenido de audio de la videollamada\n\n' +
+      'Tu micrófono\n' +
+      'Audio de todos los participantes\n' +
+      'Todo el contenido de audio de la videollamada\n\n' +
       'Asegúrate de tener el micrófono encendido durante la grabación.',
       'info',
       'Iniciar Grabación',
       'Cancelar',
       async () => {
         try {
-          console.log(' Iniciando proceso de grabación...');
+          console.log('Iniciando proceso de grabación...');
           
           try {
             await this.videoCallService.clearRecording(this.sessionId).toPromise();
-            console.log(' Grabaciones previas limpiadas');
+            console.log('Grabaciones previas limpiadas');
           } catch (error) {
-            console.log(' No había grabaciones previas');
+            console.log('No había grabaciones previas');
           }
           
           const response = await this.videoCallService.startRecording(this.sessionId).toPromise();
           
           if (response && response.success) {
-            console.log(' Backend notificado:', response.data);
+            console.log('Backend notificado:', response.data);
             
             await new Promise(resolve => setTimeout(resolve, 500));
             
@@ -743,24 +741,23 @@ export class VideoCallComponent implements OnInit, OnDestroy {
               this.recordingStartTime = new Date();
               this.startRecordingTimer();
               
-              console.log(' Grabación iniciada exitosamente');
+              console.log('Grabación iniciada exitosamente');
               
-             
               this.displayToast('Grabación iniciada', 'success');
             } else {
               await this.videoCallService.stopRecording(this.sessionId).toPromise();
               this.showAlert(
                 'Error al Iniciar',
-                'No se pudo iniciar la grabación. Por favor, intenta nuevamente.',
+                'No se pudo iniciar la grabación.Por favor, intenta nuevamente.',
                 'error'
               );
             }
           }
         } catch (error) {
-          console.error(' Error:', error);
+          console.error('Error:', error);
           this.showAlert(
             'Error de Grabación',
-            'Ocurrió un error al iniciar la grabación. Por favor, intenta de nuevo.',
+            'Ocurrió un error al iniciar la grabación.Por favor, intenta de nuevo.',
             'error'
           );
         }
@@ -770,12 +767,12 @@ export class VideoCallComponent implements OnInit, OnDestroy {
 
   async stopRecording(): Promise<void> {
     if (!this.isRecording) {
-      console.log(' stopRecording llamado pero NO está grabando, ignorando');
+      console.log('stopRecording llamado pero NO está grabando, ignorando');
       return;
     }
 
     console.log('========================================');
-    console.log('⏹ DETENIENDO GRABACIÓN - INICIO');
+    console.log('DETENIENDO GRABACIÓN - INICIO');
     console.log('========================================');
 
     this.isRecording = false;
@@ -783,7 +780,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     this.recordingStartTime = null;
 
     try {
-      console.log(' Deteniendo grabación...');
+      console.log('Deteniendo grabación...');
       
       this.videoCallService.stopNativeAudioRecording();
       
@@ -792,19 +789,17 @@ export class VideoCallComponent implements OnInit, OnDestroy {
       const response = await this.videoCallService.stopRecording(this.sessionId).toPromise();
       
       if (response && response.success) {
-        console.log(' Grabación detenida');
+        console.log('Grabación detenida');
         console.log('   Duración:', response.data.durationSeconds, 'segundos');
         
-    
         this.displayToast('Grabación finalizada', 'success');
         
         console.log('========================================');
-        console.log(' GRABACIÓN DETENIDA - FIN');
+        console.log('GRABACIÓN DETENIDA - FIN');
         console.log('========================================');
       }
     } catch (error) {
-      console.error(' Error al detener grabación:', error);
-      
+      console.error('Error al detener grabación:', error);
       
       this.displayToast('Error al detener la grabación', 'error');
     }
@@ -814,7 +809,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     if (this.isRecording) {
       this.showAlert(
         'Detener Grabación',
-        '¿Estás seguro de que deseas detener la grabación de audio?',
+        'Estás seguro de que deseas detener la grabación de audio?',
         'warning',
         'Detener',
         'Cancelar',
@@ -897,17 +892,28 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   //#endregion
 
   //#region Hangup Interceptor
-  private setupHangupInterceptor(): void {
-    window.addEventListener('jitsi-hangup-clicked', (event: any) => {
-      if (this.videoCallData?.isModerator) {
-        event.preventDefault();
-        this.showEndSessionModal = true;
-      } else {
-        this.leaveCall();
-      }
-    });
+private setupHangupInterceptor(): void {
+  console.log('Configurando interceptor de hangup');
+  
+  const jitsiApi = this.videoCallService.jitsiApi;
+  if (!jitsiApi) {
+    console.log('Jitsi API no disponible aún');
+    return;
   }
-  //#endregion
+
+  jitsiApi.addEventListener('readyToClose', () => {
+    console.log('readyToClose event - isModerator:', this.videoCallData?. isModerator);
+    
+    if (this.videoCallData?.isModerator) {
+      console.log('Es instructor: mostrar modal');
+      this.showEndSessionModal = true;
+    } else {
+      console.log('Es learner: ir a feedback');
+      this.endSessionAndLeaveRating();
+    }
+  });
+}
+//#endregion
 
   //#region Modal Management
   openParticipantsModal(): void {
@@ -938,7 +944,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
         const jitsiApi = this.videoCallService.jitsiApi;
         if (jitsiApi) {
           jitsiApi.executeCommand('toggleChat');
-          console.log(' Chat toggled');
+          console.log('Chat toggled');
         }
       } catch (error) {
         console.error('Error al abrir chat:', error);
@@ -969,7 +975,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
       console.error('Error al finalizar sesión:', error);
       this.showAlert(
         'Error al Finalizar',
-        'Ocurrió un error al finalizar la sesión. Por favor, intenta de nuevo.',
+        'Ocurrió un error al finalizar la sesión.Por favor, intenta de nuevo.',
         'error'
       );
     }
@@ -996,23 +1002,54 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     
     this.router.navigate(['/app/dashboard']);
   }
+
+  endSessionAndLeaveRating(): void {
+  console.log('[VideoCall] Iniciando endSessionAndLeaveRating');
+  console.log('   isModerator:', this.videoCallData?. isModerator);
+  console.log('   sessionId:', this.sessionId);
+  
+  this.stopTimer();
+  this.stopRecordingTimer();
+  
+  if (this.isRecording) {
+    this.stopRecording();
+  }
+  
+  console.log('[VideoCall] Limpiando Jitsi.. .');
+  if (this.videoCallService.isJitsiActive()) {
+    this.videoCallService.leaveVideoCall();
+  }
+  
+  console.log('[VideoCall] Navegando a feedback sin esperar.. .');
+  
+  this.router.navigate(['/app/feedback', this.sessionId]). then(success => {
+    console.log('[VideoCall] Redirección completada:', success);
+    if (! success) {
+      console.error('[VideoCall] Redirección falló, intentando nuevamente...');
+      this.router.navigate(['/app/feedback', this.sessionId]);
+    }
+  }). catch(error => {
+    console.error('[VideoCall] Error en redirección:', error);
+    this.router.navigate(['/app/dashboard']);
+  });
+}
   //#endregion
 
   //#region Error Handling
   private handleError(error: any): void {
-    console.error(' Error en videollamada:', error);
+    console.error('Error en videollamada:', error);
     
     if (error.status === 401) {
-      this.errorMessage = 'Usuario no autenticado. Redirigiendo a login...';
+      this.errorMessage = 'Usuario no autenticado.Redirigiendo a login...';
       setTimeout(() => this.router.navigate(['/login']), 2000);
     } else if (error.status === 400) {
       this.errorMessage = 'Enlace no válido o sesión no disponible';
     } else if (error.status === 403) {
-      this.errorMessage = 'La sesión aún no está disponible. Espera a que el instructor la active.';
+      this.errorMessage = 'La sesión aún no está disponible.Espera a que el instructor la active.';
     } else if (error.error?.message) {
       this.errorMessage = error.error.message;
     } else {
-      this.errorMessage = 'Error al conectar a la videollamada. Intenta de nuevo.';
+      this.errorMessage = 'Error al conectar a la videollamada.Intenta de nuevo.';
     }
 
     this.isLoading = false;
@@ -1035,38 +1072,34 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   //#endregion
 
   //#region Transcription Management
-/**
- *  Descarga la transcripción como archivo .txt
- */
-downloadTranscription(): void {
-  if (!this.videoCallData?.isModerator) {
-    this.displayToast('Solo el instructor puede descargar', 'error');
-    return;
-  }
+  downloadTranscription(): void {
+    if (!this.videoCallData?.isModerator) {
+      this.displayToast('Solo el instructor puede descargar', 'error');
+      return;
+    }
 
-  this.showAlert(
-    'Descargar Transcripción',
-    '¿Deseas descargar la transcripción de esta sesión?\n\n' +
-    'Se descargará un archivo .txt con el contenido completo.',
-    'info',
-    'Descargar',
-    'Cancelar',
-    () => {
-      console.log(' Solicitando transcripción...');
-      
-      this.transcriptionService.getTranscription(this.sessionId).subscribe({
-        next: (response: any) => {
-          if (response && response.data && response.data.transcription) {
-            const transcription = response.data.transcription;
-            const wordCount = response.data.wordCount || 0;
-            const duration = response.data.durationSeconds || 0;
-            
-            console.log(' Transcripción obtenida');
-            console.log('   Palabras:', wordCount);
-            console.log('   Duración:', duration, 'segundos');
-            
-            // Crear contenido con metadata
-            const metadata = `===========================================
+    this.showAlert(
+      'Descargar Transcripción',
+      'Deseas descargar la transcripción de esta sesión?\n\n' +
+      'Se descargará un archivo .txt con el contenido completo.',
+      'info',
+      'Descargar',
+      'Cancelar',
+      () => {
+        console.log('Solicitando transcripción...');
+        
+        this.transcriptionService.getTranscription(this.sessionId).subscribe({
+          next: (response: any) => {
+            if (response && response.data && response.data.transcription) {
+              const transcription = response.data.transcription;
+              const wordCount = response.data.wordCount || 0;
+              const duration = response.data.durationSeconds || 0;
+              
+              console.log('Transcripción obtenida');
+              console.log('   Palabras:', wordCount);
+              console.log('   Duración:', duration, 'segundos');
+              
+              const metadata = `===========================================
 TRANSCRIPCIÓN DE SESIÓN - SKILLSWAP
 ===========================================
 Sesión: #${this.sessionId}
@@ -1076,41 +1109,40 @@ Fecha: ${new Date().toLocaleString('es-ES')}
 ===========================================
 
 `;
+              
+              const fullContent = metadata + transcription;
+              const fileName = `transcripcion_sesion_${this.sessionId}_${new Date().getTime()}.txt`;
+              
+              const blob = new Blob([fullContent], { type: 'text/plain;charset=utf-8' });
+              const url = window.URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = fileName;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              window.URL.revokeObjectURL(url);
+              
+              console.log('Archivo descargado:', fileName);
+              this.displayToast('Transcripción descargada exitosamente', 'success');
+              
+            } else {
+              console.warn('No hay transcripción disponible');
+              this.displayToast('No hay transcripción disponible para esta sesión', 'error');
+            }
+          },
+          error: (error: any) => {
+            console.error('Error al descargar transcripción:', error);
             
-            const fullContent = metadata + transcription;
-            const fileName = `transcripcion_sesion_${this.sessionId}_${new Date().getTime()}.txt`;
-            
-            // Crear blob y descargar
-            const blob = new Blob([fullContent], { type: 'text/plain;charset=utf-8' });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
-            
-            console.log(' Archivo descargado:', fileName);
-            this.displayToast('Transcripción descargada exitosamente', 'success');
-            
-          } else {
-            console.warn(' No hay transcripción disponible');
-            this.displayToast('No hay transcripción disponible para esta sesión', 'error');
+            if (error.status === 404) {
+              this.displayToast('No hay transcripción disponible aún', 'error');
+            } else {
+              this.displayToast('Error al descargar transcripción', 'error');
+            }
           }
-        },
-        error: (error: any) => {
-          console.error(' Error al descargar transcripción:', error);
-          
-          if (error.status === 404) {
-            this.displayToast('No hay transcripción disponible aún', 'error');
-          } else {
-            this.displayToast('Error al descargar transcripción', 'error');
-          }
-        }
-      });
-    }
-  );
-}
-//#endregion
+        });
+      }
+    );
+  }
+  //#endregion
 }
