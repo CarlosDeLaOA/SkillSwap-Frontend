@@ -177,8 +177,8 @@ export const routes: Routes = [
            authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
            name: 'Dejar Reseña',
            showInSidebar: false
-  }
-},
+       }
+      },
       {
         path: 'community/:id',
         component: CommunityMainComponent,
