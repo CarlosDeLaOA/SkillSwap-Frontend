@@ -26,10 +26,13 @@ import { VideoCallComponent } from './components/video-call/video-call.component
 import { AcceptInvitationComponent } from './components/accept-invitation/accept-invitation.component';
 import { CommunityMainComponent } from './pages/community-main/community-main.component';
 import { CommunityAchievementsComponent } from './pages/community-achievements/community-achievements';
+import { QuizComponent } from './pages/quiz/quiz.component';
 import { CoinPurchaseComponent } from './components/coin-purchase/coin-purchase.component';
 import { ReviewsPageComponent } from './pages/reviews/reviews-page.component';
 import { FeedbackPageComponent } from './pages/feedback-page/feedback-page.component';
 import { InstructorPaypalWithdrawalComponent } from './components/instructor-paypal-withdrawal/instructor-paypal-withdrawal.component';
+
+
 
 export const routes: Routes = [
   {
@@ -127,7 +130,7 @@ export const routes: Routes = [
         component: SessionDetailComponent,
         data: {
           authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
-          name: 'Detalle de Sesion',
+          name: 'Detalle de Sesión',
           showInSidebar: false
         },
       },
@@ -136,7 +139,7 @@ export const routes: Routes = [
         component: CreateSessionComponent,
         data: {
           authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
-          name: 'Crear Sesion',
+          name: 'Crear Sesión',
           showInSidebar: false
         }
       },
@@ -168,15 +171,6 @@ export const routes: Routes = [
         }
       },
       {
-        path: 'feedback/:sessionId',
-        component: FeedbackPageComponent,
-        data: {
-          authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
-          name: 'Dejar Reseña',
-          showInSidebar: false
-        }
-      },
-      {
         path: 'community/:id',
         component: CommunityMainComponent,
         data: {
@@ -195,16 +189,24 @@ export const routes: Routes = [
         }
       },
       {
-        path: 'coins/purchase',
-        component: CoinPurchaseComponent,
+      path: 'coins/purchase',
+      component: CoinPurchaseComponent,  // ← Agregar esta ruta
+      data: {
+        authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+        name: 'Comprar SkillCoins',
+        showInSidebar: false
+      }},
+
+      {
+        path: 'quiz',
+        component: QuizComponent,
         data: {
           authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
-          name: 'Comprar SkillCoins',
+          name: 'Cuestionario',
           showInSidebar: false
         }
       },
-      
-      {
+   {
         path: 'instructor/paypal',
         component: InstructorPaypalWithdrawalComponent,
         data: {
