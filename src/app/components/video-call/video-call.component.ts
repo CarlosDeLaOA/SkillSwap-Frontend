@@ -7,6 +7,7 @@ import { IVideoCallConfig, IVideoCallData, IScreenShareStatus } from '../../inte
 import { ParticipantsModalComponent } from '../participants-modal/participants-modal.component';
 import { DocumentsModalComponent } from '../documents-modal/documents-modal.component';
 import { CollaborativeDocumentComponent } from '../collaborative-document/collaborative-document.component';
+import { ProfileService } from '../../services/profile.service';
 
 interface JitsiParticipant {
   id: string;
@@ -91,6 +92,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     private router: Router,
     private videoCallService: VideoCallService,
     private transcriptionService: TranscriptionService
+    
   ) {}
 
   //#region Lifecycle Hooks
@@ -891,7 +893,8 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   }
   //#endregion
 
-  //#region Hangup Interceptor
+
+//#region Hangup Interceptor
 private setupHangupInterceptor(): void {
   console.log('Configurando interceptor de hangup');
   
@@ -902,18 +905,20 @@ private setupHangupInterceptor(): void {
   }
 
   jitsiApi.addEventListener('readyToClose', () => {
-    console.log('readyToClose event - isModerator:', this.videoCallData?. isModerator);
+    console.log('readyToClose event - isModerator:', this.videoCallData?.isModerator);
     
     if (this.videoCallData?.isModerator) {
-      console.log('Es instructor: mostrar modal');
-      this.showEndSessionModal = true;
+      console.log('Es instructor: finalizar sesión para todos');
+      //  Instructor: Finalizar sesión para todos SIN mostrar modal
+      this.endSessionForEveryoneDirectly();
     } else {
-      console.log('Es learner: ir a feedback');
+      console.log('Es learner: redirigir a feedback directamente');
+      //  Learner: Ir directo a feedback SIN mostrar modal
       this.endSessionAndLeaveRating();
     }
   });
 }
-//#endregion
+//#endregionn
 
   //#region Modal Management
   openParticipantsModal(): void {
@@ -1034,6 +1039,51 @@ private setupHangupInterceptor(): void {
   });
 }
   //#endregion
+
+  /**
+ * Finaliza la sesión para todos sin mostrar modal
+ * Solo para instructores cuando hacen click en el botón de colgar de Jitsi
+ */
+async endSessionForEveryoneDirectly(): Promise<void> {
+  try {
+    console.log('[VideoCall] Finalizando sesión para todos (sin modal)');
+    
+    // Detener grabación si está activa
+    if (this.isRecording) {
+      await this.stopRecording();
+    }
+    
+    // Llamar al backend para finalizar la sesión
+    await this.videoCallService.endVideoCall(this.sessionId).toPromise();
+    
+    console.log('[VideoCall] Sesión finalizada para todos');
+    
+    // Limpiar timers
+    this.stopTimer();
+    this.stopRecordingTimer();
+    
+    // Limpiar Jitsi
+    if (this.videoCallService.isJitsiActive()) {
+      this.videoCallService.leaveVideoCall();
+    }
+    
+    // Redirigir al dashboard
+    this.router.navigate(['/app/dashboard']);
+    
+  } catch (error) {
+    console.error('[VideoCall] Error al finalizar sesión:', error);
+    
+    // Si hay error, intentar salir de todos modos
+    this.stopTimer();
+    this.stopRecordingTimer();
+    
+    if (this.videoCallService.isJitsiActive()) {
+      this.videoCallService.leaveVideoCall();
+    }
+    
+    this.router.navigate(['/app/dashboard']);
+  }
+}
 
   //#region Error Handling
   private handleError(error: any): void {
