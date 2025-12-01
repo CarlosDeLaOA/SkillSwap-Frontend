@@ -171,6 +171,15 @@ export const routes: Routes = [
         }
       },
       {
+        path: 'feedback/:sessionId',
+        component: FeedbackPageComponent,
+        data: {
+           authorities: [IRoleType.admin, IRoleType.superAdmin, IRoleType.user],
+           name: 'Dejar Reseña',
+           showInSidebar: false
+  }
+},
+      {
         path: 'community/:id',
         component: CommunityMainComponent,
         data: {
