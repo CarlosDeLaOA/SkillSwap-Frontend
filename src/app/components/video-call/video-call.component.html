@@ -121,38 +121,6 @@
   [isModerator]="videoCallData?.isModerator || false" [currentUserId]="0" (closeModal)="closeDocumentsModal()">
 </app-documents-modal>
 
-<!-- Modal: End Session Confirmation -->
-<div *ngIf="showEndSessionModal" class="modal-overlay" (click)="closeEndSessionModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>Finalizar Sesión</h2>
-      <button class="modal-close" (click)="closeEndSessionModal()">
-        <i class='bx bx-x'></i>
-      </button>
-    </div>
-    <div class="modal-body">
-      <p *ngIf="videoCallData?.isModerator">¿Qué deseas hacer?</p>
-      <p *ngIf="!videoCallData?.isModerator">Abandonando la sesión...</p>
-      <p *ngIf="isRecording" class="warning-text">
-        <i class='bx bx-error-circle'></i>
-        La grabación se detendrá automáticamente
-      </p>
-    </div>
-    <div class="modal-actions">
-      <button *ngIf="videoCallData?.isModerator" class="modal-btn btn-danger" (click)="endSessionForEveryone()">
-        <i class='bx bx-stop-circle'></i>
-        Finalizar para todos
-      </button>
-      <button class="modal-btn btn-secondary" (click)="leaveSessionOnly()">
-        <i class='bx bx-exit'></i>
-        {{ videoCallData?.isModerator ?  'Solo abandonar' : 'Abandonar sesión' }}
-      </button>
-      <button class="modal-btn btn-cancel" (click)="closeEndSessionModal()">
-        Cancelar
-      </button>
-    </div>
-  </div>
-</div>
 
 <!-- Panel de Notas Colaborativas -->
 <div *ngIf="showNotesPanel" class="notes-panel-overlay" (click)="closeNotes()">
