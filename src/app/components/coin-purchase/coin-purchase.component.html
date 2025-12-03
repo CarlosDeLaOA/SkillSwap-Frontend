@@ -1,0 +1,155 @@
+<div class="coin-purchase-page">
+  <!-- Header Section -->
+  <div class="header-section">
+    <h1 class="main-title">Obtener SkillCoins</h1>
+    <div class="balance-info">
+      <span class="balance-label">Balance Actual</span>
+      <span class="balance-amount">{{ currentBalance }} <span class="currency">coins</span></span>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p class="loading-text">Cargando paquetes...</p>
+  </div>
+
+  <!-- Packages Grid -->
+  <div *ngIf="!isLoading" class="packages-container">
+    <div 
+      *ngFor="let package of packages" 
+      class="package-card"
+      [class.popular]="package.popular"
+      (click)="selectPackage(package)">
+      
+      <!-- Popular Badge -->
+      <div *ngIf="package.popular" class="popular-badge">
+        MÁS POPULAR
+      </div>
+
+      <!-- Package Content -->
+      <div class="card-content">
+        <!-- Package Type -->
+        <h3 class="package-type">{{ package.type }}</h3>
+
+        <!-- Coin Image -->
+        <div class="coin-image-container">
+          <img 
+            [src]="package.image || 'assets/coins/basic.png'" 
+            [alt]="package.name + ' coin'"
+            class="coin-image">
+        </div>
+
+        <!-- Coins Amount -->
+        <div class="coins-display">
+          <span class="coins-number">{{ package.coins }}</span>
+          <span class="coins-label">SkillCoins</span>
+        </div>
+
+        <!-- Price -->
+        <div class="price-display">
+          <span class="currency-symbol">$</span>
+          <span class="price-amount">{{ package.priceUsd }}</span>
+          <span class="price-currency">USD</span>
+        </div>
+
+        <!-- Buy Button -->
+        <button class="buy-button">
+          Comprar Ahora
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PayPal Modal -->
+  <div *ngIf="selectedPackage" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      
+      <!-- Close Button -->
+      <button class="close-button" (click)="closeModal()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <!-- Modal Title -->
+      <h2 class="modal-title">Completa tu Compra</h2>
+
+      <!-- Purchase Summary -->
+      <div class="purchase-summary">
+        <div class="summary-item">
+          <span class="item-label">Paquete:</span>
+          <span class="item-value">{{ selectedPackage.name || selectedPackage.type }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="item-label">SkillCoins:</span>
+          <span class="item-value">{{ selectedPackage.coins }} coins</span>
+        </div>
+        <div class="summary-item total-item">
+          <span class="item-label">Total:</span>
+          <span class="item-value">${{ selectedPackage.priceUsd }} USD</span>
+        </div>
+      </div>
+
+      <!-- PayPal Section -->
+      <div class="paypal-section">
+        <div *ngIf="!isPurchasing && !purchaseSuccess && !purchaseError" 
+             id="paypal-button-container" 
+             class="paypal-container">
+        </div>
+
+        <!-- Processing State -->
+        <div *ngIf="isPurchasing" class="state-container processing">
+          <div class="spinner"></div>
+          <p class="state-title">Procesando tu pago...</p>
+          <p class="state-text">Por favor espera, no cierres esta ventana</p>
+        </div>
+
+        <!-- Success State -->
+        <div *ngIf="purchaseSuccess" class="state-container success">
+          <div class="success-icon">
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+              <circle cx="32" cy="32" r="32" fill="#AAE16B"/>
+              <path d="M20 32L28 40L44 24" stroke="#141414" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3 class="state-title">¡Compra Exitosa!</h3>
+          <p class="state-text">
+            {{ selectedPackage.coins }} SkillCoins han sido agregados a tu cuenta
+          </p>
+          <div class="balance-display">
+            <span class="balance-label">Nuevo Balance:</span>
+            <span class="balance-value">{{ currentBalance }} coins</span>
+          </div>
+          <button class="action-button primary" (click)="goToDashboard()">
+            Ir al Dashboard
+          </button>
+        </div>
+
+        <!-- Error State -->
+        <div *ngIf="purchaseError" class="state-container error">
+          <div class="error-icon">
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+              <circle cx="32" cy="32" r="32" fill="#FF4444"/>
+              <path d="M24 24L40 40M40 24L24 40" stroke="white" stroke-width="4" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3 class="state-title">Pago Fallido</h3>
+          <p class="state-text">{{ purchaseError }}</p>
+          <button class="action-button secondary" (click)="closeModal()">
+            Intentar de Nuevo
+          </button>
+        </div>
+      </div>
+
+      <!-- Payment Info -->
+      <div *ngIf="!isPurchasing && !purchaseSuccess && !purchaseError" class="payment-info">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="7" stroke="#AAE16B" stroke-width="1.5"/>
+          <path d="M8 4V8M8 11V12" stroke="#AAE16B" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span>Pago seguro con PayPal</span>
+      </div>
+    </div>
+  </div>
+</div>

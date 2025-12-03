@@ -90,11 +90,11 @@ export class UpcomingSessionsComponent implements OnInit {
   }
 
 handleCancelSession(data: { sessionId: string, reason: string }): void {
-  console.log('🎓 [INSTRUCTOR] Canceling session:', data.sessionId);
+  console.log(' [INSTRUCTOR] Canceling session:', data.sessionId);
   
   this.dashboardService.cancelSession(Number(data.sessionId), data.reason).subscribe({
     next: (response: any) => {
-      console.log('✅ Session cancelled successfully');
+      console.log(' Session cancelled successfully');
       
       this.cancellationInfo = {
         sessionTitle: this.selectedSession?.title || '',
@@ -104,13 +104,13 @@ handleCancelSession(data: { sessionId: string, reason: string }): void {
       this.showConfirmationModal = true;
       this.closeCancelSessionModal();
       
-      // ✅ AGREGAR: Recargar después de 3 segundos
+      //  AGREGAR: Recargar después de 3 segundos
       setTimeout(() => {
         this.loadUpcomingSessions();
       }, 3000);
     },
     error: (error: any) => {
-      console.error('❌ Error canceling session:', error);
+      console.error(' Error canceling session:', error);
       alert(`Error: ${error.error?.message || 'Error al cancelar la sesión'}`);
       this.closeCancelSessionModal();
     }
@@ -118,11 +118,11 @@ handleCancelSession(data: { sessionId: string, reason: string }): void {
 }
 
  handleCancelBooking(bookingId: number): void {
-  console.log('🎒 [LEARNER] Canceling booking:', bookingId);
+  console.log(' [LEARNER] Canceling booking:', bookingId);
   
   this.dashboardService.cancelBooking(bookingId).subscribe({
     next: (response: any) => {
-      console.log('✅ Booking cancelled successfully');
+      console.log(' Booking cancelled successfully');
       
       this.cancellationInfo = {
         sessionTitle: this.selectedSession?.title || '',
@@ -132,13 +132,13 @@ handleCancelSession(data: { sessionId: string, reason: string }): void {
       this.showConfirmationModal = true;
       this.closeCancelBookingModal();
       
-      // ✅ AGREGAR: Recargar después de 3 segundos
+      //  AGREGAR: Recargar después de 3 segundos
       setTimeout(() => {
         this.loadUpcomingSessions();
       }, 3000);
     },
     error: (error: any) => {
-      console.error('❌ Error canceling booking:', error);
+      console.error(' Error canceling booking:', error);
       alert(`Error: ${error.error?.message || 'Error al cancelar el registro'}`);
       this.closeCancelBookingModal();
     }

@@ -1,0 +1,168 @@
+<div class="session-history-container">
+  <!-- Header centrado -->
+  <div class="history-header">
+    <h2 class="header-title">Historial de Sesiones</h2>
+    <div class="header-subtitle" *ngIf="totalItems > 0 && !isLoading">
+      {{ totalItems }} {{ totalItems === 1 ? 'sesión' : 'sesiones' }} en total
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading && sessions.length === 0">
+    <i class='bx bx-loader-alt bx-spin loading-icon'></i>
+    <p class="loading-text">Cargando historial...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-container" *ngIf="errorMessage && !isLoading">
+    <i class='bx bx-error-circle error-icon'></i>
+    <p class="error-text">{{ errorMessage }}</p>
+    <button class="retry-button" (click)="loadSessionHistory(currentPage)">
+      <i class='bx bx-refresh'></i>
+      Reintentar
+    </button>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-container" *ngIf="sessions.length === 0 && !isLoading && !errorMessage">
+    <i class='bx bx-calendar-x empty-icon'></i>
+    <p class="empty-text">No hay sesiones en tu historial</p>
+    <p class="empty-subtext">Las sesiones finalizadas o canceladas aparecerán aquí</p>
+  </div>
+
+  <!-- Sessions Grid -->
+  <div 
+    class="sessions-grid" 
+    *ngIf="sessions.length > 0"
+    [class.fade-out]="isTransitioning"
+    [class.fade-in]="!isTransitioning">
+    
+    <div 
+      class="session-card" 
+      *ngFor="let session of sessions; trackBy: trackBySessionId"
+      (click)="openSessionDetail(session)">
+      
+      <!-- Status Badge -->
+      <div class="status-badge" [ngClass]="getStatusClass(session.status)">
+        {{ getStatusText(session.status) }}
+      </div>
+
+      <!-- Card Content -->
+      <div class="card-content">
+        <h3 class="session-title">{{ session.title }}</h3>
+        
+        <div class="skill-badge">
+          <i class='bx bx-bookmark'></i>
+          {{ session.skill.name }}
+        </div>
+
+        <div class="session-info">
+          <div class="info-item">
+            <i class='bx bx-calendar'></i>
+            <span>{{ formatDate(session.scheduledDatetime) }}</span>
+          </div>
+
+          <div class="info-item">
+            <i class='bx bx-time'></i>
+            <span>{{ formatTime(session.scheduledDatetime) }}</span>
+          </div>
+
+          <div class="info-item">
+            <i class='bx bx-time-five'></i>
+            <span>{{ formatDuration(session.durationMinutes) }}</span>
+          </div>
+
+          <div class="info-item">
+            <i class='bx bx-category'></i>
+            <span>{{ session.skill.knowledgeArea.name }}</span>
+          </div>
+        </div>
+
+        <button class="details-button">
+          Ver detalles
+          <i class='bx bx-right-arrow-alt'></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-container" *ngIf="totalPages > 1 && sessions.length > 0">
+    <button 
+      class="pagination-button prev"
+      [disabled]="!hasPrevious || isTransitioning"
+      (click)="previousPage()">
+      <i class='bx bx-chevron-left'></i>
+      Anterior
+    </button>
+
+    <div class="pagination-info">
+      Página {{ currentPage + 1 }} de {{ totalPages }}
+    </div>
+
+    <button 
+      class="pagination-button next"
+      [disabled]="!hasNext || isTransitioning"
+      (click)="nextPage()">
+      Siguiente
+      <i class='bx bx-chevron-right'></i>
+    </button>
+  </div>
+</div>
+
+<!-- Modal de detalles -->
+<div class="modal-overlay" *ngIf="showDetailModal" (click)="closeDetailModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    
+    <!-- Loading en modal -->
+    <div class="modal-loading" *ngIf="isLoadingDetail">
+      <i class='bx bx-loader-alt bx-spin'></i>
+      <p>Cargando detalles...</p>
+    </div>
+
+    <!-- Contenido del modal -->
+    <div class="modal-body" *ngIf="!isLoadingDetail && selectedSession">
+      <button class="modal-close" (click)="closeDetailModal()">
+        <i class='bx bx-x'></i>
+      </button>
+
+      <h2 class="modal-title">{{ selectedSession.session.title }}</h2>
+      
+      <div class="modal-section">
+        <h3 class="section-title">DESCRIPCIÓN</h3>
+        <p class="section-text">{{ selectedSession.session.description }}</p>
+      </div>
+
+      <div class="modal-section">
+        <h3 class="section-title">INFORMACIÓN DE LA SESIÓN</h3>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <i class='bx bx-calendar'></i>
+            <span>{{ formatDateTime(selectedSession.session.scheduledDatetime) }}</span>
+          </div>
+          <div class="detail-item">
+            <i class='bx bx-time'></i>
+            <span>{{ formatDuration(selectedSession.session.durationMinutes) }}</span>
+          </div>
+          <div class="detail-item">
+            <i class='bx bx-world'></i>
+            <span>{{ selectedSession.session.language }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <h3 class="section-title">HABILIDAD</h3>
+        <div class="skill-detail">
+          <div class="skill-modal-badge">
+            <i class='bx bx-bookmark'></i>
+            {{ selectedSession.session.skill.name }}
+          </div>
+          <div class="category-modal-badge">
+            {{ selectedSession.session.skill.knowledgeArea.name }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

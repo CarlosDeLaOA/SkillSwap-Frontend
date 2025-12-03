@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { IAuthority, ILoginResponse, IRoleType, IUser } from '../interfaces';
+import { IAuthority, ILoginResponseSkillSwap, IRoleType, IUser } from '../interfaces';
 import { Observable, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { ProfileService } from './profile.service';
@@ -8,10 +8,10 @@ import { ProfileService } from './profile.service';
   providedIn: 'root',
 })
 export class AuthService {
- 
+
   private accessToken!: string;
   private expiresIn!: number;
-  private user: IUser | null = null; 
+    private user: IUser | null = null;
   private http: HttpClient = inject(HttpClient);
   private profileService: ProfileService = inject(ProfileService);
   
@@ -20,19 +20,19 @@ export class AuthService {
   }
 
   public save(): void {
-    if (this.user) localStorage.setItem('auth_user', JSON.stringify(this.user));
-    if (this.accessToken) localStorage.setItem('access_token', this.accessToken);
+    if (this.user) localStorage.setItem('authPerson', JSON.stringify(this.user));
+    if (this.accessToken) localStorage.setItem('authToken', this.accessToken);
     if (this.expiresIn) localStorage.setItem('expiresIn', JSON.stringify(this.expiresIn));
   }
 
   private load(): void {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('authToken');
     if (token) this.accessToken = token;
-    
+
     const exp = localStorage.getItem('expiresIn');
     if (exp) this.expiresIn = JSON.parse(exp);
-    
-    const user = localStorage.getItem('auth_user');
+
+    const user = localStorage.getItem('authPerson');
     if (user) {
       try {
         this.user = JSON.parse(user);
@@ -53,23 +53,21 @@ export class AuthService {
 
   /**
    * Establece el usuario actual
-   * @param user Datos del usuario
+   * @param user Datos del usuario (IPerson)
    */
   public setUser(user: any): void {
-    console.log('🔵 Setting user:', user);
-    
+    console.log(' Setting user:', user);
+
     if (!user) {
-      console.error('⚠️ Attempting to set undefined/null user');
+      console.error(' Attempting to set undefined/null user');
       return;
     }
-    
-    this.user = {
-      email: user.email || '',
-      authorities: Array.isArray(user.authorities) ? user.authorities : []
-    };
-    
-    localStorage.setItem('auth_user', JSON.stringify(this.user));
-    console.log('✅ User set successfully:', this.user);
+
+    // Guardar el IPerson completo
+    this.user = user;
+
+    localStorage.setItem('authPerson', JSON.stringify(this.user));
+    console.log(' User set successfully:', this.user);
   }
 
   /**
@@ -85,7 +83,7 @@ export class AuthService {
    * @returns Token JWT o null
    */
   public getToken(): string | null {
-    return this.accessToken || localStorage.getItem('access_token');
+    return this.accessToken || localStorage.getItem('authToken');
   }
 
   /**
@@ -94,7 +92,7 @@ export class AuthService {
    */
   public setToken(token: string): void {
     this.accessToken = token;
-    localStorage.setItem('access_token', token);
+    localStorage.setItem('authToken', token);
   }
 
   /**
@@ -118,13 +116,13 @@ export class AuthService {
    * @param credentials Credenciales del usuario
    * @returns Observable con la respuesta de login
    */
-  public login(credentials: { email: string; password: string }): Observable<ILoginResponse> {
-    return this.http.post<ILoginResponse>('auth/login', credentials).pipe(
+  public login(credentials: { email: string; password: string }): Observable<ILoginResponseSkillSwap> {
+    return this.http.post<ILoginResponseSkillSwap>('auth/login', credentials).pipe(
       tap({
-        next: (response: any) => {
+        next: (response: ILoginResponseSkillSwap) => {
           this.accessToken = response.token;
           this.expiresIn = response.expiresIn;
-          this.setUser(response.authUser); 
+          this.setUser(response.authPerson);
           this.save();
         },
         error: (error) => {
@@ -139,8 +137,8 @@ export class AuthService {
    * @param user Datos del usuario
    * @returns Observable con la respuesta de registro
    */
-  public signup(user: IUser): Observable<ILoginResponse> {
-    return this.http.post<ILoginResponse>('auth/signup', user);
+  public signup(user: IUser): Observable<ILoginResponseSkillSwap> {
+    return this.http.post<ILoginResponseSkillSwap>('auth/signup', user);
   }
 
   /**
@@ -148,21 +146,21 @@ export class AuthService {
    * Limpia tokens, datos de usuario y perfil cargado
    */
   public logout(): void {
-    console.log('🚪 Cerrando sesión...');
-    
+    console.log(' Cerrando sesión...');
+
     // Limpiar datos de autenticación
     this.accessToken = '';
     this.user = null;
-    
+
     // Limpiar localStorage
-    localStorage.removeItem('access_token');
+    localStorage.removeItem('authToken');
     localStorage.removeItem('expiresIn');
-    localStorage.removeItem('auth_user');
-    
+    localStorage.removeItem('authPerson');
+
     // IMPORTANTE: Limpiar el perfil del ProfileService
     this.profileService.clearProfile();
-    
-    console.log('✅ Sesión cerrada correctamente');
+
+    console.log(' Sesión cerrada correctamente');
   }
 
   /**

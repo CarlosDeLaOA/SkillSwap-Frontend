@@ -1,0 +1,322 @@
+<div class="paypal-withdrawal-container">
+  
+  <!-- Header -->
+  <div class="page-header">
+    <h1>
+      <svg class="header-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+      </svg>
+      Retiros PayPal
+    </h1>
+    <p>Gestiona tus ganancias y retira tus SkillCoins a tu cuenta PayPal</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando información...</p>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!isLoading">
+    
+    <!-- Dashboard Grid -->
+    <div class="dashboard-grid">
+      
+      <!-- Balance Card -->
+      <div class="balance-card">
+        <div class="balance-content">
+          <div class="balance-label">Balance Disponible</div>
+          <div class="balance-amount">
+            <span class="amount">{{ paypalInfo?.currentBalance || 0 }}</span>
+            <span class="currency">SkillCoins</span>
+          </div>
+          <div class="usd-equivalent">
+            Equivalente: <span class="usd-amount">${{ paypalInfo?.estimatedUsd || '0.00' }} USD</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Account Status Card -->
+      <div class="account-status-card">
+        <div class="status-header">
+          <h3>Estado de Cuenta PayPal</h3>
+          <p>Información de vinculación</p>
+        </div>
+        <div class="status-info">
+          <div class="info-row">
+            <span class="label">Estado</span>
+            <span class="status-badge" [class.verified]="paypalInfo?.verified" [class.not-linked]="!paypalInfo?.hasLinkedAccount">
+              <svg class="badge-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path *ngIf="paypalInfo?.hasLinkedAccount && paypalInfo?.verified" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                <circle *ngIf="!paypalInfo?.hasLinkedAccount || !paypalInfo?.verified" cx="12" cy="12" r="10" stroke-width="2"/>
+              </svg>
+              {{ paypalInfo?.hasLinkedAccount ? (paypalInfo?.verified ? 'Verificada' : 'Pendiente') : 'No vinculada' }}
+            </span>
+          </div>
+          <div class="info-row" *ngIf="paypalInfo?.hasLinkedAccount">
+            <span class="label">Cuenta PayPal</span>
+            <span class="value">{{ paypalInfo?.paypalEmail }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Actions Section -->
+    <div class="actions-section">
+      <div class="actions-grid">
+        
+        <!-- Link PayPal Account Button -->
+        <button 
+          *ngIf="!paypalInfo?.hasLinkedAccount"
+          class="action-button primary"
+          (click)="openLinkModal()">
+          <svg class="button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+          </svg>
+          <span>Vincular Cuenta PayPal</span>
+        </button>
+
+        <!-- Withdraw Button -->
+        <button 
+          *ngIf="paypalInfo?.hasLinkedAccount && paypalInfo?.verified"
+          class="action-button primary"
+          [disabled]="(paypalInfo?.currentBalance || 0) < (paypalInfo?.minWithdrawal || 10)"
+          (click)="openWithdrawalModal()">
+          <svg class="button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+          </svg>
+          <span>Retirar a PayPal</span>
+        </button>
+
+        <!-- Change Account Button -->
+        <button 
+          *ngIf="paypalInfo?.hasLinkedAccount"
+          class="action-button secondary"
+          (click)="openLinkModal()">
+          <svg class="button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+          <span>Cambiar Cuenta</span>
+        </button>
+
+        <!-- Disabled Withdraw Button (Insufficient Balance) -->
+        <button 
+          *ngIf="paypalInfo?.hasLinkedAccount && paypalInfo?.verified && (paypalInfo?.currentBalance || 0) < (paypalInfo?.minWithdrawal || 10)"
+          class="action-button outline"
+          disabled>
+          <svg class="button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+          <span>Balance Insuficiente</span>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Info Cards -->
+    <div class="info-cards-section">
+      <h3 class="section-title">Información de Retiros</h3>
+      <div class="info-cards-grid">
+        
+        <div class="info-card">
+          <div class="icon minimum">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <h4>Retiro Mínimo</h4>
+          <p class="value">{{ paypalInfo?.minWithdrawal || 10 }} SkillCoins</p>
+        </div>
+
+        <div class="info-card">
+          <div class="icon time">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <h4>Tiempo de Procesamiento</h4>
+          <p class="value">1-3 días hábiles</p>
+        </div>
+
+        <div class="info-card">
+          <div class="icon fee">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+            </svg>
+          </div>
+          <h4>Comisión de Plataforma</h4>
+          <p class="value">10%</p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL: Link PayPal Account -->
+  <div *ngIf="showLinkModal" class="modal-overlay" (click)="closeLinkModal()" style="display: flex !important; align-items: center !important; justify-content: center !important;">
+  <div class="modal" (click)="$event.stopPropagation()" style="display: block !important; width: 90%; max-width: 520px; background: #2A3440 !important; border: 2px solid #AAE16B !important;">
+      
+      <div class="modal-header">
+        <h2>{{ paypalInfo?.hasLinkedAccount ? 'Cambiar Cuenta PayPal' : 'Vincular Cuenta PayPal' }}</h2>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="paypal-email">Email de PayPal Business</label>
+          <input
+            type="email"
+            id="paypal-email"
+            [(ngModel)]="paypalEmailInput"
+            placeholder="tu-cuenta@business.example.com"
+            [disabled]="isLinking"
+            (keyup.enter)="linkPayPalAccount()">
+          <p class="helper-text">Asegúrate de usar una cuenta PayPal Business verificada</p>
+        </div>
+
+        <div *ngIf="linkError" class="error-message">
+          <svg class="error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span class="text">{{ linkError }}</span>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button 
+          class="modal-button cancel"
+          (click)="closeLinkModal()"
+          [disabled]="isLinking">
+          Cancelar
+        </button>
+        <button 
+          class="modal-button confirm"
+          (click)="linkPayPalAccount()"
+          [disabled]="!paypalEmailInput || isLinking">
+          {{ isLinking ? 'Vinculando...' : 'Vincular Cuenta' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL: Withdrawal -->
+  <div *ngIf="showWithdrawalModal" class="modal-overlay" (click)="closeWithdrawalModal()" style="display: flex !important; align-items: center !important; justify-content: center !important;">
+  <div class="modal" (click)="$event.stopPropagation()" style="display: block !important; width: 90%; max-width: 520px; background: #2A3440 !important; border: 2px solid #AAE16B !important;">
+      
+      <div class="modal-header">
+        <h2>Retirar a PayPal</h2>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="withdrawal-amount">Cantidad a Retirar (SkillCoins)</label>
+          <input
+            type="number"
+            id="withdrawal-amount"
+            [(ngModel)]="withdrawalAmount"
+            [min]="paypalInfo?.minWithdrawal || 10"
+            [max]="paypalInfo?.currentBalance || 0"
+            placeholder="10"
+            [disabled]="isWithdrawing"
+            (keyup.enter)="processWithdrawal()">
+          <p class="helper-text">
+            Mínimo: {{ paypalInfo?.minWithdrawal || 10 }} SkillCoins | 
+            Disponible: {{ paypalInfo?.currentBalance || 0 }} SkillCoins
+          </p>
+        </div>
+
+        <div *ngIf="withdrawalAmount && withdrawalAmount >= (paypalInfo?.minWithdrawal || 10)" class="conversion-preview">
+          <h4>Resumen del Retiro</h4>
+          <div class="breakdown">
+            <div class="breakdown-row">
+              <span class="label">SkillCoins a retirar</span>
+              <span class="value">{{ withdrawalAmount }}</span>
+            </div>
+            <div class="breakdown-row">
+              <span class="label">Valor en USD (1 SC = $0.90)</span>
+              <span class="value">${{ (withdrawalAmount * 0.90).toFixed(2) }} USD</span>
+            </div>
+            <div class="breakdown-row">
+              <span class="label negative">Comisión de plataforma (10%)</span>
+              <span class="value negative">-${{ (withdrawalAmount * 0.90 * 0.10).toFixed(2) }} USD</span>
+            </div>
+            <div class="breakdown-row">
+              <span class="label">Recibirás en PayPal</span>
+              <span class="value highlight">${{ calculateUsdAmount(withdrawalAmount) }} USD</span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="withdrawalError" class="error-message">
+          <svg class="error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span class="text">{{ withdrawalError }}</span>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button 
+          class="modal-button cancel"
+          (click)="closeWithdrawalModal()"
+          [disabled]="isWithdrawing">
+          Cancelar
+        </button>
+        <button 
+          class="modal-button confirm"
+          (click)="processWithdrawal()"
+          [disabled]="!withdrawalAmount || withdrawalAmount < (paypalInfo?.minWithdrawal || 10) || withdrawalAmount > (paypalInfo?.currentBalance || 0) || isWithdrawing">
+          {{ isWithdrawing ? 'Procesando...' : 'Confirmar Retiro' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+<div *ngIf="showSuccessModal" class="modal-overlay" (click)="closeSuccessModal()" style="display: flex !important; align-items: center !important; justify-content: center !important;">
+  <div class="modal success-modal" (click)="$event.stopPropagation()" style="display: block !important; width: 90%; max-width: 520px; background: #2A3440 !important; border: 2px solid #AAE16B !important;">
+    
+    <div class="modal-body">
+      <div class="success-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      
+      
+      <h3>{{ successDetails ? '¡Retiro Exitoso!' : '¡Operación Exitosa!' }}</h3>
+      <p>{{ successMessage }}</p>
+
+   >
+      <div *ngIf="successDetails" class="details">
+        <div class="detail-row">
+          <span class="label">Monto retirado</span>
+          <span class="value">{{ successDetails.amount }} SkillCoins</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Recibirás</span>
+          <span class="value">${{ successDetails.usdAmount }} USD</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Cuenta PayPal</span>
+          <span class="value">{{ paypalInfo?.paypalEmail }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Tiempo estimado</span>
+          <span class="value">1-3 días hábiles</span>
+        </div>
+      </div>
+
+      <button class="success-button" (click)="closeSuccessModal()">
+        Entendido
+      </button>
+    </div>
+
+  </div>
+</div>
+
+</div>

@@ -1,0 +1,167 @@
+<div class="video-call-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="loading-content">
+      <div class="spinner"></div>
+      <p>Conectando a la videollamada...</p>
+      <p *ngIf="retryCount > 0" class="retry-message">
+        Reintento {{ retryCount }}/{{ maxRetries }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!isLoading && errorMessage" class="error-container">
+    <div class="error-content">
+      <i class='bx bx-error-circle'></i>
+      <h2>Error de Conexión</h2>
+      <p>{{ errorMessage }}</p>
+      <button class="btn-primary" (click)="initializeVideoCall()">
+        Reintentar
+      </button>
+      <button class="btn-secondary" (click)="leaveCall()">
+        Volver al Dashboard
+      </button>
+    </div>
+  </div>
+
+  <!-- Video Call Active -->
+  <div *ngIf="isConnected && !errorMessage" class="video-call-active">
+
+    <!-- Session Info Badge -->
+    <div class="session-info-badge">
+      <i class='bx bx-time'></i>
+      <span class="timer">{{ sessionTimer }}</span>
+      <span class="divider">|</span>
+      <span class="session-title">Sesión #{{ sessionId }}</span>
+      <span *ngIf="videoCallData?.isModerator" class="moderator-badge">
+        <i class='bx bx-star'></i> Instructor
+      </span>
+    </div>
+
+    <!-- Recording Indicator -->
+    <div *ngIf="isRecording" class="recording-indicator">
+      <div class="recording-dot"></div>
+      <span>GRABANDO {{ recordingDuration }}</span>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="content-wrapper">
+
+      <!-- Left: Main Video -->
+      <div class="left-section">
+        <div class="main-video-container">
+          <div id="jitsi-container" class="jitsi-container"></div>
+        </div>
+      </div>
+
+      <!-- Right: Participants Sidebar -->
+      <div class="right-sidebar">
+        <div *ngFor="let participant of jitsiParticipants; let i = index" class="participant-tile"
+          [style.background]="getParticipantColor(i)">
+
+          <div [id]="'participant-video-' + participant.id" class="participant-video-container"></div>
+
+          <div class="participant-content" [class.has-video]="participant.hasVideo">
+            <span class="participant-initials" *ngIf="!participant.hasVideo">{{ participant.initials }}</span>
+            <span class="participant-label">{{ participant.displayName }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Custom Right Buttons -->
+    <div class="custom-action-buttons">
+      <button class="action-btn" title="Participantes" (click)="toggleParticipants()">
+        <i class='bx bx-group'></i>
+      </button>
+      <button class="action-btn" title="Chat" (click)="toggleChat()">
+        <i class='bx bx-message-rounded'></i>
+      </button>
+      <button class="action-btn" title="Documentos" (click)="toggleDocuments()">
+        <i class='bx bx-file'></i>
+      </button>
+      <button class="action-btn" [class.active]="showNotesPanel" title="Notas Colaborativas" (click)="toggleNotes()">
+        <i class='bx bx-note'></i>
+      </button>
+
+      <button *ngIf="videoCallData?.isModerator" class="action-btn record-btn"
+        [class.recording-active]="isRecording"
+        [title]="isRecording ? 'Detener grabación' : 'Iniciar grabación de sesión'" (click)="toggleRecording()">
+        <i class='bx bxs-circle'></i>
+      </button>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- Permission Dialog -->
+<div *ngIf="showPermissionDialog" class="permission-dialog-overlay">
+  <div class="permission-dialog">
+    <i class='bx bx-video-recording'></i>
+    <h2>Permisos Necesarios</h2>
+    <p>Para unirte a la videollamada, necesitamos acceso a:</p>
+    <ul>
+      <li><i class='bx bx-camera'></i> Cámara</li>
+      <li><i class='bx bx-microphone'></i> Micrófono</li>
+    </ul>
+    <p class="note">El navegador te pedirá permiso en breve.</p>
+  </div>
+</div>
+
+<!-- Modal: Participantes -->
+<app-participants-modal *ngIf="showParticipantsModal" [participants]="jitsiParticipants"
+  (closeModal)="closeParticipantsModal()">
+</app-participants-modal>
+
+<!-- Modal: Documentos -->
+<app-documents-modal *ngIf="showDocumentsModal" [sessionId]="sessionId"
+  [isModerator]="videoCallData?.isModerator || false" [currentUserId]="0" (closeModal)="closeDocumentsModal()">
+</app-documents-modal>
+
+
+<!-- Panel de Notas Colaborativas -->
+<div *ngIf="showNotesPanel" class="notes-panel-overlay" (click)="closeNotes()">
+  <div class="notes-panel-container" (click)="$event.stopPropagation()">
+    <div class="notes-panel-header">
+      <h3>
+        <i class='bx bx-note'></i>
+        Notas Colaborativas
+      </h3>
+      <button class="notes-close-btn" (click)="closeNotes()">
+        <i class='bx bx-x'></i>
+      </button>
+    </div>
+    <div class="notes-panel-content">
+      <app-collaborative-document [sessionId]="sessionId"></app-collaborative-document>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showCustomAlert" class="custom-alert-overlay" (click)="cancelCustomAlert()">
+  <div class="custom-alert-modal" (click)="$event.stopPropagation()" [style.border-color]="getAlertColor()">
+    <div class="custom-alert-header" [style.background]="getAlertColor()">
+      <i class='bx' [ngClass]="getAlertIcon()"></i>
+      <h3>{{ customAlertTitle }}</h3>
+    </div>
+    <div class="custom-alert-body">
+      <p [innerHTML]="getFormattedMessage()"></p>
+    </div>
+    <div class="custom-alert-actions">
+      <button class="custom-alert-btn btn-confirm" (click)="confirmCustomAlert()" [style.background]="getAlertColor()">
+        {{ customAlertConfirmText }}
+      </button>
+      <button *ngIf="customAlertCancelText" class="custom-alert-btn btn-cancel-alert" (click)="cancelCustomAlert()">
+        {{ customAlertCancelText }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showToast" class="toast-notification" [class.toast-success]="toastType === 'success'"
+  [class.toast-error]="toastType === 'error'" (click)="closeToast()">
+  <i class='bx' [ngClass]="toastType === 'success' ? 'bx-check-circle' : 'bx-error-circle'"></i>
+  <span>{{ toastMessage }}</span>
+</div>

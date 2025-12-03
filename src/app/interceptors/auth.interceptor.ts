@@ -4,7 +4,7 @@ import { AuthService } from '../services/auth.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
-  let token = authService.getToken?.() ?? localStorage.getItem('access_token');
+  let token = authService.getToken?.() ?? localStorage.getItem('authToken');
 
   // #region Rutas públicas (no añadir Authorization)
   const isPublic =
